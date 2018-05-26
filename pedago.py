@@ -48,6 +48,9 @@ class Block:
         def call(self, method, args=None):
                 for function in self.get_filter(method):
                         function(self, args)
+        # Standard hooks
+        def set_time(self, t):          self.call('set_time', t)
+        def dump    (self, dummy=None): self.call('dump', dummy)
 class Blocks(Block):
         def __init__(self):
                 self.blocks  = []
@@ -75,11 +78,11 @@ blocks = Blocks()
 blocks.append(SRC())
 blocks.append(LEX())
 
-def blocks_dump(blocks, dummy_args):
+def blocks_dump(blocks, dummy_arg):
         print('<dump>')
         for block in blocks.blocks:
                 print('\t<', block.name, 't=', block.t, '>')
-                block.call('dump')
+                block.dump(dummy_arg)
                 print('\t</', block.name, '>')
         print('</dump>')
 blocks.add_filter('dump', blocks_dump)
@@ -129,7 +132,7 @@ blocks.get('SRC').add_filter('set_time', SRC_set_time)
 
 blocks.get('SRC').call('set', '')
 blocks.get('SRC').call('set', 'a=\n9')
-blocks.call('dump')
-blocks.get('SRC').call('set_time', 0)
-blocks.call('dump')
+blocks.dump()
+blocks.get('SRC').set_time(0)
+blocks.dump()
 
