@@ -34,6 +34,8 @@ except:
 # Create framework
 ###############################################################################
 
+fontsize = 16
+
 class Item:
         def __init__(self, char='', x=0, y=0, previous_items=[], next_items=[]):
                 self.next_items     = next_items
@@ -56,6 +58,12 @@ class Item:
                 return v
         def dump(self):
                 print("\t\t{", self.long(), "}")
+        def xy(self):
+                return [2 + 0.8 * fontsize * self.x,
+                        fontsize + 1.1 * fontsize * self.y]
+        def wh(self):
+                return [len(self.char) * 0.8 * fontsize, 1.1 * fontsize]
+
 class Block:
         def __init__(self):
                 self.items          = []
@@ -130,6 +138,10 @@ def blocks_html_init(blocks, body):
                 block.html_init()
 blocks.add_filter('html_init', blocks_html_init)
 
+def blocks_html_update(blocks, body):
+        for block in blocks.blocks:
+                block.html_update()
+blocks.add_filter('html_update', blocks_html_update)
 
 
 ###############################################################################
@@ -172,11 +184,23 @@ def SRC_set_time(block, t):
 blocks.get('SRC').add_filter('set_time', SRC_set_time)
 
 def canvas_html_init(block, dummy):
-        block.element = document.createElement('DIV')
+        block.element = document.createElement('CANVAS')
+        block.element.width = 200
+        block.element.height = 200
+        block.element.style.width  = str(block.element.width) + 'px'
+        block.element.style.height = str(block.element.height) + 'px'
         block.blocks.element.appendChild(block.element)
-        block.element.innerHTML = "toto"
 blocks.get('SRC').add_filter('html_init', canvas_html_init)
 blocks.get('LEX').add_filter('html_init', canvas_html_init)
+
+def src_html_update(block, dummy):
+        c = block.element.getContext("2d")
+        c.fillStyle = "#000"
+        c.font = str(fontsize) + "px monospace"
+        for item in block.items:
+                x, y = item.xy()
+                c.fillText(item.char, x, y)
+blocks.get('SRC').add_filter('html_update', src_html_update)
 
 ###############################################################################
 # Define the LEX behavior
@@ -197,8 +221,9 @@ blocks.get('LEX').add_filter('init', LEX_init)
 
 class Lexem:
         def __init__(self, data):
-                self.name = data[0]
-                self.regexp = data[1]
+                self.name       = data[0]
+                self.regexp     = data[1]
+                self.background = data[2]
         def long(self):
                 return self.name + ':' + self.regexp
 
@@ -250,9 +275,18 @@ def LEX_set_time(block, t):
                         previous_items.append(item)
                         previous_possibles = possibles
                         previous_current = current
-        
-                        
 blocks.get('LEX').add_filter('set_time', LEX_set_time)
+
+def lex_html_update(block, dummy):
+        c = block.element.getContext("2d")
+        for item in block.items:
+                c.strokeStyle = item.lexem.background
+                x, y = item.xy()
+                w, h = item.wh()
+                c.strokeRect(x, y - h + 5, w - 3, h - 3)
+        src_html_update(block)
+blocks.get('LEX').add_filter('html_update', lex_html_update)
+
 
 
 
@@ -261,12 +295,15 @@ blocks.get('LEX').add_filter('set_time', LEX_set_time)
 ###############################################################################
 
 blocks.init()
-blocks.get('LEX').call('add_lexem', ['word', '[a-z]+'])
-blocks.get('LEX').call('add_lexem', ['number', '[-+]?[0-9]+'])
-blocks.get('LEX').call('add_lexem', ['separator', '[ \n\t]'])
-blocks.get('LEX').call('add_lexem', ['operator', '[=]'])
+blocks.get('LEX').call('add_lexem', ['word'        , '[a-zA-Z]+'   , '#0FF'])
+blocks.get('LEX').call('add_lexem', ['number'      , '[0-9]+'      , '#FF0'])
+blocks.get('LEX').call('add_lexem', ['separator'   , '[ \n\t]'     , '#000'])
+blocks.get('LEX').call('add_lexem', ['operator'    , '[-+/*]'      , '#F0F'])
+blocks.get('LEX').call('add_lexem', ['affectation' , '[=]'         , '#F00'])
+blocks.get('LEX').call('add_lexem', ['open'        , '[(]'         , '#00F'])
+blocks.get('LEX').call('add_lexem', ['close'       , '[)]'         , '#00F'])
 blocks.get('SRC').call('set', '')
-blocks.get('SRC').call('set', 'ab=\n2018')
+blocks.get('SRC').call('set', 'Ap =+42\nc=(Ap+1)/2')
 
 try:
         body = document.getElementsByTagName('BODY')[0]
@@ -275,6 +312,7 @@ except:
 
 if body:
         blocks.html_init(body)
+        blocks.html_update()
 else:
         blocks.dump()
         blocks.get('SRC').set_time(0)
