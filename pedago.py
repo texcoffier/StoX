@@ -49,8 +49,9 @@ class Block:
                 for function in self.get_filter(method):
                         function(self, args)
         # Standard hooks
-        def set_time(self, t):          self.call('set_time', t)
-        def dump    (self, dummy=None): self.call('dump', dummy)
+        def set_time(self, t):         self.call('set_time', t)
+        def dump    (self, args=None): self.call('dump', args)
+        def init    (self, args=None): self.call('init', args)
 class Blocks(Block):
         def __init__(self):
                 self.blocks  = []
@@ -87,13 +88,19 @@ def blocks_dump(blocks, dummy_arg):
         print('</dump>')
 blocks.add_filter('dump', blocks_dump)
 
+def blocks_init(blocks, dummy_arg):
+        for block in blocks.blocks:
+                block.init(dummy_arg)
+blocks.add_filter('init', blocks_init)
+
+
 ###############################################################################
 # Define the SRC behavior
 ###############################################################################
 
-def SRC_dump(src, dummy_args):
-        dump_item = src.get_filter('dumpitem')
-        for item in src.items:
+def SRC_dump(block, dummy_args):
+        dump_item = block.get_filter('dumpitem')
+        for item in block.items:
                 item.dump()
                 for function in dump_item:
                         function(item)
@@ -132,22 +139,24 @@ blocks.get('SRC').add_filter('set_time', SRC_set_time)
 # Define the LEX behavior
 ###############################################################################
 
-def LEX_dump(lex, dummy_args):
-        dump_item = lex.get_filter('dumpitem')
-        for item in lex.items:
+def LEX_dump(block, dummy_args):
+        dump_item = block.get_filter('dumpitem')
+        for item in block.items:
                 item.dump()
                 for function in dump_item:
                         function(item)
 
 blocks.get('LEX').add_filter('dump', LEX_dump)
 
+def LEX_init(block, dummy):
+        block.lexem = {}
+blocks.get('LEX').add_filter('init', LEX_init)
+
 def LEX_set_time(block, t):
         block.t = t
         items = block.previous_block.items
         for item in items:
                 pass
-        print("lex set time")
-
 blocks.get('LEX').add_filter('set_time', LEX_set_time)
 
 
@@ -156,6 +165,7 @@ blocks.get('LEX').add_filter('set_time', LEX_set_time)
 # Test
 ###############################################################################
 
+blocks.init()
 blocks.get('SRC').call('set', '')
 blocks.get('SRC').call('set', 'a=\n9')
 blocks.dump()
