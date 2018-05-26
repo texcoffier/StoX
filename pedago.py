@@ -43,6 +43,11 @@ class Blocks(Block):
                 for block in self.blocks:
                         if block.name() == name:
                                 return block
+
+###############################################################################
+# Create the blocks
+###############################################################################
+
 class SRC(Block):
         pass
 class LEX(Block):
@@ -61,6 +66,9 @@ def blocks_dump(blocks, dummy_args):
         print('</dump>')
 blocks.add_filter('dump', blocks_dump)
 
+###############################################################################
+# Define the SRC behavior
+###############################################################################
 
 def SRC_dump(src, dummy_args):
         dump_item = src.get_filter('dumpitem')
@@ -69,8 +77,6 @@ def SRC_dump(src, dummy_args):
                 for function in dump_item:
                         function(item)
 blocks.get('SRC').add_filter('dump', SRC_dump)
-
-
 
 def SRC_analyse(block, text):
         block.items = []
@@ -100,6 +106,9 @@ def SRC_set_time(block, t):
 
 blocks.get('SRC').add_filter('set_time', SRC_set_time)
 
+###############################################################################
+# Test
+###############################################################################
 
 blocks.get('SRC').call('set', '')
 blocks.get('SRC').call('set', 'a=\n9')
