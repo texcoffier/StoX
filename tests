@@ -16,7 +16,6 @@ node pedago.js >xxx-js.txt
 if cmp xxx-py.txt xxx-js.txt
 then
         echo "JavaScript output the same thing than Python"
-        cat xxx-py.txt
 else
         diff -u xxx-py.txt xxx-js.txt
 fi

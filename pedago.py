@@ -108,6 +108,7 @@ class Blocks(Block):
                 for block in self.blocks:
                         if block.name == name:
                                 return block
+        def key        (self, key):       self.call('key'        , key)
 
 ###############################################################################
 # Create the blocks
@@ -208,7 +209,6 @@ def src_html_update(block, dummy):
 blocks.get('SRC').add_filter('html_update', src_html_update)
 
 def src_draw_cursor(block, dummy):
-        block.cursor = 3
         item = Item()
         w, h = item.wh()
         if block.cursor == 0 or len(block.items) == 0:
@@ -227,6 +227,13 @@ def src_draw_cursor(block, dummy):
         c.fillRect(x - 3, y - h + 5, 3, fontsize)
 blocks.get('SRC').add_filter('draw_cursor', src_draw_cursor)
 
+def src_key(blocks, key):
+        src = blocks.get('SRC')
+        if key == 'ArrowRight':
+                src.cursor += 1
+        elif key == 'ArrowLeft':
+                src.cursor -= 1
+blocks.add_filter('key', src_key)
 
 
 ###############################################################################
@@ -338,9 +345,13 @@ except:
         body = None
 
 if body:
+        def keyevent(event):
+                event = event or window.event
+                blocks.key(event.key)
         blocks.html_init(body)
         blocks.html_update()
-        setInterval("blocks.get('SRC').draw_cursor()", 1000)
+        setInterval("blocks.get('SRC').draw_cursor()", 200)
+        window.addEventListener('keypress', keyevent, False)
 else:
         blocks.dump()
         blocks.get('SRC').set_time(0)
