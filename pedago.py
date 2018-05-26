@@ -76,15 +76,18 @@ class Block:
                 for function in self.get_filter(method):
                         function(self, args)
         # Standard hooks
-        def set_time(self, t):         self.call('set_time', t)
-        def dump    (self, args=None): self.call('dump', args)
-        def init    (self, args=None): self.call('init', args)
+        def set_time   (self, t):         self.call('set_time'   , t)
+        def dump       (self, args=None): self.call('dump'       , args)
+        def init       (self, args=None): self.call('init'       , args)
+        def html_init  (self, args=None): self.call('html_init'  , args)
+        def html_update(self, args=None): self.call('html_update', args)
 class Blocks(Block):
         def __init__(self):
                 self.blocks  = []
                 self.methods = {}
         def append(self, block):
                 self.blocks.append(block)
+                block.blocks = self
                 if len(self.blocks) > 1:
                         self.blocks[-2].next_block = block
                         block.previous_block = self.blocks[-2]
@@ -120,6 +123,14 @@ def blocks_init(blocks, dummy_arg):
                 block.init(dummy_arg)
 blocks.add_filter('init', blocks_init)
 
+def blocks_html_init(blocks, body):
+        blocks.element = document.createElement('DIV')
+        body.appendChild(blocks.element)
+        for block in blocks.blocks:
+                block.html_init()
+blocks.add_filter('html_init', blocks_html_init)
+
+
 
 ###############################################################################
 # Define the SRC behavior
@@ -152,15 +163,20 @@ def SRC_set(block, text):
         SRC_analyse(block, text)
         block.t += 1
         block.next_block.set_time(0)
-
 blocks.get('SRC').add_filter('set', SRC_set)
 
 def SRC_set_time(block, t):
         block.t = t
         SRC_analyse(block, block.history[t])
         block.next_block.set_time(0)
-
 blocks.get('SRC').add_filter('set_time', SRC_set_time)
+
+def canvas_html_init(block, dummy):
+        block.element = document.createElement('DIV')
+        block.blocks.element.appendChild(block.element)
+        block.element.innerHTML = "toto"
+blocks.get('SRC').add_filter('html_init', canvas_html_init)
+blocks.get('LEX').add_filter('html_init', canvas_html_init)
 
 ###############################################################################
 # Define the LEX behavior
@@ -251,7 +267,16 @@ blocks.get('LEX').call('add_lexem', ['separator', '[ \n\t]'])
 blocks.get('LEX').call('add_lexem', ['operator', '[=]'])
 blocks.get('SRC').call('set', '')
 blocks.get('SRC').call('set', 'ab=\n2018')
-blocks.dump()
-blocks.get('SRC').set_time(0)
-blocks.dump()
 
+try:
+        body = document.getElementsByTagName('BODY')[0]
+except:
+        body = None
+
+if body:
+        blocks.html_init(body)
+else:
+        blocks.dump()
+        blocks.get('SRC').set_time(0)
+        blocks.dump()
+        
