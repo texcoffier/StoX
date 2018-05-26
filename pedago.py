@@ -1,7 +1,27 @@
 #!/usr/bin/python3
 
+###############################################################################
+# Utilities
+###############################################################################
+
+
+###############################################################################
+# JavaScript compatibility layer
+###############################################################################
+
+try:
+        [].append(0)
+except:
+        o = Object
+        o.defineProperty(Array.prototype, 'append' ,
+                        {'enumerable': False,'value': Array.prototype.push})
+        
+###############################################################################
+# Create framework
+###############################################################################
+
 class Item:
-        def __init__(self, previous_item=(), next_item=(), char='', x=0, y=0):
+        def __init__(self, char='', x=0, y=0, previous_item=[], next_item=[]):
                 self.next_item     = next_item
                 self.previous_item = previous_item
                 self.char          = char
@@ -20,20 +40,18 @@ class Block:
                 if method in self.methods:
                         return self.methods[method]
                 else:
-                        return ()
+                        return []
         def add_filter(self, method, function):
                 if method not in self.methods:
                         self.methods[method] = []
                 self.methods[method].append(function)
-        def call(self, method, args=()):
+        def call(self, method, args=None):
                 for function in self.get_filter(method):
                         function(self, args)
-        def name(self):
-                return self.__class__.__name__
 class Blocks(Block):
         def __init__(self):
-                self.blocks = []
-                self.methods       = {}
+                self.blocks  = []
+                self.methods = {}
         def append(self, block):
                 self.blocks.append(block)
                 if len(self.blocks) > 1:
@@ -41,7 +59,7 @@ class Blocks(Block):
                         blocks.previous_block = self.blocks[-2]
         def get(self, name):
                 for block in self.blocks:
-                        if block.name() == name:
+                        if block.name == name:
                                 return block
 
 ###############################################################################
@@ -49,9 +67,9 @@ class Blocks(Block):
 ###############################################################################
 
 class SRC(Block):
-        pass
+        name = "SRC"
 class LEX(Block):
-        pass
+        name = "LEX"
 
 blocks = Blocks()
 blocks.append(SRC())
@@ -60,9 +78,9 @@ blocks.append(LEX())
 def blocks_dump(blocks, dummy_args):
         print('<dump>')
         for block in blocks.blocks:
-                print('\t<', block.name(), 't=', block.t, '>')
+                print('\t<', block.name, 't=', block.t, '>')
                 block.call('dump')
-                print('\t</', block.name(), '>')
+                print('\t</', block.name, '>')
         print('</dump>')
 blocks.add_filter('dump', blocks_dump)
 
@@ -82,7 +100,7 @@ def SRC_analyse(block, text):
         block.items = []
         x = y = 0
         for char in text:
-                block.items.append(Item(char=char, x=x, y=y))
+                block.items.append(Item(char, x, y))
                 if char == '\n':
                         x = 0
                         y += 1
@@ -100,7 +118,6 @@ def SRC_set(block, text):
 blocks.get('SRC').add_filter('set', SRC_set)
 
 def SRC_set_time(block, t):
-        assert(t < len(block.history))
         block.t = t
         SRC_analyse(block, block.history[t])
 

@@ -1,0 +1,31 @@
+#!/bin/sh
+
+if [ ! -x RapydScript/bin/rapydscript ]
+then
+        git clone https://github.com/atsepkov/RapydScript.git
+fi
+
+RapydScript/bin/rapydscript --prettify --bare pedago.py |
+sed -e 's/x.__class__.__name__/typeof(x)/'  >pedago.js
+
+ls -ls pedago.py pedago.js
+
+node pedago.js >xxx-js.txt
+./pedago.py >xxx-py.txt
+
+if cmp xxx-py.txt xxx-js.txt
+then
+        echo "JavaScript output the same thing than Python"
+        cat xxx-py.txt
+else
+        diff -u xxx-py.txt xxx-js.txt
+fi
+
+
+
+
+
+
+
+
+
