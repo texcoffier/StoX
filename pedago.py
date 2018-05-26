@@ -59,7 +59,7 @@ class Blocks(Block):
                 self.blocks.append(block)
                 if len(self.blocks) > 1:
                         self.blocks[-2].next_block = block
-                        blocks.previous_block = self.blocks[-2]
+                        block.previous_block = self.blocks[-2]
         def get(self, name):
                 for block in self.blocks:
                         if block.name == name:
@@ -117,14 +117,40 @@ def SRC_set(block, text):
         block.history.append(text)
         SRC_analyse(block, text)
         block.t += 1
+        block.next_block.set_time(0)
 
 blocks.get('SRC').add_filter('set', SRC_set)
 
 def SRC_set_time(block, t):
         block.t = t
         SRC_analyse(block, block.history[t])
+        block.next_block.set_time(0)
 
 blocks.get('SRC').add_filter('set_time', SRC_set_time)
+
+###############################################################################
+# Define the LEX behavior
+###############################################################################
+
+def LEX_dump(lex, dummy_args):
+        dump_item = lex.get_filter('dumpitem')
+        for item in lex.items:
+                item.dump()
+                for function in dump_item:
+                        function(item)
+
+blocks.get('LEX').add_filter('dump', LEX_dump)
+
+def LEX_set_time(block, t):
+        block.t = t
+        items = block.previous_block.items
+        for item in items:
+                pass
+        print("lex set time")
+
+blocks.get('LEX').add_filter('set_time', LEX_set_time)
+
+
 
 ###############################################################################
 # Test
