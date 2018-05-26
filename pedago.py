@@ -1,5 +1,8 @@
 #!/usr/bin/python3
 
+# cas pas possible, time
+# curseur et edition
+
 ###############################################################################
 # Utilities
 ###############################################################################
@@ -71,6 +74,7 @@ class Block:
                 self.next_block     = None
                 self.previous_block = None
                 self.methods        = {}
+                self.cursor         = 0
         def get_filter(self, method):
                 if method in self.methods:
                         return self.methods[method]
@@ -89,6 +93,7 @@ class Block:
         def init       (self, args=None): self.call('init'       , args)
         def html_init  (self, args=None): self.call('html_init'  , args)
         def html_update(self, args=None): self.call('html_update', args)
+        def draw_cursor(self, args=None): self.call('draw_cursor', args)
 class Blocks(Block):
         def __init__(self):
                 self.blocks  = []
@@ -202,6 +207,28 @@ def src_html_update(block, dummy):
                 c.fillText(item.char, x, y)
 blocks.get('SRC').add_filter('html_update', src_html_update)
 
+def src_draw_cursor(block, dummy):
+        block.cursor = 3
+        item = Item()
+        w, h = item.wh()
+        if block.cursor == 0 or len(block.items) == 0:
+                x, y = item.xy()
+        elif block.cursor < len(block.items):
+                x, y = block.items[block.cursor].xy()
+        else:
+                x, y = block.items[block.cursor - 1].xy()
+                x += w
+
+        c = block.element.getContext("2d")
+        c.fillStyle = "#000"
+        c.strokeStyle = "#F00"
+        c.lineWidth = 3
+        c.globalCompositeOperation = "xor"
+        c.fillRect(x - 3, y - h + 5, 3, fontsize)
+blocks.get('SRC').add_filter('draw_cursor', src_draw_cursor)
+
+
+
 ###############################################################################
 # Define the LEX behavior
 ###############################################################################
@@ -313,6 +340,7 @@ except:
 if body:
         blocks.html_init(body)
         blocks.html_update()
+        setInterval("blocks.get('SRC').draw_cursor()", 1000)
 else:
         blocks.dump()
         blocks.get('SRC').set_time(0)
