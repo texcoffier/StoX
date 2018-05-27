@@ -62,7 +62,7 @@ class Item:
         def dump(self):
                 print("\t\t{", self.long(), "}")
         def xy(self):
-                return [2 + 0.8 * fontsize * self.x,
+                return [4 + 0.8 * fontsize * self.x,
                         fontsize + 1.1 * fontsize * self.y]
         def wh(self):
                 return [len(self.char) * 0.8 * fontsize, 1.1 * fontsize]
@@ -92,7 +92,7 @@ class Block:
         def dump       (self, args=None): self.call('dump'       , args)
         def init       (self, args=None): self.call('init'       , args)
         def html_init  (self, args=None): self.call('html_init'  , args)
-        def html_update(self, args=None): self.call('html_update', args)
+        def html_draw  (self, args=None): self.call('html_draw'  , args)
         def draw_cursor(self, args=None): self.call('draw_cursor', args)
 class Blocks(Block):
         def __init__(self):
@@ -144,15 +144,19 @@ def blocks_html_init(blocks, body):
                 block.html_init()
 blocks.add_filter('html_init', blocks_html_init)
 
-def blocks_html_update(blocks, body):
+def blocks_html_draw(blocks, body):
         for block in blocks.blocks:
-                block.html_update()
-blocks.add_filter('html_update', blocks_html_update)
+                block.html_draw()
+blocks.add_filter('html_draw', blocks_html_draw)
 
 
 ###############################################################################
 # Define the SRC behavior
 ###############################################################################
+
+def SRC_init(block, dummy_args):
+        block.cursor_visible = 1
+blocks.get('SRC').add_filter('init', SRC_init)
 
 def SRC_dump(block, dummy_args):
         dump_item = block.get_filter('dumpitem')
@@ -199,14 +203,19 @@ def canvas_html_init(block, dummy):
 blocks.get('SRC').add_filter('html_init', canvas_html_init)
 blocks.get('LEX').add_filter('html_init', canvas_html_init)
 
-def src_html_update(block, dummy):
+def src_html_draw(block, dummy):
         c = block.element.getContext("2d")
+        c.fillStyle = "#FFF"
+        c.clearRect(0, 0, 10000, 10000)
         c.fillStyle = "#000"
         c.font = str(fontsize) + "px monospace"
         for item in block.items:
                 x, y = item.xy()
                 c.fillText(item.char, x, y)
-blocks.get('SRC').add_filter('html_update', src_html_update)
+        if block.cursor_visible:
+                block.draw_cursor()
+        block.cursor_visible = 1 - block.cursor_visible
+blocks.get('SRC').add_filter('html_draw', src_html_draw)
 
 def src_draw_cursor(block, dummy):
         item = Item()
@@ -223,7 +232,6 @@ def src_draw_cursor(block, dummy):
         c.fillStyle = "#000"
         c.strokeStyle = "#F00"
         c.lineWidth = 3
-        c.globalCompositeOperation = "xor"
         c.fillRect(x - 3, y - h + 5, 3, fontsize)
 blocks.get('SRC').add_filter('draw_cursor', src_draw_cursor)
 
@@ -233,6 +241,7 @@ def src_key(blocks, key):
                 src.cursor += 1
         elif key == 'ArrowLeft':
                 src.cursor -= 1
+        src.cursor_visible = 1
 blocks.add_filter('key', src_key)
 
 
@@ -311,15 +320,15 @@ def LEX_set_time(block, t):
                         previous_current = current
 blocks.get('LEX').add_filter('set_time', LEX_set_time)
 
-def lex_html_update(block, dummy):
+def lex_html_draw(block, dummy):
+        src_html_draw(block)
         c = block.element.getContext("2d")
         for item in block.items:
                 c.strokeStyle = item.lexem.background
                 x, y = item.xy()
                 w, h = item.wh()
                 c.strokeRect(x, y - h + 5, w - 3, h - 3)
-        src_html_update(block)
-blocks.get('LEX').add_filter('html_update', lex_html_update)
+blocks.get('LEX').add_filter('html_draw', lex_html_draw)
 
 
 
@@ -349,8 +358,7 @@ if body:
                 event = event or window.event
                 blocks.key(event.key)
         blocks.html_init(body)
-        blocks.html_update()
-        setInterval("blocks.get('SRC').draw_cursor()", 200)
+        setInterval("blocks.html_draw()", 300)
         window.addEventListener('keypress', keyevent, False)
 else:
         blocks.dump()
