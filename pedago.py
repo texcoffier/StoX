@@ -1,6 +1,5 @@
 #!/usr/bin/python3
 
-# curseur pas visible quand on se éplace
 # insertion/destruction texte
 # cas pas possible pour le lexer, gestion time
 
@@ -277,7 +276,7 @@ def SRC_key(blocks, key):
                         direction = 1
                 item, after = src.change_line(item, direction, after)
                 src.cursor = item.index + after
-        src.cursor_visible = 0
+        src.cursor_visible = 1
 blocks.add_filter('key', SRC_key)
 
 
@@ -402,10 +401,11 @@ if body:
         def keyevent(event):
                 event = event or window.event
                 blocks.key(event.key)
+                blocks.html_draw()
         def drawevent():
+                blocks.html_draw()
                 src = blocks.get('SRC')
                 src.cursor_visible = 1 - src.cursor_visible
-                blocks.html_draw()
 
         blocks.html_init(body)
         setInterval(drawevent, 400)
