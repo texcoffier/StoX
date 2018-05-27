@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
-# curseur (borne, haut bas, lex clignote) et edition
+# curseur pas visible quand on se éplace
+# insertion/destruction texte
 # cas pas possible pour le lexer, gestion time
 
 ###############################################################################
@@ -87,6 +88,24 @@ class Block:
         def call(self, method, args=None):
                 for function in self.get_filter(method):
                         function(self, args)
+        def change_line(self, item, direction, after):
+                line = item.y + direction
+                if line < 0:
+                        return [item, 0]
+                x = item.x + after
+                last = None
+                for i in self.items:
+                        if i.y == line:
+                                last = i
+                                if i.x >= x:
+                                        return [i, 0]
+                        elif i.y > line:
+                                return [last, 0]
+                if last:
+                        return [last, 1]
+                else:
+                        return [item, after]
+
         # Standard hooks
         def set_time   (self, t):         self.call('set_time'   , t)
         def dump       (self, args=None): self.call('dump'       , args)
@@ -245,6 +264,19 @@ def SRC_key(blocks, key):
         elif key == 'ArrowLeft':
                 if src.cursor > 0:
                         src.cursor -= 1
+        elif key == 'ArrowUp' or key == 'ArrowDown':
+                if src.cursor == len(src.items):
+                        after = 1
+                        item = src.items[-1]
+                else:
+                        after = 0
+                        item = src.items[src.cursor]
+                if key == 'ArrowUp':
+                        direction = -1
+                else:
+                        direction = 1
+                item, after = src.change_line(item, direction, after)
+                src.cursor = item.index + after
         src.cursor_visible = 0
 blocks.add_filter('key', SRC_key)
 
@@ -359,7 +391,7 @@ blocks.get('LEX').call('add_lexem', ['affectation' , '[=]'         , '#F00'])
 blocks.get('LEX').call('add_lexem', ['open'        , '[(]'         , '#00F'])
 blocks.get('LEX').call('add_lexem', ['close'       , '[)]'         , '#00F'])
 blocks.get('SRC').call('set', '')
-blocks.get('SRC').call('set', 'Ap =+42\nc=(Ap+1)/2')
+blocks.get('SRC').call('set', 'Ap =+42\nc=(Ap+1)/2\n7+8')
 
 try:
         body = document.getElementsByTagName('BODY')[0]
