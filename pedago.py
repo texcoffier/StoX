@@ -246,7 +246,11 @@ def SRC_draw_cursor(block, dummy):
         x, y = item.xy()
         w, h = item.wh()
         if right:
-                x += w
+                if item.char == '\n':
+                        y += fontsize
+                        x = Item().x + 3
+                else:
+                        x += w
         c = block.element.getContext("2d")
         c.fillStyle = "#000"
         c.strokeStyle = "#F00"
