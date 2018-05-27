@@ -218,16 +218,18 @@ def SRC_html_draw(block, dummy):
 blocks.get('SRC').add_filter('html_draw', SRC_html_draw)
 
 def SRC_draw_cursor(block, dummy):
-        item = Item()
-        w, h = item.wh()
+        right = False
         if block.cursor == 0 or len(block.items) == 0:
-                x, y = item.xy()
+                item = Item()
         elif block.cursor < len(block.items):
-                x, y = block.items[block.cursor].xy()
+                item = block.items[block.cursor]
         else:
-                x, y = block.items[block.cursor - 1].xy()
+                item = block.items[-1]
+                right = True
+        x, y = item.xy()
+        w, h = item.wh()
+        if right:
                 x += w
-
         c = block.element.getContext("2d")
         c.fillStyle = "#000"
         c.strokeStyle = "#F00"
