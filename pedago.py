@@ -171,6 +171,7 @@ def SRC_analyse(block, text):
         x = y = 0
         for char in text:
                 block.items.append(Item(char, x, y))
+                block.items[-1].index = len(block.items) - 1
                 if char == '\n':
                         x = 0
                         y += 1
@@ -214,7 +215,6 @@ def SRC_html_draw(block, dummy):
                 c.fillText(item.char, x, y)
         if block.cursor_visible:
                 block.draw_cursor()
-        block.cursor_visible = 1 - block.cursor_visible
 blocks.get('SRC').add_filter('html_draw', SRC_html_draw)
 
 def SRC_draw_cursor(block, dummy):
@@ -245,7 +245,7 @@ def SRC_key(blocks, key):
         elif key == 'ArrowLeft':
                 if src.cursor > 0:
                         src.cursor -= 1
-        src.cursor_visible = 1
+        src.cursor_visible = 0
 blocks.add_filter('key', SRC_key)
 
 
@@ -325,13 +325,22 @@ def LEX_set_time(block, t):
 blocks.get('LEX').add_filter('set_time', LEX_set_time)
 
 def LEX_html_draw(block, dummy):
-        SRC_html_draw(block)
+        src = blocks.get('SRC')
+        SRC_html_draw(block) # 'src.html_draw()' draws on SRC canvas
         c = block.element.getContext("2d")
         for item in block.items:
+                cursor = False
+                for i in item.previous_items:
+                        if i.index == src.cursor - 1:
+                                cursor = True
+                                break
                 c.strokeStyle = item.lexem.background
                 x, y = item.xy()
                 w, h = item.wh()
                 c.strokeRect(x, y - h + 5, w - 3, h - 3)
+                if cursor:
+                        c.fillStyle = item.lexem.background + '8'
+                        c.fillRect(x, y - h + 5, w - 3, h - 3)
 blocks.get('LEX').add_filter('html_draw', LEX_html_draw)
 
 
@@ -361,8 +370,13 @@ if body:
         def keyevent(event):
                 event = event or window.event
                 blocks.key(event.key)
+        def drawevent():
+                src = blocks.get('SRC')
+                src.cursor_visible = 1 - src.cursor_visible
+                blocks.html_draw()
+
         blocks.html_init(body)
-        setInterval("blocks.html_draw()", 300)
+        setInterval(drawevent, 400)
         window.addEventListener('keypress', keyevent, False)
 else:
         blocks.dump()
