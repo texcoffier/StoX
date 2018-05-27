@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
-# cas pas possible, time
-# curseur et edition
+# curseur (borne, haut bas, lex clignote) et edition
+# cas pas possible pour le lexer, gestion time
 
 ###############################################################################
 # Utilities
@@ -203,7 +203,7 @@ def canvas_html_init(block, dummy):
 blocks.get('SRC').add_filter('html_init', canvas_html_init)
 blocks.get('LEX').add_filter('html_init', canvas_html_init)
 
-def src_html_draw(block, dummy):
+def SRC_html_draw(block, dummy):
         c = block.element.getContext("2d")
         c.fillStyle = "#FFF"
         c.clearRect(0, 0, 10000, 10000)
@@ -215,9 +215,9 @@ def src_html_draw(block, dummy):
         if block.cursor_visible:
                 block.draw_cursor()
         block.cursor_visible = 1 - block.cursor_visible
-blocks.get('SRC').add_filter('html_draw', src_html_draw)
+blocks.get('SRC').add_filter('html_draw', SRC_html_draw)
 
-def src_draw_cursor(block, dummy):
+def SRC_draw_cursor(block, dummy):
         item = Item()
         w, h = item.wh()
         if block.cursor == 0 or len(block.items) == 0:
@@ -233,16 +233,18 @@ def src_draw_cursor(block, dummy):
         c.strokeStyle = "#F00"
         c.lineWidth = 3
         c.fillRect(x - 3, y - h + 5, 3, fontsize)
-blocks.get('SRC').add_filter('draw_cursor', src_draw_cursor)
+blocks.get('SRC').add_filter('draw_cursor', SRC_draw_cursor)
 
-def src_key(blocks, key):
+def SRC_key(blocks, key):
         src = blocks.get('SRC')
         if key == 'ArrowRight':
-                src.cursor += 1
+                if src.cursor < len(src.items):
+                        src.cursor += 1
         elif key == 'ArrowLeft':
-                src.cursor -= 1
+                if src.cursor > 0:
+                        src.cursor -= 1
         src.cursor_visible = 1
-blocks.add_filter('key', src_key)
+blocks.add_filter('key', SRC_key)
 
 
 ###############################################################################
@@ -320,15 +322,15 @@ def LEX_set_time(block, t):
                         previous_current = current
 blocks.get('LEX').add_filter('set_time', LEX_set_time)
 
-def lex_html_draw(block, dummy):
-        src_html_draw(block)
+def LEX_html_draw(block, dummy):
+        SRC_html_draw(block)
         c = block.element.getContext("2d")
         for item in block.items:
                 c.strokeStyle = item.lexem.background
                 x, y = item.xy()
                 w, h = item.wh()
                 c.strokeRect(x, y - h + 5, w - 3, h - 3)
-blocks.get('LEX').add_filter('html_draw', lex_html_draw)
+blocks.get('LEX').add_filter('html_draw', LEX_html_draw)
 
 
 
