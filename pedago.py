@@ -285,7 +285,9 @@ def SRC_key(blocks, key):
                 if src.cursor != len(content):
                         new_content = content[:src.cursor] + content[src.cursor+1:]
                         src.call('set', new_content)
-        elif len(key) == 1:
+        elif len(key) == 1 or key == 'Enter':
+                if key == 'Enter':
+                        key = '\n'
                 content = src.history[src.t-1]
                 new_content = content[:src.cursor] + key + content[src.cursor:]
                 src.call('set', new_content)
