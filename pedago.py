@@ -1,6 +1,5 @@
 #!/usr/bin/python3
 
-# insertion/destruction texte
 # cas pas possible pour le lexer, gestion time
 
 ###############################################################################
@@ -257,14 +256,15 @@ blocks.get('SRC').add_filter('draw_cursor', SRC_draw_cursor)
 
 def SRC_key(blocks, key):
         src = blocks.get('SRC')
+        content = src.history[src.t - 1]
         if key == 'ArrowRight':
-                if src.cursor < len(src.items):
+                if src.cursor < len(content):
                         src.cursor += 1
         elif key == 'ArrowLeft':
                 if src.cursor > 0:
                         src.cursor -= 1
         elif key == 'ArrowUp' or key == 'ArrowDown':
-                if src.cursor == len(src.items):
+                if src.cursor == len(content):
                         after = 1
                         item = src.items[-1]
                 else:
@@ -276,6 +276,22 @@ def SRC_key(blocks, key):
                         direction = 1
                 item, after = src.change_line(item, direction, after)
                 src.cursor = item.index + after
+        elif key == 'Backspace':
+                if src.cursor != 0:
+                        new_content = content[:src.cursor-1] + content[src.cursor:]
+                        src.call('set', new_content)
+                        src.cursor -= 1
+        elif key == 'Delete':
+                if src.cursor != len(content):
+                        new_content = content[:src.cursor] + content[src.cursor+1:]
+                        src.call('set', new_content)
+        elif len(key) == 1:
+                content = src.history[src.t-1]
+                new_content = content[:src.cursor] + key + content[src.cursor:]
+                src.call('set', new_content)
+                src.cursor += 1
+        else:
+                print('key=', key)
         src.cursor_visible = 1
 blocks.add_filter('key', SRC_key)
 
