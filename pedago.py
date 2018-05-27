@@ -1,6 +1,5 @@
 #!/usr/bin/python3
 
-# cas pas possible pour le lexer, gestion time
 
 ###############################################################################
 # Utilities
@@ -69,7 +68,7 @@ class Item:
 class Block:
         def __init__(self):
                 self.items          = []
-                self.t              = 0
+                self.t              = -1
                 self.next_block     = None
                 self.previous_block = None
                 self.methods        = {}
@@ -88,9 +87,13 @@ class Block:
                         function(self, args)
         def change_line(self, item, direction, after):
                 line = item.y + direction
+                if after and item.char == '\n':
+                        line += 1
+                        x = 0
+                else:
+                        x = item.x + after
                 if line < 0:
                         return [item, 0]
-                x = item.x + after
                 last = None
                 for i in self.items:
                         if i.y == line:
@@ -102,6 +105,8 @@ class Block:
                 if last:
                         return [last, 1]
                 else:
+                        if self.items[-1].char == '\n':
+                                return [self.items[-1], 1]
                         return [item, after]
 
         # Standard hooks
@@ -197,7 +202,7 @@ def SRC_analyse(block, text):
 def SRC_set(block, text):
         if not hasattr(block, 'history'):
                 block.history = []
-        if len(block.history) != block.t:
+        if len(block.history) != block.t + 1:
                 block.history = block.history[:block.t]
         block.history.append(text)
         SRC_analyse(block, text)
@@ -260,16 +265,29 @@ blocks.get('SRC').add_filter('draw_cursor', SRC_draw_cursor)
 
 def SRC_key(blocks, key):
         src = blocks.get('SRC')
-        content = src.history[src.t - 1]
+        content = src.history[src.t]
         if key == 'ArrowRight':
                 if src.cursor < len(content):
                         src.cursor += 1
         elif key == 'ArrowLeft':
                 if src.cursor > 0:
                         src.cursor -= 1
+        elif key == 'Home':
+                y = src.items[min(src.cursor, len(src.items)-1)].y
+                while src.cursor > 0 and src.items[src.cursor-1].y == y:
+                        src.cursor -= 1
+        elif key == 'End':
+                y = src.items[min(src.cursor, len(src.items)-1)].y
+                while src.cursor < len(src.items)-1 and src.items[src.cursor+1].y == y:
+                        src.cursor += 1
+                if src.cursor == len(src.items)-1 and src.items[-1].char != '\n':
+                        src.cursor += 1
         elif key == 'ArrowUp' or key == 'ArrowDown':
                 if src.cursor == len(content):
-                        after = 1
+                        if content[-1] == '\n':
+                                after = 0
+                        else:
+                                after = 1
                         item = src.items[-1]
                 else:
                         after = 0
@@ -292,7 +310,6 @@ def SRC_key(blocks, key):
         elif len(key) == 1 or key == 'Enter':
                 if key == 'Enter':
                         key = '\n'
-                content = src.history[src.t-1]
                 new_content = content[:src.cursor] + key + content[src.cursor:]
                 src.call('set', new_content)
                 src.cursor += 1
@@ -415,6 +432,54 @@ blocks.get('LEX').add_filter('html_draw', LEX_html_draw)
 # Test
 ###############################################################################
 
+def test_change_line():
+        src = blocks.get('SRC')
+        src.call('set', 'a\nab\na\n\na')
+        src.call('set', 'a\nab\na\n\na\n')
+        src.call('set', 'a\nab\na\n\na\naa\na')
+        for t in [0, 1, 2]:
+                src.set_time(t)
+                char = 0
+                tests = [
+                        [0,0, 2,0], [1,0, 3,0], [0,0, 5,0], [1,0, 6,0],
+                        [1,0, 6,0], [2,0, 7,0], [3,0, 7,0], [5,0, 8,0]
+                        ]
+                if t == 0:
+                        more = [[7,0, 8,0], [7,0, 8,1]]
+                elif t == 1:
+                        more = [[7,0, 9,1], [7,0, 9,1], [8,0, 9,1]]
+                else:
+                        more = [[7,0,10,0], [7,0,11,0], [8,0,13,0],
+                                [9,0,13,1], [9,0,13,1], [10,0,13,0],[11,0,13,1]]
+                for i in more:
+                        tests.append(i)
+                afte = 0
+                for item_before, after_before, item_after, after_after in tests:
+                        if afte:
+                                bug
+                        if char == len(src.items):
+                                afte = 1
+                                char -= 1
+                        else:
+                                afte = 0
+                        for direction, i, a in [[-1, item_before, after_before],
+                                                [ 1, item_after , after_after]]:
+                                item, after = src.change_line(src.items[char],
+                                                              direction, afte)
+                                if item.index != i or after != a:
+                                        print("t=", t,
+                                              "char=", char,
+                                              "direction=", direction,
+                                              "after=", afte)
+                                        print("expected_item=", i,
+                                              "expected_after=", a)
+                                        print("computed item=", item.index,
+                                              "computed after=", after)
+                                        zeraze
+                        char += 1
+        print('test_change_line OK')
+
+
 blocks.init()
 blocks.get('LEX').call('add_lexem', ['word'        , '[a-zA-Z]+'   , '#0FF'])
 blocks.get('LEX').call('add_lexem', ['number'      , '[0-9]+'      , '#FF0'])
@@ -423,8 +488,7 @@ blocks.get('LEX').call('add_lexem', ['operator'    , '[-+/*]'      , '#F0F'])
 blocks.get('LEX').call('add_lexem', ['affectation' , '[=]'         , '#F00'])
 blocks.get('LEX').call('add_lexem', ['open'        , '[(]'         , '#00F'])
 blocks.get('LEX').call('add_lexem', ['close'       , '[)]'         , '#00F'])
-blocks.get('SRC').call('set', '')
-blocks.get('SRC').call('set', 'Ap =+42\nc=(Ap+1)/2\n7+8')
+test_change_line()
 
 try:
         body = document.getElementsByTagName('BODY')[0]
@@ -441,11 +505,10 @@ if body:
                 src = blocks.get('SRC')
                 src.cursor_visible = 1 - src.cursor_visible
 
+        #blocks.get('SRC').call('set', 'Ap =+42\nc=(Ap+1)/2\n7+8')
         blocks.html_init(body)
         setInterval(drawevent, 400)
         window.addEventListener('keypress', keyevent, False)
 else:
-        blocks.dump()
-        blocks.get('SRC').set_time(0)
         blocks.dump()
         
