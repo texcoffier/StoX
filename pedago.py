@@ -351,6 +351,7 @@ def LEX_set_time(block, t):
                         for lexem in block.lexem:
                                 if match(lexem.regexp, current):
                                         possibles.append(lexem)
+                        item.possibles = possibles
                 if len(possibles) == 0:
                         if len(previous_possibles) == 1:
                                 block.items.append(Item(previous_current,
@@ -360,7 +361,7 @@ def LEX_set_time(block, t):
                                 block.items[-1].lexem = previous_possibles[0]
                                 current = ''
                                 previous_items = []
-                                previous_possibles = []
+                                previous_possibles = block.lexem
                                 previous_current = ''
                         else:
                                 break
@@ -376,6 +377,8 @@ def LEX_html_draw(block, dummy):
         SRC_html_draw(block) # 'src.html_draw()' draws on SRC canvas
         c = block.element.getContext("2d")
         for item in block.items:
+                if not item.lexem:
+                        continue
                 cursor = False
                 for i in item.previous_items:
                         if i.index == src.cursor - 1:
@@ -388,6 +391,15 @@ def LEX_html_draw(block, dummy):
                 if cursor:
                         c.fillStyle = item.lexem.background + '8'
                         c.fillRect(x, y - h + 5, w - 3, h - 3)
+        if src.cursor:
+                possibles = src.items[src.cursor-1].possibles
+                if possibles:
+                        last_line = src.items[-1].y + 3
+                        c.fillStyle = '#000'
+                        for y, lexem in enumerate(possibles):
+                                c.fillText(lexem.long(),
+                                           0, (y + last_line) * fontsize)
+
 blocks.get('LEX').add_filter('html_draw', LEX_html_draw)
 
 
