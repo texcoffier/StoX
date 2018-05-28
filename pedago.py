@@ -35,7 +35,7 @@ except:
 # Create framework
 ###############################################################################
 
-fontsize = 16
+fontsize = 12
 
 class Item:
         def __init__(self, char='', x=0, y=0, previous_items=[], next_items=[]):
@@ -600,7 +600,7 @@ s = ['separator', '*']
 for rule in [
         ['Program'   , [['Statement', '*']]],
         ['Statement' , [s, ['word'], s, ['affectation'], s, ['Expression']]],
-        ['Expression', [['Value'], s, ['operator'], s, ['Expression']]],
+        ['Expression', [['Expression'], s, ['operator'], s, ['Expression']]],
         ['Expression', [['open'], s, ['Expression'], s, ['close']]],
         ['Expression', [['Value']]],
         ['Value'     , [['word']]],
