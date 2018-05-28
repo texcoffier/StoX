@@ -140,10 +140,13 @@ class SRC(Block):
         name = "SRC"
 class LEX(Block):
         name = "LEX"
+class YAC(Block):
+        name = "YAC"
 
 blocks = Blocks()
 blocks.append(SRC())
 blocks.append(LEX())
+blocks.append(YAC())
 
 def blocks_dump(blocks, dummy_arg):
         print('<dump>')
@@ -219,12 +222,11 @@ blocks.get('SRC').add_filter('set_time', SRC_set_time)
 def canvas_html_init(block, dummy):
         block.element = document.createElement('CANVAS')
         block.element.width = 200
-        block.element.height = 200
+        block.element.height = 400
         block.element.style.width  = str(block.element.width) + 'px'
         block.element.style.height = str(block.element.height) + 'px'
         block.blocks.element.appendChild(block.element)
 blocks.get('SRC').add_filter('html_init', canvas_html_init)
-blocks.get('LEX').add_filter('html_init', canvas_html_init)
 
 def SRC_html_draw(block, dummy):
         c = block.element.getContext("2d")
@@ -323,6 +325,8 @@ blocks.add_filter('key', SRC_key)
 # Define the LEX behavior
 ###############################################################################
 
+blocks.get('LEX').add_filter('html_init', canvas_html_init)
+
 def LEX_dump(block, dummy_args):
         dump_item = block.get_filter('dumpitem')
         for item in block.items:
@@ -393,6 +397,7 @@ def LEX_set_time(block, t):
                         previous_items.append(item)
                         previous_possibles = possibles
                         previous_current = current
+        block.next_block.set_time(0)
 blocks.get('LEX').add_filter('set_time', LEX_set_time)
 
 def LEX_html_draw(block, dummy):
@@ -402,16 +407,16 @@ def LEX_html_draw(block, dummy):
         for item in block.items:
                 if not item.lexem:
                         continue
-                cursor = False
+                item.cursor = False
                 for i in item.previous_items:
                         if i.index == src.cursor - 1:
-                                cursor = True
+                                item.cursor = True
                                 break
                 c.strokeStyle = item.lexem.background
                 x, y = item.xy()
                 w, h = item.wh()
                 c.strokeRect(x, y - h + 5, w - 3, h - 3)
-                if cursor:
+                if item.cursor:
                         c.fillStyle = item.lexem.background + '8'
                         c.fillRect(x, y - h + 5, w - 3, h - 3)
         if src.cursor:
@@ -422,11 +427,108 @@ def LEX_html_draw(block, dummy):
                         for y, lexem in enumerate(possibles):
                                 c.fillText(lexem.long(),
                                            0, (y + last_line) * fontsize)
-
 blocks.get('LEX').add_filter('html_draw', LEX_html_draw)
 
+###############################################################################
+# Define the YAC behavior
+###############################################################################
+
+blocks.get('YAC').add_filter('dump', LEX_dump)
+blocks.get('YAC').add_filter('html_init', canvas_html_init)
+
+def YAC_init(block, dummy):
+        block.rules = {}
+        block.disabled = {}
+blocks.get('YAC').add_filter('init', YAC_init)
+
+class Rule:
+        def __init__(self, data):
+                self.lexems = []
+                for x in data:
+                        if len(x) == 1:
+                                x = [x[0], '1']
+                        self.lexems.append(x)
+        def long(self):
+                return self.name + ':' + self.lexems
+
+def YAC_update_rule(block, rule):
+        if rule[0] not in block.rules:
+                block.rules[rule[0]] = []
+        block.rules[rule[0]].append(Rule(rule[1]))
+blocks.get('YAC').add_filter('update_rule', YAC_update_rule)
 
 
+def matching(block, items, position, rule_name):
+        """Returns the Item"""
+        if rule_name == items[position].lexem.name:
+                item = Item(rule_name + ':' + items[position].char)
+                item.remaining = position + 1
+                item.previous_items = [items[position]]
+                return item
+        if rule_name not in block.rules:
+                return
+        
+        if rule_name in block.disabled:
+                return
+        block.disabled[rule_name] = True
+        try:
+                for rule in block.rules[rule_name]:
+                        i = position
+                        ok = True
+                        found = []
+                        for name, repeat in rule.lexems:
+                                while True:
+                                        match = matching(block, items, i, name)
+                                        if match:
+                                                found.append(match)
+                                                i = match.remaining
+                                                if repeat != '*':
+                                                        break
+                                        else:
+                                                if repeat != '*':
+                                                        ok = False
+                                                break
+                        if ok:
+                                match = Item(rule_name)
+                                match.remaining = i
+                                match.children = found
+                                return match
+        finally:
+                del block.disabled[rule_name]
+
+def YAC_set_time(block, t):
+        block.t = t
+        root = matching(block, block.previous_block.items, 0, 'Program')
+        if root:
+                block.items = []
+                def walk(item, x, y):
+                        item.x = x
+                        item.y = y
+                        block.items.append(item)
+                        x += 1
+                        y += 1
+                        if item.children:
+                                for child in item.children:
+                                        y = walk(child, x, y)
+                        return y
+                walk(root, 0, 0)
+                
+        else:
+                block.items = []
+blocks.get('YAC').add_filter('set_time', YAC_set_time)
+
+def YAC_html_draw(block, dummy):
+        src = blocks.get('SRC')
+        SRC_html_draw(block) # 'src.html_draw()' draws on SRC canvas
+        c = block.element.getContext("2d")
+        for item in block.items:
+                if len(item.previous_items) == 1 and item.previous_items[0].cursor:
+                        c.strokeStyle = item.previous_items[0].lexem.background
+                        x, y = item.xy()
+                        w, h = item.wh()
+                        c.strokeRect(x, y - h + 5, w - 3, h - 3)
+        
+blocks.get('YAC').add_filter('html_draw', YAC_html_draw)
 
 ###############################################################################
 # Test
@@ -488,6 +590,17 @@ blocks.get('LEX').call('add_lexem', ['operator'    , '[-+/*]'      , '#F0F'])
 blocks.get('LEX').call('add_lexem', ['affectation' , '[=]'         , '#F00'])
 blocks.get('LEX').call('add_lexem', ['open'        , '[(]'         , '#00F'])
 blocks.get('LEX').call('add_lexem', ['close'       , '[)]'         , '#00F'])
+
+s = ['separator', '*']
+for rule in [
+        ['Program'   , [['Statement', '*']]],
+        ['Statement' , [s, ['word'], s, ['affectation'], s, ['Expression']]],
+        ['Expression', [['Expression'], s, ['operator'], s, ['Expression']]],
+        ['Expression', [['open'], s, ['Expression'], s, ['close']]],
+        ['Expression', [['word']]],
+        ['Expression', [['number']]],
+]:
+        blocks.get('YAC').call('update_rule', rule)
 test_change_line()
 
 try:
@@ -505,7 +618,7 @@ if body:
                 src = blocks.get('SRC')
                 src.cursor_visible = 1 - src.cursor_visible
 
-        #blocks.get('SRC').call('set', 'Ap =+42\nc=(Ap+1)/2\n7+8')
+        blocks.get('SRC').call('set', 'a=4\nb=a+5+1')
         blocks.html_init(body)
         setInterval(drawevent, 400)
         window.addEventListener('keypress', keyevent, False)
