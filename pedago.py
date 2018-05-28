@@ -510,11 +510,16 @@ def YAC_set_time(block, t):
                         item.x = x
                         item.y = y
                         block.items.append(item)
-                        x += 1
-                        y += 1
-                        if item.children:
-                                for child in item.children:
-                                        y = walk(child, x, y)
+                        if item.children and len(item.children) == 1:
+                                child = item.children[0]
+                                x += len(item.char) * 0.8
+                                y = walk(child, x, y)
+                        else:
+                                x += 1
+                                y += 1
+                                if item.children:
+                                        for child in item.children:
+                                                y = walk(child, x, y)
                         return y
                 walk(root, 0, 0)
                 
