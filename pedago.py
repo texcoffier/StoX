@@ -439,27 +439,33 @@ blocks.get('YAC').add_filter('html_init', canvas_html_init)
 def YAC_init(block, dummy):
         block.rules = {}
         block.disabled = {}
+        block.rule_id = 0
 blocks.get('YAC').add_filter('init', YAC_init)
 
 class Rule:
-        def __init__(self, data):
+        def __init__(self, data, rule_id):
+                self.id = rule_id
                 self.lexems = []
                 for x in data:
                         if len(x) == 1:
                                 x = [x[0], '1']
                         self.lexems.append(x)
         def long(self):
-                return self.name + ':' + self.lexems
+                return self.lexems
 
 def YAC_update_rule(block, rule):
         if rule[0] not in block.rules:
                 block.rules[rule[0]] = []
-        block.rules[rule[0]].append(Rule(rule[1]))
+        block.rules[rule[0]].append(Rule(rule[1], block.rule_id))
+        block.rule_id += 1
 blocks.get('YAC').add_filter('update_rule', YAC_update_rule)
 
 
 def matching(block, items, position, rule_name):
         """Returns the Item"""
+        #print("\t\t\t\t\t\t"[:position+1], rule_name, items[position].lexem.name)
+        if position == len(items):
+                return
         if rule_name == items[position].lexem.name:
                 item = Item(rule_name + ':' + items[position].char)
                 item.remaining = position + 1
@@ -467,34 +473,33 @@ def matching(block, items, position, rule_name):
                 return item
         if rule_name not in block.rules:
                 return
-        
-        if rule_name in block.disabled:
-                return
-        block.disabled[rule_name] = True
-        try:
-                for rule in block.rules[rule_name]:
-                        i = position
-                        ok = True
-                        found = []
-                        for name, repeat in rule.lexems:
-                                while True:
-                                        match = matching(block, items, i, name)
-                                        if match:
-                                                found.append(match)
-                                                i = match.remaining
-                                                if repeat != '*':
-                                                        break
-                                        else:
-                                                if repeat != '*':
-                                                        ok = False
+        for rule in block.rules[rule_name]:
+                if block.disabled[rule.id] == position:
+                        continue
+                block.disabled[rule.id] = position
+                i = position
+                ok = True
+                found = []
+                for name, repeat in rule.lexems:
+                        while True:
+                                match = matching(block, items, i, name)
+                                if match:
+                                        found.append(match)
+                                        i = match.remaining
+                                        if repeat != '*':
                                                 break
-                        if ok:
-                                match = Item(rule_name)
-                                match.remaining = i
-                                match.children = found
-                                return match
-        finally:
-                del block.disabled[rule_name]
+                                else:
+                                        if repeat != '*':
+                                                ok = False
+                                        break
+                        if not ok:
+                                break
+                del block.disabled[rule.id]
+                if ok:
+                        match = Item(rule_name)
+                        match.remaining = i
+                        match.children = found
+                        return match
 
 def YAC_set_time(block, t):
         block.t = t
@@ -595,13 +600,14 @@ s = ['separator', '*']
 for rule in [
         ['Program'   , [['Statement', '*']]],
         ['Statement' , [s, ['word'], s, ['affectation'], s, ['Expression']]],
-        ['Expression', [['Expression'], s, ['operator'], s, ['Expression']]],
+        ['Expression', [['Value'], s, ['operator'], s, ['Expression']]],
         ['Expression', [['open'], s, ['Expression'], s, ['close']]],
-        ['Expression', [['word']]],
-        ['Expression', [['number']]],
+        ['Expression', [['Value']]],
+        ['Value'     , [['word']]],
+        ['Value'     , [['number']]],
 ]:
         blocks.get('YAC').call('update_rule', rule)
-test_change_line()
+#test_change_line()
 
 try:
         body = document.getElementsByTagName('BODY')[0]
@@ -618,7 +624,7 @@ if body:
                 src = blocks.get('SRC')
                 src.cursor_visible = 1 - src.cursor_visible
 
-        blocks.get('SRC').call('set', 'a=4\nb=a+5+1')
+        blocks.get('SRC').call('set', 'a=(4)+3+2+1')
         blocks.html_init(body)
         setInterval(drawevent, 400)
         window.addEventListener('keypress', keyevent, False)
