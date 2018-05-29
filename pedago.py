@@ -5,7 +5,6 @@
 ###############################################################################
 
 
-
 ###############################################################################
 # JavaScript compatibility layer
 ###############################################################################
@@ -41,6 +40,7 @@ class Item:
                 self.char           = char
                 self.x              = x
                 self.y              = y
+                self.color          = "#000"
                 for i in previous_items:
                         i.next_items = [self]
         def short(self):
@@ -240,10 +240,10 @@ def SRC_html_draw(block, dummy):
         c = block.element.getContext("2d")
         c.fillStyle = "#FFF"
         c.clearRect(0, 0, 10000, 10000)
-        c.fillStyle = "#000"
         c.font = str(block.fontsize) + "px monospace"
         for item in block.items:
                 x, y = item.xy()
+                c.fillStyle = item.color
                 c.fillText(item.char, x, y)
         if block.cursor_visible:
                 block.draw_cursor()
@@ -504,21 +504,22 @@ def rule_apply(block, items, rule_name):
                 after.append(items[position])
                 position += 1
 
-def yac_walk(block, item, x, y, depth):
+def yac_walk(block, item, x, y, depth, color):
         item.x = x
         item.y = y
+        item.color = color
         block.append(item)
         if len(item.children) == 1:
                 child = item.children[0]
                 x += len(item.char) * 0.85
-                y = yac_walk(block, child, x, y, depth)
+                y = yac_walk(block, child, x, y, depth, color)
         else:
                 depth += 1
                 x = 2 * depth
                 y += 1
                 if item.children:
                         for child in item.children:
-                                y = yac_walk(block, child, x, y, depth)
+                                y = yac_walk(block, child, x, y, depth, color)
         return y
 
 def YAC_set_time(block, t):
@@ -528,6 +529,7 @@ def YAC_set_time(block, t):
                 item = Item(i.char)
                 item.rule = i.lexem.name
                 item.children = []
+                item.previous_items = [i]
                 items.append(item)
         change = True
         while change:
@@ -540,8 +542,11 @@ def YAC_set_time(block, t):
                                 change = True
                                 break
         block.items = []
+        y = 0
+        color = "#000"
         for root in items:
-                yac_walk(block, root, 0, 0, 0)
+                y = yac_walk(block, root, 0, y, 0, color)
+                color = "#F00"
 blocks.get('YAC').add_filter('set_time', YAC_set_time)
 
 def YAC_html_draw(block, dummy):
@@ -554,7 +559,6 @@ def YAC_html_draw(block, dummy):
                         x, y = item.xy()
                         w, h = item.wh()
                         c.strokeRect(x, y - h + 5, w - 3, h - 3)
-        
 blocks.get('YAC').add_filter('html_draw', YAC_html_draw)
 
 ###############################################################################
