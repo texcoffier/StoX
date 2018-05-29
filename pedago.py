@@ -605,16 +605,19 @@ def test_change_line():
 
 
 blocks.init()
-blocks.get('LEX').call('add_lexem', ['word'        , '[a-zA-Z]+'   , '#0FF'])
-blocks.get('LEX').call('add_lexem', ['number'      , '[0-9]+'      , '#FF0'])
-blocks.get('LEX').call('add_lexem', ['separator'   , '[ \n\t]'     , '#000'])
-blocks.get('LEX').call('add_lexem', ['plus'        , '[+]'         , '#F0F'])
-blocks.get('LEX').call('add_lexem', ['minus'       , '[-]'         , '#F0F'])
-blocks.get('LEX').call('add_lexem', ['star'        , '[*]'         , '#F0F'])
-blocks.get('LEX').call('add_lexem', ['slash'       , '[/]'         , '#F0F'])
-blocks.get('LEX').call('add_lexem', ['affectation' , '[=]'         , '#F00'])
-blocks.get('LEX').call('add_lexem', ['open'        , '[(]'         , '#00F'])
-blocks.get('LEX').call('add_lexem', ['close'       , '[)]'         , '#00F'])
+for lexem in [
+                ['word'        , '[a-zA-Z]+'   , '#0FF'],
+                ['number'      , '[0-9]+'      , '#FF0'],
+                ['separator'   , '[ \n\t]'     , '#000'],
+                ['plus'        , '[+]'         , '#F0F'],
+                ['minus'       , '[-]'         , '#F0F'],
+                ['star'        , '[*]'         , '#F0F'],
+                ['slash'       , '[/]'         , '#F0F'],
+                ['affectation' , '[=]'         , '#F00'],
+                ['open'        , '[(]'         , '#00F'],
+                ['close'       , '[)]'         , '#00F']
+        ]:
+        blocks.get('LEX').call('add_lexem', lexem)
 
 s = ['separator', '*']
 for rule in [
