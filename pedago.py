@@ -1,6 +1,5 @@
 #!/usr/bin/python3
 
-
 ###############################################################################
 # Utilities
 ###############################################################################
@@ -485,7 +484,8 @@ def matching(block, items, position, rule_name):
         if rule_name not in block.rules:
                 return
         for rule in block.rules[rule_name]:
-                if block.disabled[rule.id] == position:
+                if (rule.id in block.disabled
+                    and block.disabled[rule.id] == position):
                         continue
                 block.disabled[rule.id] = position
                 i = position
@@ -608,7 +608,10 @@ blocks.init()
 blocks.get('LEX').call('add_lexem', ['word'        , '[a-zA-Z]+'   , '#0FF'])
 blocks.get('LEX').call('add_lexem', ['number'      , '[0-9]+'      , '#FF0'])
 blocks.get('LEX').call('add_lexem', ['separator'   , '[ \n\t]'     , '#000'])
-blocks.get('LEX').call('add_lexem', ['operator'    , '[-+/*]'      , '#F0F'])
+blocks.get('LEX').call('add_lexem', ['plus'        , '[+]'         , '#F0F'])
+blocks.get('LEX').call('add_lexem', ['minus'       , '[-]'         , '#F0F'])
+blocks.get('LEX').call('add_lexem', ['star'        , '[*]'         , '#F0F'])
+blocks.get('LEX').call('add_lexem', ['slash'       , '[/]'         , '#F0F'])
 blocks.get('LEX').call('add_lexem', ['affectation' , '[=]'         , '#F00'])
 blocks.get('LEX').call('add_lexem', ['open'        , '[(]'         , '#00F'])
 blocks.get('LEX').call('add_lexem', ['close'       , '[)]'         , '#00F'])
@@ -619,17 +622,27 @@ for rule in [
         ['Statement'  , [['Affectation']]],
         ['Affectation', [s, ['word'], s, ['affectation'], s, ['Expression']]],
         ['Expression' , [['Binary']]],
-        ['Expression' , [['Group']]],
         ['Expression' , [['Value']]],
-        ['Binary'     , [['Expression'], s, ['operator'], s, ['Expression']]],
+        ['Binary'     , [['Expression'], s, ['Operator'], s, ['Expression']]],
         ['Group'      , [['open'], s, ['Expression'], s, ['close']]],
+        ['Unary'      , [['plus'], s, ['Value']]],
+        ['Unary'      , [['minus'], s, ['Value']]],
         ['Value'      , [['Variable']]],
         ['Value'      , [['Number']]],
+        ['Value'      , [['Unary']]],
+        ['Value'      , [['Group']]],
         ['Variable'   , [['word']]],
-        ['Number'     , [['number']]],
+        ['Number'     , [['Positive']]],
+        ['Number'     , [['Negative']]],
+        ['Positive'   , [['number']]],
+        ['Negative'   , [['minus'], ['number']]],
+        ['Operator'   , [['plus']]],
+        ['Operator'   , [['minus']]],
+        ['Operator'   , [['star']]],
+        ['Operator'   , [['slash']]],
 ]:
         blocks.get('YAC').call('update_rule', rule)
-#test_change_line()
+test_change_line()
 
 try:
         body = document.getElementsByTagName('BODY')[0]
@@ -646,7 +659,7 @@ if body:
                 src = blocks.get('SRC')
                 src.cursor_visible = 1 - src.cursor_visible
 
-        blocks.get('SRC').call('set', 'a=(4)+2+1\nc=d')
+        blocks.get('SRC').call('set', 'a=5-6+-7--8++9')
         blocks.html_init(body)
         setInterval(drawevent, 400)
         window.addEventListener('keypress', keyevent, False)
