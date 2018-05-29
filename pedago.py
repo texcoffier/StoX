@@ -35,8 +35,6 @@ except:
 # Create framework
 ###############################################################################
 
-fontsize = 12
-
 class Item:
         def __init__(self, char='', x=0, y=0, previous_items=[], next_items=[]):
                 self.next_items     = next_items
@@ -60,10 +58,11 @@ class Item:
         def dump(self):
                 print("\t\t{", self.long(), "}")
         def xy(self):
-                return [4 + 0.8 * fontsize * self.x,
-                        fontsize + 1.1 * fontsize * self.y]
+                return [4 + 0.8 * self.block.fontsize * self.x,
+                        self.block.fontsize + 1.1 * self.block.fontsize * self.y]
         def wh(self):
-                return [len(self.char) * 0.8 * fontsize, 1.1 * fontsize]
+                return [len(self.char) * 0.8 * self.block.fontsize,
+                        1.1 * self.block.fontsize]
 
 class Block:
         def __init__(self):
@@ -73,6 +72,9 @@ class Block:
                 self.previous_block = None
                 self.methods        = {}
                 self.cursor         = 0
+                self.fontsize       = 12
+                self.empty          = Item()
+                self.empty.block    = self
         def get_filter(self, method):
                 if method in self.methods:
                         return self.methods[method]
@@ -116,6 +118,14 @@ class Block:
         def html_init  (self, args=None): self.call('html_init'  , args)
         def html_draw  (self, args=None): self.call('html_draw'  , args)
         def draw_cursor(self, args=None): self.call('draw_cursor', args)
+        
+        def append(self, item):
+                item.index = len(self.items)
+                self.items.append(item)
+                item.block = self
+                self.call('append', item)
+                return item
+
 class Blocks(Block):
         def __init__(self):
                 self.blocks  = []
@@ -195,8 +205,7 @@ def SRC_analyse(block, text):
         block.items = []
         x = y = 0
         for char in text:
-                block.items.append(Item(char, x, y))
-                block.items[-1].index = len(block.items) - 1
+                block.append(Item(char, x, y))
                 if char == '\n':
                         x = 0
                         y += 1
@@ -233,7 +242,7 @@ def SRC_html_draw(block, dummy):
         c.fillStyle = "#FFF"
         c.clearRect(0, 0, 10000, 10000)
         c.fillStyle = "#000"
-        c.font = str(fontsize) + "px monospace"
+        c.font = str(block.fontsize) + "px monospace"
         for item in block.items:
                 x, y = item.xy()
                 c.fillText(item.char, x, y)
@@ -244,7 +253,7 @@ blocks.get('SRC').add_filter('html_draw', SRC_html_draw)
 def SRC_draw_cursor(block, dummy):
         right = False
         if block.cursor == 0 or len(block.items) == 0:
-                item = Item()
+                item = block.empty
         elif block.cursor < len(block.items):
                 item = block.items[block.cursor]
         else:
@@ -254,15 +263,15 @@ def SRC_draw_cursor(block, dummy):
         w, h = item.wh()
         if right:
                 if item.char == '\n':
-                        y += fontsize
-                        x = Item().x + 3
+                        y += block.fontsize
+                        x = block.empty.xy()[0] + 3
                 else:
                         x += w
         c = block.element.getContext("2d")
         c.fillStyle = "#000"
         c.strokeStyle = "#F00"
         c.lineWidth = 3
-        c.fillRect(x - 3, y - h + 5, 3, fontsize)
+        c.fillRect(x - 3, y - h + 5, 3, block.fontsize)
 blocks.get('SRC').add_filter('draw_cursor', SRC_draw_cursor)
 
 def SRC_key(blocks, key):
@@ -381,11 +390,11 @@ def LEX_set_time(block, t):
                         item.possibles = possibles
                 if len(possibles) == 0:
                         if len(previous_possibles) == 1:
-                                block.items.append(Item(previous_current
-                                                         .replace('\n', '\\n'),
-                                                        previous_items[0].x,
-                                                        previous_items[0].y,
-                                                        previous_items))
+                                block.append(Item(previous_current
+                                                        .replace('\n', '\\n'),
+                                                  previous_items[0].x,
+                                                  previous_items[0].y,
+                                                  previous_items))
                                 block.items[-1].lexem = previous_possibles[0]
                                 current = ''
                                 previous_items = []
@@ -427,7 +436,7 @@ def LEX_html_draw(block, dummy):
                         c.fillStyle = '#000'
                         for y, lexem in enumerate(possibles):
                                 c.fillText(lexem.long(),
-                                           0, (y + last_line) * fontsize)
+                                           0, (y + last_line) * block.fontsize)
 blocks.get('LEX').add_filter('html_draw', LEX_html_draw)
 
 ###############################################################################
@@ -441,6 +450,7 @@ def YAC_init(block, dummy):
         block.rules = {}
         block.disabled = {}
         block.rule_id = 0
+        block.fontsize = 8
 blocks.get('YAC').add_filter('init', YAC_init)
 
 class Rule:
@@ -510,7 +520,7 @@ def YAC_set_time(block, t):
                 def walk(item, x, y, depth):
                         item.x = x
                         item.y = y
-                        block.items.append(item)
+                        block.append(item)
                         if item.children and len(item.children) == 1:
                                 child = item.children[0]
                                 x += len(item.char) * 0.8
