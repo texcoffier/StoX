@@ -221,8 +221,8 @@ blocks.get('SRC').add_filter('set_time', SRC_set_time)
 
 def canvas_html_init(block, dummy):
         block.element = document.createElement('CANVAS')
-        block.element.width = 200
-        block.element.height = 400
+        block.element.width = 300
+        block.element.height = 500
         block.element.style.width  = str(block.element.width) + 'px'
         block.element.style.height = str(block.element.height) + 'px'
         block.blocks.element.appendChild(block.element)
@@ -381,7 +381,8 @@ def LEX_set_time(block, t):
                         item.possibles = possibles
                 if len(possibles) == 0:
                         if len(previous_possibles) == 1:
-                                block.items.append(Item(previous_current,
+                                block.items.append(Item(previous_current
+                                                         .replace('\n', '\\n'),
                                                         previous_items[0].x,
                                                         previous_items[0].y,
                                                         previous_items))
@@ -467,7 +468,7 @@ def matching(block, items, position, rule_name):
         if position == len(items):
                 return
         if rule_name == items[position].lexem.name:
-                item = Item(rule_name + ':' + items[position].char)
+                item = Item('«' + items[position].char + '»')
                 item.remaining = position + 1
                 item.previous_items = [items[position]]
                 return item
@@ -506,22 +507,23 @@ def YAC_set_time(block, t):
         root = matching(block, block.previous_block.items, 0, 'Program')
         if root:
                 block.items = []
-                def walk(item, x, y):
+                def walk(item, x, y, depth):
                         item.x = x
                         item.y = y
                         block.items.append(item)
                         if item.children and len(item.children) == 1:
                                 child = item.children[0]
                                 x += len(item.char) * 0.8
-                                y = walk(child, x, y)
+                                y = walk(child, x, y, depth)
                         else:
-                                x += 1
+                                depth += 1
+                                x = depth
                                 y += 1
                                 if item.children:
                                         for child in item.children:
-                                                y = walk(child, x, y)
+                                                y = walk(child, x, y, depth)
                         return y
-                walk(root, 0, 0)
+                walk(root, 0, 0, 0)
                 
         else:
                 block.items = []
@@ -603,13 +605,18 @@ blocks.get('LEX').call('add_lexem', ['close'       , '[)]'         , '#00F'])
 
 s = ['separator', '*']
 for rule in [
-        ['Program'   , [['Statement', '*']]],
-        ['Statement' , [s, ['word'], s, ['affectation'], s, ['Expression']]],
-        ['Expression', [['Expression'], s, ['operator'], s, ['Expression']]],
-        ['Expression', [['open'], s, ['Expression'], s, ['close']]],
-        ['Expression', [['Value']]],
-        ['Value'     , [['word']]],
-        ['Value'     , [['number']]],
+        ['Program'    , [['Statement', '*']]],
+        ['Statement'  , [['Affectation']]],
+        ['Affectation', [s, ['word'], s, ['affectation'], s, ['Expression']]],
+        ['Expression' , [['Binary']]],
+        ['Expression' , [['Group']]],
+        ['Expression' , [['Value']]],
+        ['Binary'     , [['Expression'], s, ['operator'], s, ['Expression']]],
+        ['Group'      , [['open'], s, ['Expression'], s, ['close']]],
+        ['Value'      , [['Variable']]],
+        ['Value'      , [['Number']]],
+        ['Variable'   , [['word']]],
+        ['Number'     , [['number']]],
 ]:
         blocks.get('YAC').call('update_rule', rule)
 #test_change_line()
@@ -629,7 +636,7 @@ if body:
                 src = blocks.get('SRC')
                 src.cursor_visible = 1 - src.cursor_visible
 
-        blocks.get('SRC').call('set', 'a=(4)+3+2+1')
+        blocks.get('SRC').call('set', 'a=(4)+2+1\nc=d')
         blocks.html_init(body)
         setInterval(drawevent, 400)
         window.addEventListener('keypress', keyevent, False)
