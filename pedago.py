@@ -614,16 +614,9 @@ def ast_apply(block, item):
         if item.lex:
                 return item.char
         if item.char in block.rules:
-                transform = block.rules[item.char]
-                if transform:
-                        return transform(block, item)
-                else:
-                        return ast_apply(block, item.children[0])
+                return block.rules[item.char](block, item)
         else:
-                node = [item.char]
-                for child in item.children:
-                        node.append(ast_apply(block, child))
-                return node
+                return ast_apply(block, item.children[0])
 
 def AST_set_time(block, t):
         block.t = t
@@ -742,7 +735,7 @@ def test_ast():
                         print("computed:", nice)
                         print(yac_nice(blocks.get('YAC').items[0]))
                         bug
-        print("test_yac OK")
+        print("test_ast OK")
 
 blocks.init()
 for lexem in [
@@ -836,17 +829,22 @@ def ast_affectation(block, item):
                 child[0].children[0].char,
                 ast_apply(block, child[1])]
 
+def ast_program(block, item):
+        t = ['Program']
+        for child in ast_children(item):
+                t.append(ast_apply(block, child))
+        return t
+
 def ast_group(block, item):
         return ast_apply(block, ast_children(item)[1])
 
 for rule in [
         ['Affectation', ast_affectation],
-        ['Statement', None],
         ['Unary', ast_unary],
         ['Binary', ast_binary],
         ['Value', ast_value],
         ['Group', ast_group],
-        ['Expression', None],
+        ['Program', ast_program],
         ]:
         blocks.get('AST').call('update_rule', rule)
 
