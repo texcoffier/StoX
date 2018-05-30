@@ -627,12 +627,15 @@ def AST_set_time(block, t):
         if len(block.previous_block.items):
                 block.ast = ast_apply(block, block.previous_block.items[0])
                 block.items = []
+                yac_walk(block, block.ast, 0, 0, 0, "#000")
                 
 blocks.get('AST').add_filter('set_time', AST_set_time)
 
 def AST_update_rule(block, rule):
         block.rules[rule[0]] = rule[1]
 blocks.get('AST').add_filter('update_rule', AST_update_rule)
+
+blocks.get('AST').add_filter('html_draw', YAC_html_draw)
 
 ###############################################################################
 # Test
