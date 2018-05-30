@@ -161,11 +161,14 @@ class LEX(Block):
         name = "LEX"
 class YAC(Block):
         name = "YAC"
+class AST(Block):
+        name = "AST"
 
 blocks = Blocks()
 blocks.append(SRC())
 blocks.append(LEX())
 blocks.append(YAC())
+blocks.append(AST())
 
 def blocks_dump(blocks, dummy_arg):
         print('<dump>')
@@ -474,7 +477,6 @@ def YAC_update_rule(block, rule):
         block.rules.append(Rule(rule[0], rule[1]))
 blocks.get('YAC').add_filter('update_rule', YAC_update_rule)
 
-
 def rule_match(items, position, rule):
         for name, repeat in rule.lexems:
                 if position == len(items):
@@ -501,6 +503,7 @@ def rule_apply(block, items, rule):
                 match = Item(rule.name)
                 match.rule = rule.name
                 match.children = items[position:p]
+                match.lex = False
                 after.append(match)
                 position = p
                 while position < len(items):
@@ -547,6 +550,7 @@ def YAC_set_time(block, t):
                 item.rule = i.lexem.name
                 item.children = []
                 item.previous_items = [i]
+                item.lex = True
                 items.append(item)
         change = True
         while change:
@@ -566,6 +570,7 @@ def YAC_set_time(block, t):
         for root in items:
                 y = yac_walk(block, root, 0, y, 0, color)
                 color = "#F00"
+        block.next_block.set_time(0)
 blocks.get('YAC').add_filter('set_time', YAC_set_time)
 
 def YAC_html_draw_lines(item, ctx, x, y):
@@ -592,6 +597,43 @@ def YAC_html_draw(block, dummy):
                         item.fillRect(c)
         YAC_html_draw_lines(block.items[0], c, 0, 0)
 blocks.get('YAC').add_filter('html_draw', YAC_html_draw)
+
+###############################################################################
+# Define the AST behavior
+###############################################################################
+
+blocks.get('AST').add_filter('dump', LEX_dump)
+blocks.get('AST').add_filter('html_init', canvas_html_init)
+
+def AST_init(block, dummy):
+        block.rules = {}
+blocks.get('AST').add_filter('init', AST_init)
+
+
+def ast_apply(block, item):
+        if item.lex:
+                return item.char
+        if item.char in block.rules:
+                transform = block.rules[item.char]
+                if transform:
+                        return transform(block, item)
+                else:
+                        return ast_apply(block, item.children[0])
+        else:
+                node = [item.char]
+                for child in item.children:
+                        node.append(ast_apply(block, child))
+                return node
+
+def AST_set_time(block, t):
+        block.t = t
+        if len(block.previous_block.items):
+                block.ast = ast_apply(block, block.previous_block.items[0])
+blocks.get('AST').add_filter('set_time', AST_set_time)
+
+def AST_update_rule(block, rule):
+        block.rules[rule[0]] = rule[1]
+blocks.get('AST').add_filter('update_rule', AST_update_rule)
 
 ###############################################################################
 # Test
@@ -671,6 +713,37 @@ def test_yac():
                         bug
         print("test_yac OK")
 
+def test_ast():
+        for input, output in [
+['a=1'          , "[Program,[=,a,[Value,1]]]"],
+['a=+1'         , "[Program,[=,a,[Value,1]]]"],
+['a=-1'         , "[Program,[=,a,[-,[Value,1]]]]"],
+['a=1+2'        , "[Program,[=,a,[+,[Value,1],[Value,2]]]]"],
+['a=1+2*3'      , "[Program,[=,a,[+,[Value,1],[*,[Value,2],[Value,3]]]]]"],
+['a=++1'        , "[Program,[=,a,[Value,1]]]"],
+['a=1++2'       , "[Program,[=,a,[+,[Value,1],[Value,2]]]]"],
+['a=1+2+3'      , "[Program,[=,a,[+,[+,[Value,1],[Value,2]],[Value,3]]]]"],
+['a=1+2+3+4'    , "[Program,[=,a,[+,[+,[+,[Value,1],[Value,2]],[Value,3]],[Value,4]]]]"],
+['a=2*+3+4'     , "[Program,[=,a,[+,[*,[Value,2],[Value,3]],[Value,4]]]]"],
+['a=2*+3/4'     , "[Program,[=,a,[/,[*,[Value,2],[Value,3]],[Value,4]]]]"],
+['a=1*2+3*4'    , "[Program,[=,a,[+,[*,[Value,1],[Value,2]],[*,[Value,3],[Value,4]]]]]"],
+['a=+1*+2++3*+4', "[Program,[=,a,[+,[*,[Value,1],[Value,2]],[*,[Value,3],[Value,4]]]]]"],
+['a=-(1)'       , "[Program,[=,a,[-,[Value,1]]]]"],
+['a=(1+2)*(3+4)', "[Program,[=,a,[*,[+,[Value,1],[Value,2]],[+,[Value,3],[Value,4]]]]]"],
+[' a = 5 ', '[Program,[=,a,[Value,5]]]'],
+[' a = ( 1 * 3 ) + 5 ', '[Program,[=,a,[+,[*,[Value,1],[Value,3]],[Value,5]]]]'],
+        ]:
+                blocks.get('SRC').call('set', input)
+                nice = repr(blocks.get('AST').ast
+                        ).replace("'","").replace(" ","")
+                if nice != output:
+                        print("input:", input)
+                        print("expected:", output)
+                        print("computed:", nice)
+                        print(yac_nice(blocks.get('YAC').items[0]))
+                        bug
+        print("test_yac OK")
+
 blocks.init()
 for lexem in [
                 ['word'        , '[a-zA-Z]+'   , '#0FF'],
@@ -711,8 +784,75 @@ for rule in [
         ['Program'    , [['Statement', '*']]],
 ]:
         blocks.get('YAC').call('update_rule', rule)
+
+def ast_children(item):
+        #print(' '.join('(' + i.rule + ')' for i in item.children))
+        return [i for i in item.children if i.rule != 'separator']
+
+def ast_value(block, item):
+        if item.children[0].lex:
+                return ['Value', item.children[0].char]
+        else:
+                return ast_apply(block, item.children[0])
+
+def ast_unary(block, item):
+        child = ast_children(item)
+        if len(child) == 2:
+                node = ast_apply(block, child[1])
+                if child[0].char == '-':
+                        return [child[0].char, node]
+                else:
+                        return node
+        else:
+                bug
+                c = ast_unary_to_expression(child[0])
+                return [c[0], [child[1].char, c[1], ast_apply(block, child[2])]]
+
+def ast_unary_operation(block, item):
+        child = ast_children(item)
+        if len(child) == 2:
+                return [child[0].char, ast_apply(block, child[1])]
+        else:
+                operation, tree = ast_unary_operation(block, child[0])
+                return [operation, [child[1].char, tree, ast_apply(block, child[2])]]
+
+def ast_binary(block, item):
+        child = ast_children(item)
+        if len(child) == 3:
+                return [child[1].char,
+                        ast_apply(block, child[0]),
+                        ast_apply(block, child[2])
+                        ]
+        else:
+                operation, tree = ast_unary_operation(block, child[1])
+                return [operation,
+                        ast_apply(block, child[0]),
+                        tree
+                        ]
+
+def ast_affectation(block, item):
+        child = ast_children(item)
+        return ['=',
+                child[0].children[0].char,
+                ast_apply(block, child[1])]
+
+def ast_group(block, item):
+        return ast_apply(block, ast_children(item)[1])
+
+for rule in [
+        ['Affectation', ast_affectation],
+        ['Statement', None],
+        ['Unary', ast_unary],
+        ['Binary', ast_binary],
+        ['Value', ast_value],
+        ['Group', ast_group],
+        ['Expression', None],
+        ]:
+        blocks.get('AST').call('update_rule', rule)
+
 test_change_line()
 test_yac()
+test_ast()
 
 try:
         body = document.getElementsByTagName('BODY')[0]
