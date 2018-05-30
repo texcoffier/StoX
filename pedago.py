@@ -57,11 +57,20 @@ class Item:
         def dump(self):
                 print("\t\t{", self.long(), "}")
         def xy(self):
-                return [4 + 0.8 * self.block.fontsize * self.x,
-                        self.block.fontsize + 1.1 * self.block.fontsize * self.y]
+                return [4 + 0.9 * self.block.fontsize * self.x,
+                        self.block.fontsize
+                        + self.block.line_spacing * self.block.fontsize * self.y]
         def wh(self):
                 return [len(self.char) * 0.8 * self.block.fontsize,
-                        1.1 * self.block.fontsize]
+                        self.block.fontsize]
+        def strokeRect(self, ctx):
+                x, y = self.xy()
+                w, h = self.wh()
+                ctx.strokeRect(x - 1, y - h + 1, w, h + 2)
+        def fillRect(self, ctx):
+                x, y = self.xy()
+                w, h = self.wh()
+                ctx.fillRect(x - 1, y - h + 1, w, h + 2)
 
 class Block:
         def __init__(self):
@@ -72,6 +81,7 @@ class Block:
                 self.methods        = {}
                 self.cursor         = 0
                 self.fontsize       = 12
+                self.line_spacing   = 1.3
                 self.empty          = Item()
                 self.empty.block    = self
         def get_filter(self, method):
@@ -270,7 +280,7 @@ def SRC_draw_cursor(block, dummy):
         c.fillStyle = "#000"
         c.strokeStyle = "#F00"
         c.lineWidth = 3
-        c.fillRect(x - 3, y - h + 5, 3, block.fontsize)
+        c.fillRect(x - 3, y - h, 3, block.fontsize + 2)
 blocks.get('SRC').add_filter('draw_cursor', SRC_draw_cursor)
 
 def SRC_key(blocks, key):
@@ -422,12 +432,10 @@ def LEX_html_draw(block, dummy):
                                 item.cursor = True
                                 break
                 c.strokeStyle = item.lexem.background
-                x, y = item.xy()
-                w, h = item.wh()
-                c.strokeRect(x, y - h + 5, w - 3, h - 3)
+                item.strokeRect(c)
                 if item.cursor:
                         c.fillStyle = item.lexem.background + '8'
-                        c.fillRect(x, y - h + 5, w - 3, h - 3)
+                        item.fillRect(c)
         if src.cursor:
                 possibles = src.items[src.cursor-1].possibles
                 if possibles:
@@ -449,6 +457,7 @@ def YAC_init(block, dummy):
         block.rules = {}
         block.ordered_rules = []
         block.fontsize = 8
+        block.line_spacing = 1
 blocks.get('YAC').add_filter('init', YAC_init)
 
 class Rule:
@@ -515,7 +524,7 @@ def yac_walk(block, item, x, y, depth, color):
                 y = yac_walk(block, child, x, y, depth, color)
         else:
                 depth += 1
-                x = 2 * depth
+                x = 1.5 * depth
                 y += 1
                 if item.children:
                         for child in item.children:
@@ -549,16 +558,29 @@ def YAC_set_time(block, t):
                 color = "#F00"
 blocks.get('YAC').add_filter('set_time', YAC_set_time)
 
+def YAC_html_draw_lines(item, ctx, x, y):
+        x2, y2 = item.xy()
+        if y2 != y:
+                if y != 0:
+                        fs = item.block.fontsize / 2
+                        ctx.beginPath()
+                        ctx.moveTo(x + fs, y + 1)
+                        ctx.lineTo(x + fs, y2 - fs)
+                        ctx.lineTo(x2 - 1, y2 - fs)
+                        ctx.stroke()
+                x, y = x2, y2
+        for child in item.children:
+                YAC_html_draw_lines(child, ctx, x, y)
+
 def YAC_html_draw(block, dummy):
         src = blocks.get('SRC')
         SRC_html_draw(block) # 'src.html_draw()' draws on SRC canvas
         c = block.element.getContext("2d")
         for item in block.items:
                 if len(item.previous_items) == 1 and item.previous_items[0].cursor:
-                        c.strokeStyle = item.previous_items[0].lexem.background
-                        x, y = item.xy()
-                        w, h = item.wh()
-                        c.strokeRect(x, y - h + 5, w - 3, h - 3)
+                        c.fillStyle = item.previous_items[0].lexem.background + '8'
+                        item.fillRect(c)
+        YAC_html_draw_lines(block.items[0], c, 0, 0)
 blocks.get('YAC').add_filter('html_draw', YAC_html_draw)
 
 ###############################################################################
@@ -630,13 +652,9 @@ for lexem in [
 
 s = ['separator', '*']
 for rule in [
-        ['Var='       , [['word'], s, ['affectation']]],
-        ['Operator'   , [['plus']]],
-        ['Operator'   , [['minus']]],
-        ['Operator'   , [['star']]],
-        ['Operator'   , [['slash']]],
-        ['Positive'   , [['number']]],
+        ['Var=Value'  , [['word'], s, ['affectation']]],
         ['Negative'   , [['minus'], ['number']]],
+        ['Positive'   , [['number']]],
         ['Number'     , [['Positive']]],
         ['Number'     , [['Negative']]],
         ['Variable'   , [['word']]],
@@ -644,13 +662,16 @@ for rule in [
         ['Value'      , [['Number']]],
         ['Value'      , [['Unary']]],
         ['Value'      , [['Group']]],
-        ['Unary'      , [['plus'], s, ['Value']]],
-        ['Unary'      , [['minus'], s, ['Value']]],
         ['Group'      , [['open'], s, ['Expression'], s, ['close']]],
         ['Expression' , [['Binary']]],
         ['Expression' , [['Value']]],
-        ['Binary'     , [['Expression'], s, ['Operator'], s, ['Expression']]],
-        ['Affectation', [s, ['Var='], s, ['Expression']]],
+        ['Unary'      , [['plus'], s, ['Value']]],
+        ['Unary'      , [['minus'], s, ['Value']]],
+        ['Binary'     , [['Expression'], s, ['plus'], s, ['Expression']]],
+        ['Binary'     , [['Expression'], s, ['minus'], s, ['Expression']]],
+        ['Binary'     , [['Expression'], s, ['star'], s, ['Expression']]],
+        ['Binary'     , [['Expression'], s, ['slash'], s, ['Expression']]],
+        ['Affectation', [s, ['Var=Value'], s, ['Expression']]],
         ['Statement'  , [['Affectation']]],
         ['Program'    , [['Statement', '*']]],
 ]:
