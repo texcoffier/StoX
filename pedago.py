@@ -592,9 +592,11 @@ def YAC_html_draw(block, dummy):
         SRC_html_draw(block) # 'src.html_draw()' draws on SRC canvas
         c = block.element.getContext("2d")
         for item in block.items:
+                item.cursor = False
                 if len(item.previous_items) == 1 and item.previous_items[0].cursor:
                         c.fillStyle = item.previous_items[0].lexem.background + '8'
                         item.fillRect(c)
+                        item.cursor = True
         YAC_html_draw_lines(block.items[0], c, 0, 0)
 blocks.get('YAC').add_filter('html_draw', YAC_html_draw)
 
@@ -609,18 +611,13 @@ def AST_init(block, dummy):
         block.rules = {}
 blocks.get('AST').add_filter('init', AST_init)
 
-
 def ast_apply(block, item):
         if item.lex:
-                item = Item(item.char)
-                item.children = []
-                return item
+                return AST_item(item)
         if item.char in block.rules:
                 return block.rules[item.char](block, item)
         else:
                 return ast_apply(block, item.children[0])
-
-
 
 def AST_set_time(block, t):
         block.t = t
@@ -802,6 +799,7 @@ def AST_item(previous, name=None, children=[]):
         ast_item = Item(name or previous.char)
         ast_item.children = children
         if previous:
+                previous.lexem = Lexem(['','','#F00'])
                 ast_item.previous_items = [previous]
         return ast_item
 
@@ -824,7 +822,7 @@ def ast_unary(block, item):
 def ast_unary_operation(block, item):
         child = ast_children(item)
         if len(child) == 2:
-                return [child[0].char, ast_apply(block, child[1])]
+                return [AST_item(child[0]), ast_apply(block, child[1])]
         else:
                 operation, tree = ast_unary_operation(block, child[0])
                 return [operation, AST_item(child[1], None,
@@ -837,11 +835,12 @@ def ast_binary(block, item):
                                   ast_apply(block, child[2])])
         else:
                 operation, tree = ast_unary_operation(block, child[1])
-                return AST_item(item, operation, [ast_apply(block, child[0]), tree])
+                operation.children = [ast_apply(block, child[0]), tree]
+                return operation
 
 def ast_affectation(block, item):
         child = ast_children(item)
-        return AST_item(item, '=',
+        return AST_item(child[0].children[1], '=',
                 [AST_item(child[0].children[0]), ast_apply(block, child[1])])
 
 def ast_program(block, item):
