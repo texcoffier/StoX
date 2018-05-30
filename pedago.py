@@ -526,6 +526,19 @@ def yac_walk(block, item, x, y, depth, color):
                                 y = yac_walk(block, child, x, y, depth, color)
         return y
 
+
+def yac_nice(item):
+        if len(item.children) == 0:
+                return item.char
+        if len(item.children) == 1:
+                return yac_nice(item.children[0])
+        if item.char == 'Unary' and len(item.children) == 2:
+                return item.children[0].char + yac_nice(item.children[1])
+        s = '(' + item.char[0]
+        for i in item.children:
+                s += ' ' + yac_nice(i)
+        return s + ')'
+
 def YAC_set_time(block, t):
         block.t = t
         items = []
@@ -541,8 +554,10 @@ def YAC_set_time(block, t):
                 for rule in block.rules:
                         new_items = rule_apply(block, items, rule)
                         if new_items:
-                                #print(' '.join(i.rule for i in items))
                                 items = new_items
+                                ###################
+                                #print(' '.join(i.rule for i in items))
+                                ###################
                                 change = True
                                 break
         block.items = []
@@ -629,6 +644,32 @@ def test_change_line():
                         char += 1
         print('test_change_line OK')
 
+def test_yac():
+        for input, output in [
+['a=1'          ,'(A (V a =) 1)'],
+['a=+1'         ,'(A (V a =) +1)'],
+['a=-1'         ,'(A (V a =) -1)'],
+['a=1+2'        ,'(A (V a =) (B 1 +2))'],
+['a=1+2*3'      ,'(A (V a =) (B 1 (U +2 * 3)))'],
+['a=++1'        ,'(A (V a =) ++1)'],
+['a=1++2'       , '(A (V a =) (B 1 ++2))'],
+['a=1+2+3'      , '(A (V a =) (B (B 1 +2) +3))'],
+['a=1+2+3+4'    , '(A (V a =) (B (B (B 1 +2) +3) +4))'],
+['a=2*+3+4'     ,  '(A (V a =) (B (B 2 * +3) +4))'],
+['a=2*+3/4'     ,  '(A (V a =) (B (B 2 * +3) / 4))'],
+['a=1*2+3*4'    ,  '(A (V a =) (B (B 1 * 2) (U +3 * 4)))'],
+['a=+1*+2++3*+4', '(A (V a =) (B (B +1 * +2) +(B +3 * +4)))'],
+['a=-(1)'       , '(A (V a =) -(G ( 1 )))'],
+['a=(1+2)*(3+4)', '(A (V a =) (B (G ( (B 1 +2) )) * (G ( (B 3 +4) ))))'],
+        ]:
+                blocks.get('SRC').call('set', input)
+                nice = yac_nice(blocks.get('YAC').items[0])
+                if nice != output:
+                        print("input:", input)
+                        print("expected:", output)
+                        print("computed:", nice)
+                        bug
+        print("test_yac OK")
 
 blocks.init()
 for lexem in [
@@ -653,23 +694,25 @@ for rule in [
         ['Value'      , [['number']]],
         ['Value'      , [['Group']]],
         ['Group'      , [['open'], s, ['Expression'], s, ['close']]],
-        ['Unary'      , [['plus'], s, ['Value']]],
-        ['Unary'      , [['minus'], s, ['Value']]],
+        ['Binary'     , [['Expression'], s, ['star'] , s, ['Unary']]],
+        ['Binary'     , [['Expression'], s, ['slash'], s, ['Unary']]],
+        ['Unary'      , [['plus'], s, ['Expression']]],
+        ['Unary'      , [['minus'], s, ['Expression']]],
+        ['Unary'      , [['Unary']     , s, ['star'] , s, ['Value']]],
+        ['Unary'      , [['Unary']     , s, ['slash'] , s, ['Value']]],
+        ['Binary'     , [['Expression'], s, ['star'] , s, ['Value']]],
+        ['Binary'     , [['Expression'], s, ['slash'], s, ['Value']]],
+        ['Binary'     , [['Expression'], s, ['Unary']]],
         ['Expression' , [['Binary']]],
         ['Expression' , [['Value']]],
-        ['Binary'     , [['Expression'], s, ['Unary']]],
-        ['Binary'     , [['Expression'], s, ['plus'], s, ['Expression']]],
-        ['Binary'     , [['Expression'], s, ['minus'], s, ['Expression']]],
-        ['Binary'     , [['Expression'], s, ['star'], s, ['Expression']]],
-        ['Binary'     , [['Expression'], s, ['slash'], s, ['Expression']]],
         ['Value'      , [['Unary']]],
         ['Affectation', [s, ['Variable='], s, ['Expression']]],
         ['Statement'  , [['Affectation']]],
         ['Program'    , [['Statement', '*']]],
 ]:
         blocks.get('YAC').call('update_rule', rule)
-#test_change_line()
-blocks.get('SRC').call('set', 'a=1+2+3+4')
+test_change_line()
+test_yac()
 
 try:
         body = document.getElementsByTagName('BODY')[0]
