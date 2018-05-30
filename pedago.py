@@ -612,16 +612,22 @@ blocks.get('AST').add_filter('init', AST_init)
 
 def ast_apply(block, item):
         if item.lex:
-                return item.char
+                item = Item(item.char)
+                item.children = []
+                return item
         if item.char in block.rules:
                 return block.rules[item.char](block, item)
         else:
                 return ast_apply(block, item.children[0])
 
+
+
 def AST_set_time(block, t):
         block.t = t
         if len(block.previous_block.items):
                 block.ast = ast_apply(block, block.previous_block.items[0])
+                block.items = []
+                
 blocks.get('AST').add_filter('set_time', AST_set_time)
 
 def AST_update_rule(block, rule):
@@ -706,6 +712,15 @@ def test_yac():
                         bug
         print("test_yac OK")
 
+def ast_nice(item):
+        if len(item.children) == 0:
+                return item.char
+        s = '[' + item.char
+        for child in item.children:
+                s += ',' + ast_nice(child)
+        s += ']'
+        return s
+
 def test_ast():
         for input, output in [
 ['a=1'          , "[Program,[=,a,[Value,1]]]"],
@@ -727,8 +742,7 @@ def test_ast():
 [' a = ( 1 * 3 ) + 5 ', '[Program,[=,a,[+,[*,[Value,1],[Value,3]],[Value,5]]]]'],
         ]:
                 blocks.get('SRC').call('set', input)
-                nice = repr(blocks.get('AST').ast
-                        ).replace("'","").replace(" ","")
+                nice = ast_nice(blocks.get('AST').ast)
                 if nice != output:
                         print("input:", input)
                         print("expected:", output)
@@ -784,7 +798,11 @@ def ast_children(item):
 
 def ast_value(block, item):
         if item.children[0].lex:
-                return ['Value', item.children[0].char]
+                value = Item(item.children[0].char)
+                value.children = []
+                item = Item('Value')
+                item.children = [value]
+                return item
         else:
                 return ast_apply(block, item.children[0])
 
@@ -793,13 +811,12 @@ def ast_unary(block, item):
         if len(child) == 2:
                 node = ast_apply(block, child[1])
                 if child[0].char == '-':
-                        return [child[0].char, node]
+                        value = Item(child[0].char)
+                        value.children = [node]
+                        return value
                 else:
                         return node
-        else:
-                bug
-                c = ast_unary_to_expression(child[0])
-                return [c[0], [child[1].char, c[1], ast_apply(block, child[2])]]
+        bug
 
 def ast_unary_operation(block, item):
         child = ast_children(item)
@@ -807,33 +824,39 @@ def ast_unary_operation(block, item):
                 return [child[0].char, ast_apply(block, child[1])]
         else:
                 operation, tree = ast_unary_operation(block, child[0])
-                return [operation, [child[1].char, tree, ast_apply(block, child[2])]]
+                value = Item(child[1].char)
+                value.children = [tree, ast_apply(block, child[2])]
+                return [operation, value]
 
 def ast_binary(block, item):
         child = ast_children(item)
         if len(child) == 3:
-                return [child[1].char,
-                        ast_apply(block, child[0]),
-                        ast_apply(block, child[2])
-                        ]
+                value = Item(child[1].char)
+                value.children = [ast_apply(block, child[0]),
+                                  ast_apply(block, child[2])]
+                return value
         else:
                 operation, tree = ast_unary_operation(block, child[1])
-                return [operation,
-                        ast_apply(block, child[0]),
-                        tree
-                        ]
+                value = Item(operation)
+                value.children = [ast_apply(block, child[0]), tree]
+                return value
 
 def ast_affectation(block, item):
         child = ast_children(item)
-        return ['=',
-                child[0].children[0].char,
-                ast_apply(block, child[1])]
+        value = Item('=')
+        variable = Item(child[0].children[0].char)
+        variable.children = []
+        value.children = [variable,
+                          ast_apply(block, child[1])]
+        return value
 
 def ast_program(block, item):
-        t = ['Program']
+        t = []
         for child in ast_children(item):
                 t.append(ast_apply(block, child))
-        return t
+        value = Item('Program')
+        value.children = t
+        return value
 
 def ast_group(block, item):
         return ast_apply(block, ast_children(item)[1])
