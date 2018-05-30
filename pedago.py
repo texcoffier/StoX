@@ -607,6 +607,16 @@ blocks.get('YAC').add_filter('html_draw', YAC_html_draw)
 blocks.get('AST').add_filter('dump', LEX_dump)
 blocks.get('AST').add_filter('html_init', canvas_html_init)
 
+def AST_item(previous, name=None, children=[]):
+        ast_item = Item(name or previous.char)
+        ast_item.children = children
+        if len(previous.previous_items):
+                previous.lexem = previous.previous_items[0].lexem
+        else:
+                previous.lexem = Lexem(['','','#000'])
+        ast_item.previous_items = [previous]
+        return ast_item
+
 def AST_init(block, dummy):
         block.rules = {}
 blocks.get('AST').add_filter('init', AST_init)
@@ -794,14 +804,6 @@ for rule in [
 
 def ast_children(item):
         return [i for i in item.children if i.rule != 'separator']
-
-def AST_item(previous, name=None, children=[]):
-        ast_item = Item(name or previous.char)
-        ast_item.children = children
-        if previous:
-                previous.lexem = Lexem(['','','#F00'])
-                ast_item.previous_items = [previous]
-        return ast_item
 
 def ast_value(block, item):
         if item.children[0].lex:
