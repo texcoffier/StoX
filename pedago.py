@@ -454,27 +454,24 @@ blocks.get('YAC').add_filter('dump', LEX_dump)
 blocks.get('YAC').add_filter('html_init', canvas_html_init)
 
 def YAC_init(block, dummy):
-        block.rules = {}
-        block.ordered_rules = []
+        block.rules = []
         block.fontsize = 8
         block.line_spacing = 1
 blocks.get('YAC').add_filter('init', YAC_init)
 
 class Rule:
-        def __init__(self, data):
+        def __init__(self, name, data):
+                self.name = name
                 self.lexems = []
                 for x in data:
                         if len(x) == 1:
                                 x = [x[0], '1']
                         self.lexems.append(x)
         def long(self):
-                return self.lexems
+                return self.name + ':' + self.lexems
 
 def YAC_update_rule(block, rule):
-        if rule[0] not in block.rules:
-                block.ordered_rules.append(rule[0])
-                block.rules[rule[0]] = []
-        block.rules[rule[0]].append(Rule(rule[1]))
+        block.rules.append(Rule(rule[0], rule[1]))
 blocks.get('YAC').add_filter('update_rule', YAC_update_rule)
 
 
@@ -491,27 +488,25 @@ def rule_match(items, position, rule):
                         position += 1
         return position
 
-def rule_apply(block, items, rule_name):
+def rule_apply(block, items, rule):
         """Returns the Item"""
         position = 0
         after = []
         while position < len(items):
-                ok = False
-                for rule in block.rules[rule_name]:
-                        p = rule_match(items, position, rule)
-                        if p is False or position == p:
-                                continue
-                        match = Item(rule_name)
-                        match.rule = rule_name
-                        match.children = items[position:p]
-                        after.append(match)
-                        position = p
-                        while position < len(items):
-                                after.append(items[position])
-                                position += 1
-                        return after
-                after.append(items[position])
-                position += 1
+                p = rule_match(items, position, rule)
+                if p is False or position == p:
+                        after.append(items[position])
+                        position += 1
+                        continue
+                match = Item(rule.name)
+                match.rule = rule.name
+                match.children = items[position:p]
+                after.append(match)
+                position = p
+                while position < len(items):
+                        after.append(items[position])
+                        position += 1
+                return after
 
 def yac_walk(block, item, x, y, depth, color):
         item.x = x
@@ -543,8 +538,8 @@ def YAC_set_time(block, t):
         change = True
         while change:
                 change = False
-                for rule_name in block.ordered_rules:
-                        new_items = rule_apply(block, items, rule_name)
+                for rule in block.rules:
+                        new_items = rule_apply(block, items, rule)
                         if new_items:
                                 #print(' '.join(i.rule for i in items))
                                 items = new_items
@@ -652,26 +647,23 @@ for lexem in [
 
 s = ['separator', '*']
 for rule in [
-        ['Var=Value'  , [['word'], s, ['affectation']]],
-        ['Negative'   , [['minus'], ['number']]],
-        ['Positive'   , [['number']]],
-        ['Number'     , [['Positive']]],
-        ['Number'     , [['Negative']]],
+        ['Variable='  , [['word'], s, ['affectation']]],
         ['Variable'   , [['word']]],
         ['Value'      , [['Variable']]],
-        ['Value'      , [['Number']]],
-        ['Value'      , [['Unary']]],
+        ['Value'      , [['number']]],
         ['Value'      , [['Group']]],
         ['Group'      , [['open'], s, ['Expression'], s, ['close']]],
-        ['Expression' , [['Binary']]],
-        ['Expression' , [['Value']]],
         ['Unary'      , [['plus'], s, ['Value']]],
         ['Unary'      , [['minus'], s, ['Value']]],
+        ['Expression' , [['Binary']]],
+        ['Expression' , [['Value']]],
+        ['Binary'     , [['Expression'], s, ['Unary']]],
         ['Binary'     , [['Expression'], s, ['plus'], s, ['Expression']]],
         ['Binary'     , [['Expression'], s, ['minus'], s, ['Expression']]],
         ['Binary'     , [['Expression'], s, ['star'], s, ['Expression']]],
         ['Binary'     , [['Expression'], s, ['slash'], s, ['Expression']]],
-        ['Affectation', [s, ['Var=Value'], s, ['Expression']]],
+        ['Value'      , [['Unary']]],
+        ['Affectation', [s, ['Variable='], s, ['Expression']]],
         ['Statement'  , [['Affectation']]],
         ['Program'    , [['Statement', '*']]],
 ]:
