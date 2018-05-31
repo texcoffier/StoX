@@ -5,13 +5,13 @@ then
         git clone https://github.com/atsepkov/RapydScript.git
 fi
 
-RapydScript/bin/rapydscript --prettify --bare pedago.py |
-sed -e 's/x.__class__.__name__/typeof(x)/'  >pedago.js
+RapydScript/bin/rapydscript --prettify --bare xxx.py |
+sed -e 's/x.__class__.__name__/typeof(x)/'  >xxx.js
 
-ls -ls pedago.py pedago.js
+ls -ls xxx.py xxx.js
 
-node pedago.js >xxx-js.txt
-./pedago.py >xxx-py.txt
+node xxx.js >xxx-js.txt
+python3 xxx.py >xxx-py.txt
 
 if cmp xxx-py.txt xxx-js.txt
 then
