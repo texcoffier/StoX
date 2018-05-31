@@ -252,7 +252,7 @@ blocks.get('SRC').add_filter('set_time', SRC_set_time)
 
 def canvas_html_init(block, dummy):
         block.element = document.createElement('CANVAS')
-        block.element.width = 300
+        block.element.width = 200
         block.element.height = 500
         block.element.style.width  = str(block.element.width) + 'px'
         block.element.style.height = str(block.element.height) + 'px'
@@ -575,7 +575,11 @@ def YAC_set_time(block, t):
                         if new_items:
                                 items = new_items
                                 ###################
+                                ###################
+                                ###################
                                 #print(' '.join(i.rule for i in items))
+                                ###################
+                                ###################
                                 ###################
                                 change = True
                                 break
@@ -755,7 +759,7 @@ def test_yac():
 ['a=2*+3+4'     ,  '(A (V a =) (B (B 2 * +3) +4))'],
 ['a=2*+3/4'     ,  '(A (V a =) (B (B 2 * +3) / 4))'],
 ['a=1*2+3*4'    ,  '(A (V a =) (B (B 1 * 2) (U +3 * 4)))'],
-['a=+1*+2++3*+4', '(A (V a =) (B (B +1 * +2) +(B +3 * +4)))'],
+['a=+1*+2++3*+4', '(A (V a =) (B (U +1 * +2) +(U +3 * +4)))'],
 ['a=-(1)'       , '(A (V a =) -(G ( 1 )))'],
 ['a=(1+2)*(3+4)', '(A (V a =) (B (G ( (B 1 +2) )) * (G ( (B 3 +4) ))))'],
         ]:
@@ -796,6 +800,7 @@ def test_ast():
 ['a=(1+2)*(3+4)', "[Program,[=,a,[*,[+,[Value,1],[Value,2]],[+,[Value,3],[Value,4]]]]]"],
 [' a = 5 ', '[Program,[=,a,[Value,5]]]'],
 [' a = ( 1 * 3 ) + 5 ', '[Program,[=,a,[+,[*,[Value,1],[Value,3]],[Value,5]]]]'],
+['a=1+2/+3', '[Program,[=,a,[+,[Value,1],[/,[Value,2],[Value,3]]]]]'],
         ]:
                 blocks.get('SRC').call('set', input)
                 nice = ast_nice(blocks.get('AST').ast)
@@ -829,18 +834,20 @@ for rule in [
         ['Value'      , [['Variable']]],
         ['Value'      , [['number']]],
         ['Value'      , [['Group']]],
+        ['Expression' , [['Value']]],
         ['Group'      , [['open'], s, ['Expression'], s, ['close']]],
         ['Binary'     , [['Expression'], s, ['star'] , s, ['Unary']]],
         ['Binary'     , [['Expression'], s, ['slash'], s, ['Unary']]],
         ['Unary'      , [['plus'], s, ['Expression']]],
         ['Unary'      , [['minus'], s, ['Expression']]],
-        ['Unary'      , [['Unary']     , s, ['star'] , s, ['Value']]],
-        ['Unary'      , [['Unary']     , s, ['slash'] , s, ['Value']]],
-        ['Binary'     , [['Expression'], s, ['star'] , s, ['Value']]],
-        ['Binary'     , [['Expression'], s, ['slash'], s, ['Value']]],
+        ['Unary'      , [['Unary']     , s, ['star'] , s, ['Expression']]],
+        ['Unary'      , [['Unary']     , s, ['slash'] , s, ['Expression']]],
+        ['Unary'      , [['Unary']     , s, ['star'] , s, ['Unary']]],
+        ['Unary'      , [['Unary']     , s, ['slash'] , s, ['Unary']]],
+        ['Binary'     , [['Expression'], s, ['star'] , s, ['Expression']]],
+        ['Binary'     , [['Expression'], s, ['slash'], s, ['Expression']]],
         ['Binary'     , [['Expression'], s, ['Unary']]],
         ['Expression' , [['Binary']]],
-        ['Expression' , [['Value']]],
         ['Value'      , [['Unary']]],
         ['Affectation', [s, ['Variable='], s, ['Expression']]],
         ['Statement'  , [['Affectation']]],
@@ -868,6 +875,10 @@ def ast_unary(block, item):
                         return AST_item(child[0], None, [node])
                 else:
                         return node
+        if len(child) == 3:
+                return AST_item(child[1], None,
+                                 [ast_apply(block, child[0]),
+                                  ast_apply(block, child[2])])
         bug
 
 def ast_unary_operation(block, item):
@@ -975,6 +986,7 @@ for rule in [
         ["/", asm_divide],
         ]:
         blocks.get('ASM').call('update_rule', rule)
+
 
 test_change_line()
 test_yac()
