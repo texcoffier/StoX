@@ -900,8 +900,10 @@ def ast_binary(block, item):
 
 def ast_affectation(block, item):
         child = ast_children(item)
-        return AST_item(child[0].children[1], '=',
+        item = AST_item(child[0].children[-1], '=',
                 [AST_item(child[0].children[0]), ast_apply(block, child[1])])
+        item.previous_items = child[0].children
+        return item
 
 def ast_program(block, item):
         t = []
@@ -1000,7 +1002,7 @@ if body:
                 src = blocks.get('SRC')
                 src.cursor_visible = 1 - src.cursor_visible
 
-        blocks.get('SRC').call('set', 'a=1+2+3+4+5+6+7+8+9+10')
+        blocks.get('SRC').call('set', 'a=1\nb=3\nc = ( a+-+-b) /+ 2')
         blocks.html_init(body)
         setInterval(drawevent, 400)
         window.addEventListener('keypress', keyevent, False)
