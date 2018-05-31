@@ -1,6 +1,5 @@
 #!/usr/bin/python3
 
-# Faire marcher le /
 # Rouge pour caractère non reconnu
 # affichage du texte en méthode de Item
 # gérer proprement le curseur et la couleur, utiliser un hook
@@ -297,7 +296,10 @@ def SRC_draw_cursor(block, dummy):
         c.fillRect(x - 3, y - h, 3, block.fontsize + 2)
 blocks.get('SRC').add_filter('draw_cursor', SRC_draw_cursor)
 
-def SRC_key(blocks, key):
+def SRC_key(blocks, event):
+        if event.ctrlKey or event.metaKey or event.altKey:
+                return
+        key = event.key
         src = blocks.get('SRC')
         content = src.history[src.t]
         if key == 'ArrowRight':
@@ -347,6 +349,8 @@ def SRC_key(blocks, key):
                 new_content = content[:src.cursor] + key + content[src.cursor:]
                 src.call('set', new_content)
                 src.cursor += 1
+                event.preventDefault(True)
+                event.cancelBubble = True
         else:
                 print('key=', key)
         src.cursor_visible = 1
@@ -984,7 +988,7 @@ except:
 if body:
         def keyevent(event):
                 event = event or window.event
-                blocks.key(event.key)
+                blocks.key(event)
                 blocks.html_draw()
         def drawevent():
                 blocks.html_draw()
