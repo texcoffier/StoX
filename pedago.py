@@ -591,6 +591,7 @@ def YAC_set_time(block, t):
         items = []
         for i in block.previous_block.items:
                 item = i.clone()
+                item.char = item.char.replace("\n", "\\n")
                 item.lex = True
                 items.append(item)
         change = True
