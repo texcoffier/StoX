@@ -485,6 +485,13 @@ def LEX_set_time(block, t):
                                 previous_possibles = block.lexem # All possibles
                                 previous_current = ''
                         else:
+                                if current != '':
+                                        item = Item(current + ':UNEXPECTED',
+                                            0, len(block.items),
+                                            previous_items)
+                                        item.previous_items = items[i:]
+                                        item.color = "#F00"
+                                        block.append(item)
                                 break
                 else:
                         i += 1
