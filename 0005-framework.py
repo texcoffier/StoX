@@ -24,6 +24,10 @@ class Item:
                 item.rule           = self.rule
                 item.value          = self.value
                 return item
+        def set_byte(self, i):
+                self.value = i
+                self.char = "0123456789ABCDEF"[i//16] + "0123456789ABCDEF"[i%16]
+                return self
         def short(self):
                 return (str(int(self.x)) + '×' + str(int(self.y)) + ':'
                         + self.value + '<' + self.rule + '>')
