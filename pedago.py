@@ -1,5 +1,13 @@
 #!/usr/bin/python3
 
+# Faire marcher le /
+# Rouge pour caractère non reconnu
+# affichage du texte en méthode de Item
+# gérer proprement le curseur et la couleur, utiliser un hook
+# allocation variables
+# génération code
+
+
 ###############################################################################
 # Utilities
 ###############################################################################
@@ -44,7 +52,7 @@ class Item:
                 for i in previous_items:
                         i.next_items = [self]
         def short(self):
-                return str(self.x) + '×' + str(self.y) + ':' + self.char
+                return str(int(self.x)) + '×' + str(int(self.y)) + ':' + self.char
         def long(self):
                 v = self.short()
                 if len(self.next_items):
@@ -163,12 +171,15 @@ class YAC(Block):
         name = "YAC"
 class AST(Block):
         name = "AST"
+class ASM(Block):
+        name = "ASM"
 
 blocks = Blocks()
 blocks.append(SRC())
 blocks.append(LEX())
 blocks.append(YAC())
 blocks.append(AST())
+blocks.append(ASM())
 
 def blocks_dump(blocks, dummy_arg):
         print('<dump>')
@@ -588,7 +599,6 @@ def YAC_html_draw_lines(item, ctx, x, y):
                 YAC_html_draw_lines(child, ctx, x, y)
 
 def YAC_html_draw(block, dummy):
-        src = blocks.get('SRC')
         SRC_html_draw(block) # 'src.html_draw()' draws on SRC canvas
         c = block.element.getContext("2d")
         for item in block.items:
@@ -597,7 +607,8 @@ def YAC_html_draw(block, dummy):
                         c.fillStyle = item.previous_items[0].lexem.background + '8'
                         item.fillRect(c)
                         item.cursor = True
-        YAC_html_draw_lines(block.items[0], c, 0, 0)
+        if len(block.items):
+                YAC_html_draw_lines(block.items[0], c, 0, 0)
 blocks.get('YAC').add_filter('html_draw', YAC_html_draw)
 
 ###############################################################################
@@ -615,6 +626,7 @@ def AST_item(previous, name=None, children=[]):
         else:
                 previous.lexem = Lexem(['','','#000'])
         ast_item.previous_items = [previous]
+        ast_item.lexem = previous.lexem
         return ast_item
 
 def AST_init(block, dummy):
@@ -635,6 +647,7 @@ def AST_set_time(block, t):
                 block.ast = ast_apply(block, block.previous_block.items[0])
                 block.items = []
                 yac_walk(block, block.ast, 0, 0, 0, "#000")
+        block.next_block.set_time(0)
                 
 blocks.get('AST').add_filter('set_time', AST_set_time)
 
@@ -643,6 +656,35 @@ def AST_update_rule(block, rule):
 blocks.get('AST').add_filter('update_rule', AST_update_rule)
 
 blocks.get('AST').add_filter('html_draw', YAC_html_draw)
+
+
+###############################################################################
+# Define the ASM behavior
+###############################################################################
+
+blocks.get('ASM').add_filter('dump', LEX_dump)
+blocks.get('ASM').add_filter('html_init', canvas_html_init)
+
+def ASM_init(block, dummy):
+        block.rules = {}
+blocks.get('ASM').add_filter('init', ASM_init)
+
+def asm_generate(block, item):
+        if item.char in block.rules:
+                return block.rules[item.char](block, item)
+
+def ASM_update_rule(block, rule):
+        block.rules[rule[0]] = rule[1]
+blocks.get('ASM').add_filter('update_rule', ASM_update_rule)
+
+def ASM_set_time(block, t):
+        block.t = t
+        if len(block.previous_block.items):
+                block.items = []
+                asm_generate(block, block.previous_block.items[0])
+blocks.get('ASM').add_filter('set_time', ASM_set_time)
+
+blocks.get('ASM').add_filter('html_draw', YAC_html_draw)
 
 ###############################################################################
 # Test
@@ -811,6 +853,9 @@ def ast_value(block, item):
         else:
                 return ast_apply(block, item.children[0])
 
+def ast_variable(block, item):
+        return AST_item(item, 'Variable', [AST_item(item.children[0])])
+
 def ast_unary(block, item):
         child = ast_children(item)
         if len(child) == 2:
@@ -857,12 +902,75 @@ def ast_group(block, item):
 for rule in [
         ['Affectation', ast_affectation],
         ['Unary', ast_unary],
+        ['Variable', ast_variable],
         ['Binary', ast_binary],
         ['Value', ast_value],
         ['Group', ast_group],
         ['Program', ast_program],
         ]:
         blocks.get('AST').call('update_rule', rule)
+
+def asm_Item(block, from_item, name):
+        item = Item(name)
+        item.previous_items = [from_item]
+        item.y = len(block.items)
+        item.children = []
+        try:
+                item.lexem = from_item.lexem
+        except:
+                item.lexem = ['', '', '#F00']
+        block.append(item)
+
+def asm_program(block, item):
+        for child in item.children:
+                asm_generate(block, child)
+
+def asm_affectation(block, item):
+        asm_generate(block, item.children[1])
+        asm_Item(block, item, '    STORE AT ADDRESS ' + item.children[0].char)
+        # XXX block.items[-1].previous_items = [item, item.children[0], item.children[1]]
+
+def asm_value(block, item):
+        asm_Item(block, item.children[0], '    LOAD IMMEDIATE ' + item.children[0].char)
+
+def asm_variable(block, item):
+        asm_Item(block, item.children[0], '    LOAD AT ADDRESS ' + item.children[0].char)
+
+def asm_addition(block, item):
+        asm_generate(block, item.children[0])
+        asm_generate(block, item.children[1])
+        asm_Item(block, item, '    ADDITION')
+
+def asm_subtraction(block, item):
+        if len(item.children) == 1:
+                asm_generate(block, item.children[0])
+                asm_Item(block, item, '    NEGATE')
+        else:
+                asm_generate(block, item.children[0])
+                asm_generate(block, item.children[1])
+                asm_Item(block, item, '    SUBTRACTION')
+
+def asm_multiply(block, item):
+        asm_generate(block, item.children[0])
+        asm_generate(block, item.children[1])
+        asm_Item(block, item, '    MULTIPLY')
+
+def asm_divide(block, item):
+        asm_generate(block, item.children[0])
+        asm_generate(block, item.children[1])
+        asm_Item(block, item, '    DIVIDE')
+
+for rule in [
+        ['Program', asm_program],
+        ['=', asm_affectation],
+        ['Value', asm_value],
+        ['Variable', asm_variable],
+        ["+", asm_addition],
+        ["-", asm_subtraction],
+        ["*", asm_multiply],
+        ["/", asm_divide],
+        ]:
+        blocks.get('ASM').call('update_rule', rule)
 
 test_change_line()
 test_yac()
