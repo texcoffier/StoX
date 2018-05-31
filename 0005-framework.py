@@ -3,6 +3,8 @@
 ###############################################################################
 
 class Item:
+        error = False
+        color = "#000" # The text color
         def __init__(self, char='', x=0, y=0, previous_items=[], next_items=[]):
                 self.next_items     = next_items
                 self.previous_items = previous_items
@@ -11,7 +13,6 @@ class Item:
                 self.value          = char # The node real value
                 self.x              = x
                 self.y              = y
-                self.color          = "#000" # The text color
                 self.children       = []
                 for i in previous_items:
                         i.next_items = [self]
@@ -42,7 +43,7 @@ class Item:
                         self.block.fontsize
                         + self.block.line_spacing * self.block.fontsize * self.y]
         def wh(self):
-                return [len(self.char) * self.block.fontsize,
+                return [len(self.char) * self.block.fontsize * 0.7,
                         self.block.fontsize]
         def fillRect(self):
                 x, y = self.xy()
@@ -53,6 +54,10 @@ class Item:
                 self.block.ctx.fillText(self.char, x, y)
         def fillText(self):
                 x, y = self.xy()
+                if self.error:
+                        w, h = self.wh()
+                        self.block.ctx.fillStyle = "#F88"
+                        self.block.ctx.fillRect(x - 1, y - h, w, h + 2)
                 self.block.ctx.fillStyle = self.color
                 self.block.ctx.fillText(self.char, x, y)
         def lines_to_children(self):
@@ -72,15 +77,15 @@ class Item:
                         self.block.ctx.stroke()
 
 class Block:
+        next_block     = None
+        previous_block = None
+        cursor         = 0
+        fontsize       = 12
+        line_spacing   = 1.3
         def __init__(self):
                 self.items          = []
                 self.t              = -1
-                self.next_block     = None
-                self.previous_block = None
                 self.methods        = {}
-                self.cursor         = 0
-                self.fontsize       = 12
-                self.line_spacing   = 1.3
                 self.empty          = Item()
                 self.empty.block    = self
         def get_filter(self, method):

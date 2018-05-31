@@ -1,6 +1,5 @@
 #!/usr/bin/python3
 
-# Rouge pour caractère non reconnu
 # allocation variables
 # génération code
 

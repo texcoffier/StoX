@@ -91,6 +91,8 @@ def rule_apply(block, items, rule):
 def yac_walk(block, item, x, y, depth, bad, expand=False):
         item.x = x
         item.y = y
+        if bad:
+                item.error = True
         block.append(item)
         if not expand and len(item.children) == 1:
                 child = item.children[0]

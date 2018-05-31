@@ -94,6 +94,7 @@ def LEX_set_time(block, t):
                                             previous_items)
                                         item.previous_items = items[i:]
                                         item.color = "#F00"
+                                        item.error = True
                                         block.append(item)
                                 break
                 else:
