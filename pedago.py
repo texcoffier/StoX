@@ -556,21 +556,21 @@ def rule_apply(block, items, rule):
                         position += 1
                 return after
 
-def yac_walk(block, item, x, y, depth, bad):
+def yac_walk(block, item, x, y, depth, bad, expand=False):
         item.x = x
         item.y = y
         block.append(item)
-        if len(item.children) == 1:
+        if not expand and len(item.children) == 1:
                 child = item.children[0]
                 x += len(item.char) * 0.85
-                y = yac_walk(block, child, x, y, depth, bad)
+                y = yac_walk(block, child, x, y, depth, bad, expand)
         else:
                 depth += 1
                 x = 1.5 * depth
                 y += 1
                 if item.children:
                         for child in item.children:
-                                y = yac_walk(block, child, x, y, depth, bad)
+                                y = yac_walk(block, child, x, y, depth, bad, expand)
         return y
 
 def yac_nice(item):
@@ -651,7 +651,7 @@ def AST_set_time(block, t):
         if len(block.previous_block.items):
                 block.ast = ast_apply(block, block.previous_block.items[0])
                 block.items = []
-                yac_walk(block, block.ast, 0, 0, 0, False)
+                yac_walk(block, block.ast, 0, 0, 0, False, True)
         block.next_block.set_time(0)
 blocks.get('AST').add_filter('set_time', AST_set_time)
 
