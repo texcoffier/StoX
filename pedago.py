@@ -74,11 +74,11 @@ class Item:
         def dump(self):
                 print("\t\t{", self.long(), "}")
         def xy(self):
-                return [4 + 0.9 * self.block.fontsize * self.x,
+                return [4 + self.block.fontsize * self.x,
                         self.block.fontsize
                         + self.block.line_spacing * self.block.fontsize * self.y]
         def wh(self):
-                return [len(self.char) * 0.8 * self.block.fontsize,
+                return [len(self.char) * self.block.fontsize,
                         self.block.fontsize]
 #        def strokeRect(self):
 #                x, y = self.xy()
@@ -562,7 +562,7 @@ def yac_walk(block, item, x, y, depth, bad, expand=False):
         block.append(item)
         if not expand and len(item.children) == 1:
                 child = item.children[0]
-                x += len(item.char) * 0.85
+                x += len(item.char) * 0.65 # XXX WHY ???
                 y = yac_walk(block, child, x, y, depth, bad, expand)
         else:
                 depth += 1
@@ -1002,7 +1002,7 @@ if body:
                 src = blocks.get('SRC')
                 src.cursor_visible = 1 - src.cursor_visible
 
-        blocks.get('SRC').call('set', 'a=1\nb=3\nc = ( a+-+-b) /+ 2')
+        blocks.get('SRC').call('set', 'a=1\nb=3\nc = (a+-+-b)/+2')
         blocks.html_init(body)
         setInterval(drawevent, 400)
         window.addEventListener('keypress', keyevent, False)
