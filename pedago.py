@@ -9,6 +9,8 @@
 # Utilities
 ###############################################################################
 
+def backslash(txt):
+        return txt.replace('\n','\\n').replace('\t','\\t')
 
 ###############################################################################
 # JavaScript compatibility layer
@@ -74,7 +76,7 @@ class Item:
         def dump(self):
                 print("\t\t{", self.long(), "}")
         def xy(self):
-                return [4 + self.block.fontsize * self.x,
+                return [4 + 0.7 * self.block.fontsize * self.x,
                         self.block.fontsize
                         + self.block.line_spacing * self.block.fontsize * self.y]
         def wh(self):
@@ -89,7 +91,7 @@ class Item:
                 x, y = self.xy()
                 w, h = self.wh()
                 self.block.ctx.fillStyle = self.color + "6"
-                self.block.ctx.fillRect(x - 1, y - h + 1, w, h + 2)
+                self.block.ctx.fillRect(x - 1, y - h, w, h + 2)
                 self.block.ctx.fillStyle = '#000'
                 self.block.ctx.fillText(self.char, x, y)
         def fillText(self):
@@ -472,9 +474,10 @@ def LEX_set_time(block, t):
                                             previous_items)
                                 item.rule  = lexem.name
                                 item.value = previous_current
-                                item.char  = (item.value.replace('\n','\\n')
-                                              + ' : ' + item.rule
-                                              )
+                                item.char  = (backslash(item.value)
+                                              + ' (' + item.rule
+                                              + ':' + backslash(lexem.regexp)
+                                              + ')')
                                 item.color       = lexem.color
                                 block.append(item)
                                 current = ''
@@ -570,7 +573,7 @@ def yac_walk(block, item, x, y, depth, bad, expand=False):
         block.append(item)
         if not expand and len(item.children) == 1:
                 child = item.children[0]
-                x += len(item.char) * 0.65 # XXX WHY ???
+                x += len(item.char)
                 y = yac_walk(block, child, x, y, depth, bad, expand)
         else:
                 depth += 1
