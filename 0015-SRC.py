@@ -1,6 +1,16 @@
 class SRC(Block):
         title = "Source code editor"
         name = "SRC"
+        def analyse(self, text):
+                self.items = []
+                x = y = 0
+                for char in text:
+                        self.append(Item(char, x, y))
+                        if char == '\n':
+                                x = 0
+                                y += 1
+                        else:
+                                x += 1
 blocks.append(SRC())
 
 def SRC_init(block, dummy_args):
@@ -15,30 +25,20 @@ def SRC_dump(block, dummy_args):
                         function(item)
 blocks.get('SRC').add_filter('dump', SRC_dump)
 
-def SRC_analyse(block, text):
-        block.items = []
-        x = y = 0
-        for char in text:
-                block.append(Item(char, x, y))
-                if char == '\n':
-                        x = 0
-                        y += 1
-                else:
-                        x += 1
 def SRC_set(block, text):
         if not hasattr(block, 'history'):
                 block.history = []
         if len(block.history) != block.t + 1:
                 block.history = block.history[:block.t]
         block.history.append(text)
-        SRC_analyse(block, text)
+        block.analyse(text)
         block.t += 1
         block.next_block.set_time(0)
 blocks.get('SRC').add_filter('set', SRC_set)
 
 def SRC_set_time(block, t):
         block.t = t
-        SRC_analyse(block, block.history[t])
+        block.analyse(block.history[t])
         block.next_block.set_time(0)
 blocks.get('SRC').add_filter('set_time', SRC_set_time)
 
