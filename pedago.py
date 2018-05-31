@@ -196,14 +196,19 @@ class Blocks(Block):
 ###############################################################################
 
 class SRC(Block):
+        title = "Source code editor"
         name = "SRC"
 class LEX(Block):
+        title = "Lexical analyser"
         name = "LEX"
 class YAC(Block):
+        title = "Syntaxique analyser"
         name = "YAC"
 class AST(Block):
+        title = "Abstract Syntax Tree"
         name = "AST"
 class ASM(Block):
+        title = "Assembly language"
         name = "ASM"
 
 blocks = Blocks()
@@ -231,7 +236,7 @@ def blocks_html_init(blocks, body):
         blocks.element = document.createElement('DIV')
         body.appendChild(blocks.element)
         for block in blocks.blocks:
-                block.html_init()
+                block.html_init(block.title)
 blocks.add_filter('html_init', blocks_html_init)
 
 def blocks_html_draw(blocks, body):
@@ -284,13 +289,16 @@ def SRC_set_time(block, t):
         block.next_block.set_time(0)
 blocks.get('SRC').add_filter('set_time', SRC_set_time)
 
-def canvas_html_init(block, dummy):
-        block.element = document.createElement('CANVAS')
+def canvas_html_init(block, title):
+        div = document.createElement('DIV')
+        div.innerHTML = "<p>" + title + "</p><canvas></canvas>"
+        div.style.display = "inline-block"
+        block.blocks.element.appendChild(div)
+        block.element = div.lastChild
         block.element.width = 200
         block.element.height = 500
         block.element.style.width  = str(block.element.width) + 'px'
         block.element.style.height = str(block.element.height) + 'px'
-        block.blocks.element.appendChild(block.element)
         block.ctx = block.element.getContext("2d")
 blocks.get('SRC').add_filter('html_init', canvas_html_init)
 
