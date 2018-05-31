@@ -1,6 +1,5 @@
 #!/usr/bin/python3
 
-# block OPT
 # Rouge pour caractère non reconnu
 # allocation variables
 # génération code
@@ -8,6 +7,7 @@
 blocks.init()
 
 for block in blocks.blocks:
+        print(block.title)
         block.call('regtest')
 
 try:

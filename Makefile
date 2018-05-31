@@ -10,4 +10,5 @@ run:xxx.py
 xxx.py: $(SRC)
 	cat $(SRC) >xxx.py
 
-
+clean:
+	rm xxx*
