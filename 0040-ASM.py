@@ -12,6 +12,17 @@ class ASM(Block):
         def add_code(self, item):
                 self.cpu.memory[self.segment_code] = item
                 self.segment_code += 1
+        def dump_cpu_and_memory(self):
+                print('<register>')
+                print('\tPC', self.cpu.PC.long())
+                print('\tSP', self.cpu.SP.long())
+                print('<register>')
+                print('<memory>')
+                for i in range(0, self.segment_code):
+                        print('\t', i, self.cpu.memory[i].long())
+                for i in range(self.segment_heap, self.segment_stack):
+                        print('\t', i, self.cpu.memory[i].long())
+                print('</memory>')
 blocks.append(ASM())
 
 blocks.get('ASM').add_filter('dump', LEX_dump)
@@ -46,15 +57,6 @@ class CPU_emulator:
                         self.PC.color = code.color
                         instruction = self.by_code[code.value]
                         self.PC.char += " " + instruction.name
-        def dump(self):
-                print('<register>')
-                print('\tPC', self.PC.long())
-                print('\tSP', self.SP.long())
-                print('<register>')
-                print('<memory>')
-                for k in self.memory:
-                        print('\t', k, self.memory[k].long())
-                print('</memory>')
         def step(self):
                 if self.PC.value not in self.memory:
                         return
@@ -136,7 +138,7 @@ def ASM_set_time(block, t):
         block.variables = {}
         block.segment_heap = 0x8000
         block.segment_code = 0x0000
-        block.segment_stack = 0x8100
+        block.segment_stack = 0x8020
         for i in range(block.segment_heap, block.segment_stack):
                 block.cpu.memory[i] = Item('', 3*(i%4)).set_byte(0x00)
                 block.cpu.memory[i].color = "#DDD"
@@ -214,5 +216,5 @@ def asm_divide(block, item):
         asm_Item(block, item, 'DIVIDE')
 
 def ASM_dump(block, dummy_arg):
-        block.cpu.dump()
+        block.dump_cpu_and_memory()
 blocks.get('ASM').add_filter('dump', ASM_dump)
