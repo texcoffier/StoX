@@ -67,6 +67,11 @@ class Item:
                         self.block.ctx.fillRect(x - 1, y - h, w, h + 2)
                 self.block.ctx.fillStyle = '#000'
                 self.block.ctx.fillText(self.char, x, y)
+        def rectangle(self):
+                x, y = self.xy()
+                w, h = self.wh()
+                self.block.ctx.strokeStyle = "#000"
+                self.block.ctx.strokeRect(0, y - h, w + x, h + 2)
         def fillText(self):
                 x, y = self.xy()
                 if self.error:

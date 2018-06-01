@@ -14,6 +14,7 @@ class ASM(Block):
         def add_code(self, item):
                 self.cpu.memory[self.segment_code] = item
                 self.segment_code += 1
+                item.asm = self.items[-1]
         def dump_cpu_and_memory(self):
                 print('<register>')
                 print('\tPC', self.cpu.PC.long())
@@ -59,6 +60,7 @@ class CPU_emulator:
                         self.PC.color = code.color
                         instruction = self.by_code[code.value]
                         self.PC.char += " " + instruction.name
+                        self.memory[self.PC.value].asm.rectangle()
         def step(self):
                 if self.PC.value not in self.memory:
                         return
@@ -155,6 +157,7 @@ def asm_Item(block, from_item, name, value='', codes=[]):
         item = from_item.clone()
         item.char = name + ' ' + value
         item.y = len(block.items)
+        block.append(item)
         if name in block.cpu.by_name:
                 instruction = block.cpu.by_name[name]
                 if instruction.size != len(codes):
@@ -162,7 +165,6 @@ def asm_Item(block, from_item, name, value='', codes=[]):
                 block.add_code(item.clone().set_byte(instruction.code))
                 for code in codes:
                         block.add_code(item.clone().set_byte(code))
-        block.append(item)
 
 def asm_program(block, item):
         for child in item.children:
