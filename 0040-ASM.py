@@ -8,6 +8,8 @@ class ASM(Block):
                         asm_Item(self, item, '.HEAP # keep 2 bytes for «'
                                  + variable + '»')
                         self.cpu.memory[self.segment_heap] = item.clone().set_byte(0)
+                else:
+                        self.cpu.memory[self.variables[variable]].previous_items.append(item)
                 return self.variables[variable]
         def add_code(self, item):
                 self.cpu.memory[self.segment_code] = item
@@ -184,6 +186,7 @@ def asm_variable(block, item):
         variable_name = item.children[0].value
         if variable_name in block.variables:
                 addr = block.variables[variable_name]
+                block.cpu.memory[addr].previous_items.append(item.children[0])
         else:
                 addr = 0xFFFF
         asm_Item(block, item.children[0], 'LOAD AT ADDRESS', variable_name,
