@@ -1,5 +1,5 @@
 class YAC(Block):
-        title = "Syntaxique analyser"
+        title = "Syntaxic analyser"
         name = "YAC"
 blocks.append(YAC())
 
