@@ -1,6 +1,7 @@
 class OPT(Block):
         title = "Code optimizer"
         name = "OPT"
+        fullline_highlight = True
 blocks.append(OPT())
 
 blocks.get('OPT').add_filter('dump', LEX_dump)

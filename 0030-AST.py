@@ -1,6 +1,7 @@
 class AST(Block):
         title = "Abstract Syntax Tree"
         name = "AST"
+        fullline_highlight = True
 blocks.append(AST())
 
 blocks.get('AST').add_filter('dump', LEX_dump)

@@ -1,6 +1,7 @@
 class YAC(Block):
         title = "Syntaxic analyser"
         name = "YAC"
+        fullline_highlight = True
 blocks.append(YAC())
 
 blocks.get('YAC').add_filter('dump', LEX_dump)

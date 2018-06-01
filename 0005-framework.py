@@ -53,7 +53,10 @@ class Item:
                 x, y = self.xy()
                 w, h = self.wh()
                 self.block.ctx.fillStyle = self.color + "6"
-                self.block.ctx.fillRect(x - 1, y - h, w, h + 2)
+                if self.block.fullline_highlight:
+                        self.block.ctx.fillRect(0, y - h, w + x, h + 2)
+                else:
+                        self.block.ctx.fillRect(x - 1, y - h, w, h + 2)
                 self.block.ctx.fillStyle = '#000'
                 self.block.ctx.fillText(self.char, x, y)
         def fillText(self):
@@ -86,6 +89,7 @@ class Block:
         cursor         = 0
         fontsize       = 12
         line_spacing   = 1.3
+        fullline_highlight = False
         def __init__(self):
                 self.items          = []
                 self.t              = -1
