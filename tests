@@ -5,13 +5,14 @@ then
         git clone https://github.com/atsepkov/RapydScript.git
 fi
 
+python3 xxx.py >xxx-py.txt || exit 1
+
 RapydScript/bin/rapydscript --prettify --bare xxx.py |
 sed -e 's/x.__class__.__name__/typeof(x)/'  >xxx.js
 
 ls -ls xxx.py xxx.js
 
 node xxx.js >xxx-js.txt
-python3 xxx.py >xxx-py.txt
 
 if cmp xxx-py.txt xxx-js.txt
 then

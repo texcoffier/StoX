@@ -22,9 +22,10 @@ def OPT_walk(block, old_item):
 
 def OPT_set_time(block, t):
         block.t = t
-        root = OPT_walk(block, block.previous_block.items[0])
         block.items = []
-        yac_walk(block, root, 0, 0, 0, False, True)
+        if len(block.previous_block.items):
+                root = OPT_walk(block, block.previous_block.items[0])
+                yac_walk(block, root, 0, 0, 0, False, True)
         block.next_block.set_time(0)
 
 blocks.get('OPT').add_filter('set_time', OPT_set_time)
