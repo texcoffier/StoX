@@ -59,14 +59,15 @@ def ASM_update_rule(block, rule):
 blocks.get('ASM').add_filter('update_rule', ASM_update_rule)
 
 def ASM_set_time(block, t):
+        block.t = t
         block.variables = {}
         block.code = []
         block.heap = []
         block.nr_variables = 0
-        block.t = t
         if len(block.previous_block.items):
                 block.items = []
                 asm_generate(block, block.previous_block.items[0])
+        block.next_block.set_time(0)
 blocks.get('ASM').add_filter('set_time', ASM_set_time)
 
 def asm_Item(block, from_item, name, value='', codes=[]):
