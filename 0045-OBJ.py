@@ -9,7 +9,7 @@ blocks.get('OBJ').add_filter('html_draw', SRC_html_draw)
 
 def OBJ_set_time(block, t):
         block.t = t
-        asm = block.previous_block
+        asm = blocks.get('ASM')
         block.items = []
         n = 0
         for i in asm.cpu.code:

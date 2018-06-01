@@ -17,21 +17,29 @@ blocks.get('ASM').add_filter('html_draw', SRC_html_draw)
 
 class Instruction:
         def __init__(self, code, name, size):
-                self.block = blocks.get('ASM')
                 self.code = code
                 self.name = name
                 self.size = size
-                self.block.by_code[code] = self
-                self.block.by_name[name] = self
+                self.block = blocks.get('ASM')
+                self.block.cpu.by_code[code] = self
+                self.block.cpu.by_name[name] = self
 
 class CPU_emulator:
         def __init__(self):
-                self.PC = Item(0)
+                self.PC = Item('')
+                self.SP = Item('')
+                self.by_code = {}
+                self.by_name = {}
+                self.reset()
+        def reset(self):
+                self.PC.set_word(0)
+                self.SP.set_word(0x8000)
                 self.code = []
                 self.heap = []
         def dump(self):
                 print('<register>')
                 print('\tPC', self.PC.long())
+                print('\tSP', self.SP.long())
                 print('<register>')
                 print('<code>')
                 for item in self.code:
@@ -41,11 +49,22 @@ class CPU_emulator:
                 for item in self.heap:
                         print('\t', item.long())
                 print('</heap>')
+        def step(self):
+                if self.PC.value >= len(self.code):
+                        return
+                code = self.code[self.PC.value]
+                self.PC.color = code.color
+                print(self.by_code[code.value])
+
+
+                self.PC.set_word(self.PC.value+1)
+        def stack_push(self, value):
+                pass
+
 
 def ASM_init(block, dummy):
         block.rules = {}
-        block.by_code = {}
-        block.by_name = {}
+        block.cpu = CPU_emulator()
         for rule in [
                 ['Program' , asm_program],
                 ['='       , asm_affectation],
@@ -78,9 +97,8 @@ blocks.get('ASM').add_filter('update_rule', ASM_update_rule)
 
 def ASM_set_time(block, t):
         block.t = t
+        block.cpu.reset()
         block.variables = {}
-        block.cpu = CPU_emulator()
-        print(block.cpu.code)
         block.nr_variables = 0
         if len(block.previous_block.items):
                 block.items = []
@@ -92,8 +110,8 @@ def asm_Item(block, from_item, name, value='', codes=[]):
         item = from_item.clone()
         item.char = name + ' ' + value
         item.y = len(block.items)
-        if name in block.by_name:
-                instruction = block.by_name[name]
+        if name in block.cpu.by_name:
+                instruction = block.cpu.by_name[name]
                 if instruction.size != len(codes):
                         bug
                 block.cpu.code.append(item.clone().set_byte(instruction.code))

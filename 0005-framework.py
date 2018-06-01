@@ -26,7 +26,15 @@ class Item:
                 return item
         def set_byte(self, i):
                 self.value = i
-                self.char = "0123456789ABCDEF"[i//16] + "0123456789ABCDEF"[i%16]
+                self.char = ("0123456789ABCDEF"[i >> 4 & 15]
+                           + "0123456789ABCDEF"[i      & 15])
+                return self
+        def set_word(self, i):
+                self.value = i
+                self.char = ("0123456789ABCDEF"[i>>12 & 15]
+                           + "0123456789ABCDEF"[i>>8  & 15]
+                           + "0123456789ABCDEF"[i>>4  & 15]
+                           + "0123456789ABCDEF"[i     & 15])
                 return self
         def short(self):
                 return (str(int(self.x)) + '×' + str(int(self.y)) + ':'
