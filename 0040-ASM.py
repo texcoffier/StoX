@@ -7,7 +7,7 @@ class ASM(Block):
                         self.nr_variables += 1
                         asm_Item(self, item, '.HEAP # keep 2 bytes for «'
                                  + variable + '»')
-                        self.heap.append(item.clone().set_byte(0))
+                        self.cpu.heap.append(item.clone().set_byte(0))
                 return self.variables[variable]
 blocks.append(ASM())
 
@@ -23,6 +23,24 @@ class Instruction:
                 self.size = size
                 self.block.by_code[code] = self
                 self.block.by_name[name] = self
+
+class CPU_emulator:
+        def __init__(self):
+                self.PC = Item(0)
+                self.code = []
+                self.heap = []
+        def dump(self):
+                print('<register>')
+                print('\tPC', self.PC.long())
+                print('<register>')
+                print('<code>')
+                for item in self.code:
+                        print('\t', item.long())
+                print('</code>')
+                print('<heap>')
+                for item in self.heap:
+                        print('\t', item.long())
+                print('</heap>')
 
 def ASM_init(block, dummy):
         block.rules = {}
@@ -61,8 +79,8 @@ blocks.get('ASM').add_filter('update_rule', ASM_update_rule)
 def ASM_set_time(block, t):
         block.t = t
         block.variables = {}
-        block.code = []
-        block.heap = []
+        block.cpu = CPU_emulator()
+        print(block.cpu.code)
         block.nr_variables = 0
         if len(block.previous_block.items):
                 block.items = []
@@ -78,9 +96,9 @@ def asm_Item(block, from_item, name, value='', codes=[]):
                 instruction = block.by_name[name]
                 if instruction.size != len(codes):
                         bug
-                block.code.append(item.clone().set_byte(instruction.code))
+                block.cpu.code.append(item.clone().set_byte(instruction.code))
                 for code in codes:
-                        block.code.append(item.clone().set_byte(code))
+                        block.cpu.code.append(item.clone().set_byte(code))
         block.append(item)
 
 def asm_program(block, item):
@@ -138,12 +156,5 @@ def asm_divide(block, item):
         asm_Item(block, item, 'DIVIDE')
 
 def ASM_dump(block, dummy_arg):
-        print('<code>')
-        for item in block.code:
-                print('\t', item.char)
-        print('</code>')
-        print('<heap>')
-        for item in block.heap:
-                print('\t', item.char)
-        print('</heap>')
+        block.cpu.dump()
 blocks.get('ASM').add_filter('dump', ASM_dump)

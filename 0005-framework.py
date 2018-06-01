@@ -30,7 +30,7 @@ class Item:
                 return self
         def short(self):
                 return (str(int(self.x)) + '×' + str(int(self.y)) + ':'
-                        + str(self.value) + '<' + self.rule + '>')
+                        + str(self.value) + '<' + str(self.rule) + '>')
         def long(self):
                 v = self.short()
                 if len(self.next_items):
