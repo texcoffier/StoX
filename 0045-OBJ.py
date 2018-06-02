@@ -18,7 +18,9 @@ def OBJ_set_time(block, t):
                 item.x = 3 * (n % 4)
                 item.y = n // 4
                 n += 1
-        n = 16 + (asm.segment_code & -5) + asm.segment_heap%4
+        n = 8 + asm.segment_code
+        n -= asm.segment_code % 4
+        n += asm.segment_heap % 4 - 1
         for i in range(asm.segment_heap, 0x8000):
                 n += 1
                 item = asm.cpu.memory[i]
