@@ -120,6 +120,10 @@ def SRC_draw_cursor(block, dummy):
         block.ctx.fillRect(x - 3, y - h, 3, block.fontsize + 2)
 blocks.get('SRC').add_filter('draw_cursor', SRC_draw_cursor)
 
+def stop_event(event):
+        event.preventDefault(True)
+        event.cancelBubble = True
+
 def SRC_key(blocks, event):
         if event.ctrlKey or event.metaKey or event.altKey:
                 return
@@ -129,6 +133,7 @@ def SRC_key(blocks, event):
         if key == 'ArrowRight':
                 if src.cursor < len(content):
                         src.cursor += 1
+                stop_event(event)
         elif key == 'ArrowLeft':
                 if src.cursor > 0:
                         src.cursor -= 1
@@ -136,12 +141,14 @@ def SRC_key(blocks, event):
                 y = src.items[min(src.cursor, len(src.items)-1)].y
                 while src.cursor > 0 and src.items[src.cursor-1].y == y:
                         src.cursor -= 1
+                stop_event(event)
         elif key == 'End':
                 y = src.items[min(src.cursor, len(src.items)-1)].y
                 while src.cursor < len(src.items)-1 and src.items[src.cursor+1].y == y:
                         src.cursor += 1
                 if src.cursor == len(src.items)-1 and src.items[-1].char != '\n':
                         src.cursor += 1
+                stop_event(event)
         elif key == 'ArrowUp' or key == 'ArrowDown':
                 if src.cursor == len(content):
                         if content[-1] == '\n':
@@ -158,6 +165,7 @@ def SRC_key(blocks, event):
                         direction = 1
                 item, after = src.change_line(item, direction, after)
                 src.cursor = item.index + after
+                stop_event(event)
         elif key == 'Backspace':
                 if src.cursor != 0:
                         new_content = content[:src.cursor-1] + content[src.cursor:]
@@ -173,8 +181,7 @@ def SRC_key(blocks, event):
                 new_content = content[:src.cursor] + key + content[src.cursor:]
                 src.call('set', new_content)
                 src.cursor += 1
-                event.preventDefault(True)
-                event.cancelBubble = True
+                stop_event(event)
         else:
                 print('key=', key)
         src.cursor_visible = 1
