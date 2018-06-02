@@ -48,10 +48,10 @@ class CPU_emulator:
                 self.SP = Item('')
                 self.by_code = {}
                 self.by_name = {}
+                self.memory = {}
                 self.reset()
         def reset(self):
                 self.SP.set_word(0x8000)
-                self.memory = {}
                 self.set_PC(0)
         def set_PC(self, value):
                 self.PC.set_word(value)
@@ -60,8 +60,6 @@ class CPU_emulator:
                         self.PC.color = code.color
                         instruction = self.by_code[code.value]
                         self.PC.char += " " + instruction.name
-                        if body:
-                                self.memory[self.PC.value].asm.rectangle()
         def step(self):
                 if self.PC.value not in self.memory:
                         return
@@ -140,6 +138,7 @@ blocks.get('ASM').add_filter('update_rule', ASM_update_rule)
 def ASM_set_time(block, t):
         block.t = t
         block.cpu.reset()
+        block.cpu.memory = {}
         block.variables = {}
         block.segment_heap = 0x8000
         block.segment_code = 0x0000
@@ -246,6 +245,5 @@ def ASM_regtest(block, dummy):
                 if m.char != char or m.value != value:
                         print("set_byte", input, "=>", m.char, m.value)
                         bug_set_byte
-        
 blocks.get('ASM').add_filter('regtest', ASM_regtest)
 

@@ -1,7 +1,9 @@
 #!/usr/bin/python3
 
-# 1+2/(+3)
-
+# binary PC feedback
+# load store feedback
+# Pas 2 feedback sur le '='
+# stop event sur curseur
 blocks.init()
 
 body = None

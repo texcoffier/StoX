@@ -20,7 +20,7 @@ def CPU_set_time(block, t):
                 block.append(asm.cpu.SP)
                 asm.cpu.SP.y = 1
                 asm.cpu.SP.x = 3
-                blocks.get('ASM').cpu.set_PC(0)
+                asm.cpu.reset()
         while block.t < t:
                 asm.cpu.step()
                 block.t += 1

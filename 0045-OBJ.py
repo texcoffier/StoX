@@ -26,6 +26,13 @@ blocks.get('OBJ').add_filter('dump', LEX_dump)
 blocks.get('OBJ').add_filter('html_init', canvas_html_init)
 blocks.get('OBJ').add_filter('html_draw', SRC_html_draw)
 
+def OBJ_html_draw(block, dummy):
+        cpu = blocks.get('ASM').cpu
+        if cpu.PC.value in cpu.memory:
+                cpu.memory[cpu.PC.value].asm.rectangle()
+blocks.get('OBJ').add_filter('html_draw', OBJ_html_draw)
+
+
 
 def OBJ_set_time(block, t):
         block.t = t

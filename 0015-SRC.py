@@ -16,6 +16,8 @@ blocks.append(SRC())
 
 def SRC_init(block, dummy_args):
         block.cursor_visible = 1
+        block.t = -1
+        block.history = []
 blocks.get('SRC').add_filter('init', SRC_init)
 
 def SRC_dump(block, dummy_args):
@@ -27,10 +29,8 @@ def SRC_dump(block, dummy_args):
 blocks.get('SRC').add_filter('dump', SRC_dump)
 
 def SRC_set(block, text):
-        if not hasattr(block, 'history'):
-                block.history = []
         if len(block.history) != block.t + 1:
-                block.history = block.history[:block.t]
+                block.history = block.history[:block.t+1]
         block.history.append(text)
         block.analyse(text)
         block.set_time(block.t + 1)
@@ -38,8 +38,12 @@ def SRC_set(block, text):
 blocks.get('SRC').add_filter('set', SRC_set)
 
 def SRC_set_time(block, t):
+        if t < 0 or t >= len(block.history):
+                return
         block.t = t
         block.analyse(block.history[t])
+        if block.cursor > len(block.items):
+                block.cursor = len(block.items)
         block.next_block.set_time(0)
 blocks.get('SRC').add_filter('set_time', SRC_set_time)
 
