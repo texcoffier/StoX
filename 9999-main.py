@@ -26,8 +26,8 @@ if body:
                 src = blocks.get('SRC')
                 src.cursor_visible = 1 - src.cursor_visible
 
-        blocks.get('SRC').call('set', 'a=1\nb=3\nc = (a+-+-b)/+2')
         blocks.html_init(body)
+        blocks.get('SRC').call('set', 'a=1\nb=3\nc = (a+-+-b)/+2')
         setInterval(drawevent, 400)
         window.addEventListener('keypress', keyevent, False)
 else:

@@ -1,6 +1,7 @@
 class SRC(Block):
         title = "Source code editor"
         name = "SRC"
+        time_travel = True
         def analyse(self, text):
                 self.items = []
                 x = y = 0
@@ -32,7 +33,7 @@ def SRC_set(block, text):
                 block.history = block.history[:block.t]
         block.history.append(text)
         block.analyse(text)
-        block.t += 1
+        block.set_time(block.t + 1)
         block.next_block.set_time(0)
 blocks.get('SRC').add_filter('set', SRC_set)
 
@@ -44,10 +45,25 @@ blocks.get('SRC').add_filter('set_time', SRC_set_time)
 
 def canvas_html_init(block, title):
         div = document.createElement('DIV')
-        div.innerHTML = "<p>" + title + "</p><canvas></canvas>"
+        div.innerHTML = "<p>" + title + "</p><canvas></canvas><div></div>"
         div.style.display = "inline-block"
+        div.style.verticalAlign = 'top'
         block.blocks.element.appendChild(div)
-        block.element = div.lastChild
+        if block.time_travel:
+                block.time_travel = div.childNodes[2]
+                block.time_travel.innerHTML = (
+                        '<button>◀</button>'
+                        + '<span></span>'
+                        + '<button>▶</button>'
+                        )
+                block.time_travel_t = block.time_travel.childNodes[1]
+                def time_travel_back():
+                        block.set_time(block.t - 1)
+                def time_travel_forward():
+                        block.set_time(block.t + 1)
+                block.time_travel.childNodes[0].onclick = time_travel_back
+                block.time_travel.childNodes[2].onclick = time_travel_forward
+        block.element = div.childNodes[1]
         block.element.width = 200
         block.element.height = 500
         block.element.style.width  = str(block.element.width) + 'px'

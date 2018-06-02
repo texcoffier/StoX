@@ -1,6 +1,7 @@
 class CPU(Block):
         title = "Processor"
         name = "CPU"
+        time_travel = True
 blocks.append(CPU())
 
 blocks.get('CPU').add_filter('dump', LEX_dump)
@@ -9,8 +10,8 @@ blocks.get('CPU').add_filter('html_draw', SRC_html_draw)
 
 def CPU_set_time(block, t):
         asm = blocks.get('ASM')
-        if t == 0:
-                block.t = t
+        if t <= block.t:
+                block.t = 0
                 block.items = []
                 block.append(Item('PC:'))
                 block.append(asm.cpu.PC)
@@ -19,19 +20,11 @@ def CPU_set_time(block, t):
                 block.append(asm.cpu.SP)
                 asm.cpu.SP.y = 1
                 asm.cpu.SP.x = 3
-                block.just_init = True
-                return
-        asm.cpu.step()
-
-blocks.get('CPU').add_filter('set_time', CPU_set_time)
-
-def CPU_one_step(block, dummy):
-        if block.just_init:
                 blocks.get('ASM').cpu.set_PC(0)
-                block.just_init = False
-        else:
-                block.set_time(block.t + 1)
-blocks.get('CPU').add_filter('draw_cursor', CPU_one_step)
+        while block.t < t:
+                asm.cpu.step()
+                block.t += 1
+blocks.get('CPU').add_filter('set_time', CPU_set_time)
 
 def CPU_regtest(block, dummy):
         asm = blocks.get('ASM')
@@ -46,7 +39,7 @@ def CPU_regtest(block, dummy):
         ]:
                 blocks.get('SRC').call('set', input)
                 for i in range(100):
-                        CPU_one_step(block, None)
+                        asm.cpu.step()
                 computed = asm.cpu.memory[asm.segment_heap].value
                 if computed != output:
                         print("input:", input)

@@ -103,6 +103,7 @@ class Block:
         cursor         = 0
         fontsize       = 12
         line_spacing   = 1.3
+        time_travel    = False
         fullline_highlight = False
         def __init__(self):
                 self.items          = []
@@ -147,12 +148,16 @@ class Block:
                         return [item, after]
 
         # Standard hooks
-        def set_time   (self, t):         self.call('set_time'   , t)
         def dump       (self, args=None): self.call('dump'       , args)
         def init       (self, args=None): self.call('init'       , args)
         def html_init  (self, args=None): self.call('html_init'  , args)
         def html_draw  (self, args=None): self.call('html_draw'  , args)
         def draw_cursor(self, args=None): self.call('draw_cursor', args)
+
+        def set_time   (self, t):
+                self.call('set_time'   , t)
+                if body and self.time_travel and self.time_travel_t:
+                        self.time_travel_t.innerHTML = t
         
         def append(self, item):
                 item.index = len(self.items)
