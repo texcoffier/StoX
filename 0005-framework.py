@@ -35,7 +35,7 @@ class Item:
                 return self
         def set_word(self, i):
                 self.value = i & 0xFFFF
-                self.char = hex(i>>12) + hex(i>>8) + hex(i>>4) + hex(i)
+                self.char = hex4(i)
                 return self
         def short(self):
                 return (str(int(self.x)) + '×' + str(int(self.y)) + ':'

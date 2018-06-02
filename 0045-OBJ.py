@@ -1,38 +1,38 @@
 class OBJ(Block):
         title = "Memory content"
         name = "OBJ"
+        
+        def display(self, title, start, stop):
+                nr = 8
+                asm = blocks.get('ASM')
+                if len(self.items):
+                        n = self.items[-1].y + 2
+                else:
+                        n = 0
+                self.append(Item(title+' ['+hex4(start)+'-'+hex4(stop)+'[',
+                            0, n))
+                n += 2
+                for i in range(start, stop):
+                        line = (i-start) // nr
+                        if i % nr == 0:
+                                self.append(Item(hex4(i), 0, n + line))
+                        item = asm.cpu.memory[i]
+                        self.append(item)
+                        item.x = 4.1 + 2.1 * (i % nr)
+                        item.y = n + line
 blocks.append(OBJ())
 
 blocks.get('OBJ').add_filter('dump', LEX_dump)
 blocks.get('OBJ').add_filter('html_init', canvas_html_init)
 blocks.get('OBJ').add_filter('html_draw', SRC_html_draw)
 
+
 def OBJ_set_time(block, t):
         block.t = t
-        asm = blocks.get('ASM')
         block.items = []
-        n = 0
-        for i in range(0, asm.segment_code):
-                item = asm.cpu.memory[i]
-                block.append(item)
-                item.x = 3 * (n % 4)
-                item.y = n // 4
-                n += 1
-        n = 8 + asm.segment_code
-        n -= asm.segment_code % 4
-        n += asm.segment_heap % 4 - 1
-        for i in range(asm.segment_heap, 0x8000):
-                n += 1
-                item = asm.cpu.memory[i]
-                block.append(item)
-                item.x = 3  * (n % 4)
-                item.y = n // 4
-        for i in range(0x8000, asm.segment_stack):
-                n += 1
-                item = asm.cpu.memory[i]
-                block.append(item)
-                item.x = 3  * (n % 4)
-                item.y = n // 4
-
+        asm = blocks.get('ASM')
+        block.display("Code" , 0               , asm.segment_code)
+        block.display("Heap" , asm.segment_heap, 0x8000)
+        block.display("Stack", 0x8000          , asm.segment_stack)
         block.next_block.set_time(0)
 blocks.get('OBJ').add_filter('set_time', OBJ_set_time)
