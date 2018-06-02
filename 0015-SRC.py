@@ -1,7 +1,7 @@
 class SRC(Block):
         title = "Source code editor"
         name = "SRC"
-        time_travel = True
+        time_travel = ['^Z', '^Y']
         def analyse(self, text):
                 self.items = []
                 x = y = 0
@@ -54,19 +54,19 @@ def canvas_html_init(block, title):
         div.style.verticalAlign = 'top'
         block.blocks.element.appendChild(div)
         if block.time_travel:
-                block.time_travel = div.childNodes[2]
-                block.time_travel.innerHTML = (
-                        '<button>◀</button>'
+                tt = div.childNodes[2]
+                tt.innerHTML = (
+                          '<button>◀ ' + block.time_travel[0] + '</button>'
                         + '<span></span>'
-                        + '<button>▶</button>'
+                        + '<button>' + block.time_travel[1] + ' ▶</button>'
                         )
-                block.time_travel_t = block.time_travel.childNodes[1]
+                block.time_travel_t = tt.childNodes[1]
                 def time_travel_back():
                         block.set_time(block.t - 1)
                 def time_travel_forward():
                         block.set_time(block.t + 1)
-                block.time_travel.childNodes[0].onclick = time_travel_back
-                block.time_travel.childNodes[2].onclick = time_travel_forward
+                tt.childNodes[0].onclick = time_travel_back
+                tt.childNodes[2].onclick = time_travel_forward
         block.element = div.childNodes[1]
         block.element.width = 200
         block.element.height = 500
@@ -125,10 +125,16 @@ def stop_event(event):
         event.cancelBubble = True
 
 def SRC_key(blocks, event):
-        if event.ctrlKey or event.metaKey or event.altKey:
+        if event.metaKey or event.altKey:
                 return
         key = event.key
         src = blocks.get('SRC')
+        if event.ctrlKey:
+                if key == 'z':
+                        src.set_time(src.t - 1)
+                elif key == 'y':
+                        src.set_time(src.t + 1)
+                return
         content = src.history[src.t]
         if key == 'ArrowRight':
                 if src.cursor < len(content):

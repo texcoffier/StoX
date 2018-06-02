@@ -1,7 +1,7 @@
 class CPU(Block):
         title = "Processor"
         name = "CPU"
-        time_travel = True
+        time_travel = ['⇞', '⇟']
 blocks.append(CPU())
 
 blocks.get('CPU').add_filter('dump', LEX_dump)
@@ -10,6 +10,8 @@ blocks.get('CPU').add_filter('html_draw', SRC_html_draw)
 
 def CPU_set_time(block, t):
         asm = blocks.get('ASM')
+        if t < 0:
+                t = 0
         if t <= block.t:
                 block.t = 0
                 block.items = []
@@ -49,3 +51,9 @@ def CPU_regtest(block, dummy):
                         bug
 blocks.get('CPU').add_filter('regtest', CPU_regtest)
 
+CPU_key_codes = {'PageUp': -1, 'PageDown': +1}
+def CPU_key(blocks, event):
+        if event.key in CPU_key_codes:
+                cpu = blocks.get('CPU')
+                cpu.set_time(cpu.t + CPU_key_codes[event.key])
+blocks.add_filter('key', CPU_key)
