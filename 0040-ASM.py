@@ -53,6 +53,11 @@ class CPU_emulator:
         def reset(self):
                 self.SP.set_word(0x8000)
                 self.set_PC(0)
+                i = 0x8000
+                while i in self.memory:
+                        self.memory[i].color = "#DDD"
+                        i += 1
+
         def set_PC(self, value):
                 self.PC.set_word(value)
                 if self.PC.value in self.memory:
@@ -145,8 +150,6 @@ def ASM_set_time(block, t):
         block.segment_stack = 0x8020
         for i in range(block.segment_heap, block.segment_stack):
                 block.cpu.memory[i] = Item('', 3*(i%4)).set_byte(0x00)
-                block.cpu.memory[i].color = "#DDD"
-                
         block.items = []
         if len(block.previous_block.items):
                 asm_generate(block, block.previous_block.items[0])
