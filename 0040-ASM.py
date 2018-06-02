@@ -50,9 +50,9 @@ class CPU_emulator:
                 self.by_name = {}
                 self.reset()
         def reset(self):
-                self.PC.set_word(0)
                 self.SP.set_word(0x8000)
                 self.memory = {}
+                self.set_PC(0)
         def set_PC(self, value):
                 self.PC.set_word(value)
                 if self.PC.value in self.memory:

@@ -19,13 +19,18 @@ def CPU_set_time(block, t):
                 block.append(asm.cpu.SP)
                 asm.cpu.SP.y = 1
                 asm.cpu.SP.x = 3
+                block.just_init = True
                 return
         asm.cpu.step()
 
 blocks.get('CPU').add_filter('set_time', CPU_set_time)
 
 def CPU_one_step(block, dummy):
-        block.set_time(block.t + 1)
+        if block.just_init:
+                blocks.get('ASM').cpu.set_PC(0)
+                block.just_init = False
+        else:
+                block.set_time(block.t + 1)
 blocks.get('CPU').add_filter('draw_cursor', CPU_one_step)
 
 def CPU_regtest(block, dummy):

@@ -5,10 +5,11 @@ then
         git clone https://github.com/atsepkov/RapydScript.git
 fi
 
-python3 xxx.py >xxx-py.txt || exit 1
-
 RapydScript/bin/rapydscript --prettify --bare xxx.py |
 sed -e 's/x.__class__.__name__/typeof(x)/'  >xxx.js
+
+python3 xxx.py >xxx-py.txt || exit 1
+
 
 ls -ls xxx.py xxx.js
 
