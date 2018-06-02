@@ -21,6 +21,7 @@ def YAC_init(block, dummy):
            ['Value'      , [['Group']]],
            ['Expression' , [['Value']]],
            ['Group'      , [['open'], s, ['Expression']  , s, ['close']]],
+           ['Group'      , [['open'], s, ['Unary']  , s, ['close']]],
            ['Binary'     , [['Expression'], s, ['star']  , s, ['Unary']]],
            ['Binary'     , [['Expression'], s, ['slash'] , s, ['Unary']]],
            ['Unary'      , [['plus'], s, ['Expression']]],
@@ -124,6 +125,7 @@ def yac_nice(item):
 def YAC_set_time(block, t):
         block.t = t
         items = []
+        block.path = []
         for i in block.previous_block.items:
                 item = i.clone()
                 item.char = item.char.replace("\n", "\\n")
@@ -136,13 +138,7 @@ def YAC_set_time(block, t):
                         new_items = rule_apply(block, items, rule)
                         if new_items:
                                 items = new_items
-                                ###################
-                                ###################
-                                ###################
-                                #print(' '.join(i.rule for i in items))
-                                ###################
-                                ###################
-                                ###################
+                                block.path.append([i.rule for i in items])
                                 change = True
                                 break
         block.items = []
@@ -153,6 +149,18 @@ def YAC_set_time(block, t):
                 bad = True
         block.next_block.set_time(0)
 blocks.get('YAC').add_filter('set_time', YAC_set_time)
+
+def YAC_key(blocks, event):
+        if event.key == 'F1':
+                yac = blocks.get('YAC')
+                s = ''
+                for path in yac.path:
+                        for rule in path:
+                                s += ' ' + rule
+                        s += '\n'
+                alert(s)
+blocks.add_filter('key', YAC_key)
+
 
 def YAC_regtest(yac, dummy):
         for input, output in [
@@ -165,12 +173,13 @@ def YAC_regtest(yac, dummy):
 ['a=1++2'       , '(A (V a =) (B 1 ++2))'],
 ['a=1+2+3'      , '(A (V a =) (B (B 1 +2) +3))'],
 ['a=1+2+3+4'    , '(A (V a =) (B (B (B 1 +2) +3) +4))'],
-['a=2*+3+4'     ,  '(A (V a =) (B (B 2 * +3) +4))'],
-['a=2*+3/4'     ,  '(A (V a =) (B (B 2 * +3) / 4))'],
-['a=1*2+3*4'    ,  '(A (V a =) (B (B 1 * 2) (U +3 * 4)))'],
+['a=2*+3+4'     , '(A (V a =) (B (B 2 * +3) +4))'],
+['a=2*+3/4'     , '(A (V a =) (B (B 2 * +3) / 4))'],
+['a=1*2+3*4'    , '(A (V a =) (B (B 1 * 2) (U +3 * 4)))'],
 ['a=+1*+2++3*+4', '(A (V a =) (B (U +1 * +2) +(U +3 * +4)))'],
 ['a=-(1)'       , '(A (V a =) -(G ( 1 )))'],
 ['a=(1+2)*(3+4)', '(A (V a =) (B (G ( (B 1 +2) )) * (G ( (B 3 +4) ))))'],
+['a=1+2/(+3)'   , '(A (V a =) (B 1 (U +2 / (G ( +3 )))))'],
         ]:
                 blocks.get('SRC').call('set', input)
                 nice = yac_nice(yac.items[0])
@@ -178,5 +187,8 @@ def YAC_regtest(yac, dummy):
                         print("input:", input)
                         print("expected:", output)
                         print("computed:", nice)
+                        for path in yac.path:
+                                print(path)
                         bug
 blocks.get('YAC').add_filter('regtest', YAC_regtest)
+

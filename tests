@@ -8,8 +8,11 @@ fi
 RapydScript/bin/rapydscript --prettify --bare xxx.py |
 sed -e 's/x.__class__.__name__/typeof(x)/'  >xxx.js
 
-python3 xxx.py >xxx-py.txt || exit 1
-
+if ! python3 xxx.py >xxx-py.txt
+then
+        cat xxx-py.txt
+        exit 1
+fi
 
 ls -ls xxx.py xxx.js
 
