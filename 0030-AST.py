@@ -150,6 +150,5 @@ def AST_regtest(ast, dummy):
                         blocks.get('YAC').dump()
                         print(yac_nice(blocks.get('YAC').items[0]))
                         bug
-        print("test_ast OK")
 blocks.get('AST').add_filter('regtest', AST_regtest)
 

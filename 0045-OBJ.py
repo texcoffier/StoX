@@ -34,4 +34,3 @@ def OBJ_set_time(block, t):
 
         block.next_block.set_time(0)
 blocks.get('OBJ').add_filter('set_time', OBJ_set_time)
-

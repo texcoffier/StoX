@@ -204,5 +204,4 @@ def SRC_regtest(src, dummy):
                                               "computed after=", after)
                                         zeraze
                         char += 1
-        print('test_change_line OK')
 blocks.get('SRC').add_filter('regtest', SRC_regtest)

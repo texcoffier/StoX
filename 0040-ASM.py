@@ -60,7 +60,8 @@ class CPU_emulator:
                         self.PC.color = code.color
                         instruction = self.by_code[code.value]
                         self.PC.char += " " + instruction.name
-                        self.memory[self.PC.value].asm.rectangle()
+                        if body:
+                                self.memory[self.PC.value].asm.rectangle()
         def step(self):
                 if self.PC.value not in self.memory:
                         return
@@ -68,8 +69,8 @@ class CPU_emulator:
                 instruction.execute(self)
                 self.set_PC(self.PC.value + instruction.size + 1)
         def get_data_word(self):
-                return (self.memory[self.PC.value+1].value * 256
-                      + self.memory[self.PC.value+2].value)
+                return (self.memory[self.PC.value+1].unsigned_value * 256
+                      + self.memory[self.PC.value+2].unsigned_value)
         def get_data_byte(self):
                 return self.memory[self.PC.value+1].value
         def stack_push(self, value):
@@ -171,7 +172,7 @@ def asm_program(block, item):
                 asm_generate(block, child)
 
 def asm_bytes(value):
-        return [int(value) >> 8, int(value) & 0xFF]
+        return [clamp(int(value) >> 8), clamp(int(value) & 0xFF)]
 
 def asm_affectation(block, item):
         asm_generate(block, item.children[1])
@@ -223,3 +224,28 @@ def asm_divide(block, item):
 def ASM_dump(block, dummy_arg):
         block.dump_cpu_and_memory()
 blocks.get('ASM').add_filter('dump', ASM_dump)
+
+def ASM_regtest(block, dummy):
+        blocks.get('SRC').call('set', 'a=1')
+        m = block.cpu.memory[0]
+        for input, char, value in [
+                [-257, "FF",   -1],
+                [-256, "00",   -0],
+                [-129, "7F",  127],
+                [-128, "80", -128],
+                [  -1, "FF",   -1],
+                [   0, "00",    0],
+                [ 127, "7F",  127],
+                [ 128, "80", -128],
+                [ 129, "81", -127],
+                [ 255, "FF",   -1],
+                [ 256, "00",    0],
+                [ 257, "01",    1],
+        ]:
+                m.set_byte(input)
+                if m.char != char or m.value != value:
+                        print("set_byte", input, "=>", m.char, m.value)
+                        bug_set_byte
+        
+blocks.get('ASM').add_filter('regtest', ASM_regtest)
+

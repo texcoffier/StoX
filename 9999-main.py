@@ -4,14 +4,17 @@
 
 blocks.init()
 
+body = None
+
 for block in blocks.blocks:
-        print(block.title)
+        print('Regression tests for «', block.title, "»")
         block.call('regtest')
+        print("OK")
 
 try:
         body = document.getElementsByTagName('BODY')[0]
 except:
-        body = None
+        pass
 
 if body:
         def keyevent(event):

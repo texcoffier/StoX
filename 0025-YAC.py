@@ -179,5 +179,4 @@ def YAC_regtest(yac, dummy):
                         print("expected:", output)
                         print("computed:", nice)
                         bug
-        print("test_yac OK")
 blocks.get('YAC').add_filter('regtest', YAC_regtest)

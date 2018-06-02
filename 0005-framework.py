@@ -25,20 +25,21 @@ class Item:
                 item.value          = self.value
                 return item
         def set_byte(self, i):
-                self.value = i
-                self.char = ("0123456789ABCDEF"[i >> 4 & 15]
-                           + "0123456789ABCDEF"[i      & 15])
+                self.char = hex(i>>4) + hex(i)
+                if not ( -128 <= i <= 127 ):
+                        self.error = True
+                        for item in self.previous_items:
+                                item.error = True
+                self.unsigned_value = i & 0xFF
+                self.value = clamp(i)
                 return self
         def set_word(self, i):
-                self.value = i
-                self.char = ("0123456789ABCDEF"[i>>12 & 15]
-                           + "0123456789ABCDEF"[i>>8  & 15]
-                           + "0123456789ABCDEF"[i>>4  & 15]
-                           + "0123456789ABCDEF"[i     & 15])
+                self.value = i & 0xFFFF
+                self.char = hex(i>>12) + hex(i>>8) + hex(i>>4) + hex(i)
                 return self
         def short(self):
                 return (str(int(self.x)) + '×' + str(int(self.y)) + ':'
-                        + str(self.value) + '<' + str(self.rule) + '>')
+                        + self.char + '<' + str(self.rule) + '>')
         def long(self):
                 v = self.short()
                 if len(self.next_items):

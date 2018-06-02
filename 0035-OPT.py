@@ -27,5 +27,4 @@ def OPT_set_time(block, t):
                 root = OPT_walk(block, block.previous_block.items[0])
                 yac_walk(block, root, 0, 0, 0, False, True)
         block.next_block.set_time(0)
-
 blocks.get('OPT').add_filter('set_time', OPT_set_time)
