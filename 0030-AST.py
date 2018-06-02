@@ -99,7 +99,7 @@ def ast_affectation(block, item):
         child = ast_children(item)
         item = AST_item(child[0].children[-1], '=',
                 [AST_item(child[0].children[0]), ast_apply(block, child[1])])
-        item.previous_items = child[0].children
+        #item.previous_items = child[0].children
         return item
 
 def ast_program(block, item):

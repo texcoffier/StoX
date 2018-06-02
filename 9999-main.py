@@ -2,7 +2,6 @@
 
 # binary PC feedback
 # load store feedback
-# Pas 2 feedback sur le '='
 
 blocks.init()
 
