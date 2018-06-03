@@ -7,8 +7,13 @@ run-tests:xxx.py
 run:xxx.py
 	python3 xxx.py
 
-xxx.py: $(SRC)
+xxx.py: $(SRC) RapydScript
 	cat $(SRC) >xxx.py
+
+RapydScript:
+	git clone https://github.com/atsepkov/RapydScript.git
+	# Works with this commit
+	# git checkout f121b356dea6dfc558884af69dd780754d8c5332
 
 clean:
 	rm xxx*

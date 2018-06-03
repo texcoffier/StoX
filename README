@@ -1,0 +1,46 @@
+# From source code to execution
+
+This tool allow to edit a source code in a web page
+and see all the stages from compilation to execution:
+
+  * Source code edition
+  * Lexical analysis
+  * Syntaxical analysis
+  * Abstract Syntax Tree
+  * Code optimization
+  * Assembly generation
+  * Machine code generation
+  * Processor execution
+  * Screen display
+
+When moving the cursor in the source code,
+the 8 next stages are updated to highlight
+the consequence the last instruction.
+
+When the processor executes an instruction, previous
+stages highlight execute/read/write/modify in
+the assembly, code, heap and stack.
+
+
+## How to use
+
+The tool is coded in Python and then translated into
+JavaScript to be executed on the browser.
+
+Type 'make' to generate 'xxx.js'
+
+Goto [pedago.html](http://perso.univ-lyon1.fr/thierry.excoffier/PARSER/pedago.html)
+to see the result.
+
+## How to enhance
+
+This project is based on functionality programming.
+So to add a functionality, it is not necessary to modify files.
+You only add your functionality in a new file.
+
+The source filenames start by a number defining the order
+of functionality addition.
+A good starting point is '0100-put.py'.
+It defines a new language element modifying the 8 stages
+displayed on the screen.
+
