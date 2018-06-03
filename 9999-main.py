@@ -1,7 +1,5 @@
 #!/usr/bin/python3
 
-# backspace on last char
-
 blocks.init()
 
 # blocks.get('SRC').call('set', '+')

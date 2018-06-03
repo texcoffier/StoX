@@ -175,8 +175,8 @@ def SRC_key(blocks, event):
         elif key == 'Backspace':
                 if src.cursor != 0:
                         new_content = content[:src.cursor-1] + content[src.cursor:]
-                        src.call('set', new_content)
                         src.cursor -= 1
+                        src.call('set', new_content)
         elif key == 'Delete':
                 if src.cursor != len(content):
                         new_content = content[:src.cursor] + content[src.cursor+1:]
