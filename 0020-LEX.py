@@ -17,16 +17,16 @@ blocks.get('LEX').add_filter('dump', LEX_dump)
 def LEX_init(block, dummy):
         block.lexem = []
         for lexem in [
-                [100, 'word'        , '[a-zA-Z]+'   , '#088'],
-                [100, 'number'      , '[0-9]+'      , '#880'],
-                [100, 'separator'   , '[ \n\t]'     , '#000'],
-                [100, 'plus'        , '[+]'         , '#808'],
-                [100, 'minus'       , '[-]'         , '#808'],
-                [100, 'star'        , '[*]'         , '#808'],
-                [100, 'slash'       , '[/]'         , '#808'],
-                [100, 'affectation' , '[=]'         , '#F00'],
-                [100, 'open'        , '[(]'         , '#00F'],
-                [100, 'close'       , '[)]'         , '#00F']
+                [100, 'word'        , '[ \n\t]*[a-zA-Z]+[ \n\t]*', '#088'],
+                [100, 'number'      , '[ \n\t]*[0-9]+[ \n\t]*'   , '#880'],
+                [100, 'plus'        , '[ \n\t]*[+][ \n\t]*'      , '#808'],
+                [100, 'minus'       , '[ \n\t]*[-][ \n\t]*'      , '#808'],
+                [100, 'star'        , '[ \n\t]*[*][ \n\t]*'      , '#808'],
+                [100, 'slash'       , '[ \n\t]*[/][ \n\t]*'      , '#808'],
+                [100, 'affectation' , '[ \n\t]*[=][ \n\t]*'      , '#F00'],
+                [100, 'open'        , '[ \n\t]*[(][ \n\t]*'      , '#00F'],
+                [100, 'close'       , '[ \n\t]*[)][ \n\t]*'      , '#00F'],
+                [999, 'nothing'     , '[ \n\t]+'                 , '#000']
         ]:
                 block.call('add_lexem', lexem)
 blocks.get('LEX').add_filter('init', LEX_init)
@@ -86,7 +86,7 @@ def LEX_set_time(block, t):
                                 item = Item('', 0, len(block.items),
                                             previous_items)
                                 item.rule  = lexem.name
-                                item.value = previous_current
+                                item.value = strip(previous_current)
                                 item.char  = (backslash(item.value)
                                               + ' (' + item.rule
                                               + ':' + backslash(lexem.regexp)

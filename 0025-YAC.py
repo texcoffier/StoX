@@ -12,32 +12,32 @@ def YAC_init(block, dummy):
         block.rules = []
         block.fontsize = 8
         block.line_spacing = 1
-        s = ['separator', '*']
         for rule in [
-           [ 100, 'Variable='  , [['word'], s, ['affectation']]],
+           [ 100, 'Variable='  , [['word'], ['affectation']]],
            [ 200, 'Variable'   , [['word']]],
            [ 300, 'Value'      , [['Variable']]],
            [ 400, 'Value'      , [['number']]],
            [ 500, 'Value'      , [['Group']]],
            [ 600, 'Expression' , [['Value']]],
-           [ 700, 'Group'      , [['open'], s, ['Expression']  , s, ['close']]],
-           [ 800, 'Group'      , [['open'], s, ['Unary']  , s, ['close']]],
-           [ 900, 'Binary'     , [['Expression'], s, ['star']  , s, ['Unary']]],
-           [1000, 'Binary'     , [['Expression'], s, ['slash'] , s, ['Unary']]],
-           [1100, 'Unary'      , [['plus'], s, ['Expression']]],
-           [1200, 'Unary'      , [['minus'], s, ['Expression']]],
-           [1300, 'Unary'      , [['Unary']     , s, ['star']  , s, ['Expression']]],
-           [1400, 'Unary'      , [['Unary']     , s, ['slash'] , s, ['Expression']]],
-           [1500, 'Unary'      , [['Unary']     , s, ['star']  , s, ['Unary']]],
-           [1600, 'Unary'      , [['Unary']     , s, ['slash'] , s, ['Unary']]],
-           [1700, 'Binary'     , [['Expression'], s, ['star']  , s, ['Expression']]],
-           [1800, 'Binary'     , [['Expression'], s, ['slash'] , s, ['Expression']]],
-           [1900, 'Binary'     , [['Expression'], s, ['Unary']]],
+           [ 700, 'Group'      , [['open']      , ['Expression'], ['close']]],
+           [ 800, 'Group'      , [['open']      , ['Unary']     , ['close']]],
+           [ 900, 'Binary'     , [['Expression'], ['star']      , ['Unary']]],
+           [1000, 'Binary'     , [['Expression'], ['slash']     , ['Unary']]],
+           [1100, 'Unary'      , [['plus']      , ['Expression']]],
+           [1200, 'Unary'      , [['minus']     , ['Expression']]],
+           [1300, 'Unary'      , [['Unary']     , ['star']      , ['Expression']]],
+           [1400, 'Unary'      , [['Unary']     , ['slash']     , ['Expression']]],
+           [1500, 'Unary'      , [['Unary']     , ['star']      , ['Unary']]],
+           [1600, 'Unary'      , [['Unary']     , ['slash']     , ['Unary']]],
+           [1700, 'Binary'     , [['Expression'], ['star']      , ['Expression']]],
+           [1800, 'Binary'     , [['Expression'], ['slash']     , ['Expression']]],
+           [1900, 'Binary'     , [['Expression'], ['Unary']]],
            [2000, 'Expression' , [['Binary']]],
            [2100, 'Value'      , [['Unary']]],
-           [2200, 'Affectation', [s, ['Variable='], s, ['Expression']]],
+           [2200, 'Affectation', [['Variable='] , ['Expression']]],
            [8000, 'Statement'  , [['Affectation']]],
            [9000, 'Program'    , [['Statement', '*']]],
+           [9000, 'Program'    , [['Program'], ['Program']]]
         ]:
                 block.call('update_rule', rule)
 blocks.get('YAC').add_filter('init', YAC_init)

@@ -2,9 +2,6 @@
 # Utilities
 ###############################################################################
 
-def backslash(txt):
-        return txt.replace('\n','\\n').replace('\t','\\t')
-
 def hex(integer):
         return "0123456789ABCDEF"[integer & 15]
 

@@ -9,10 +9,10 @@
 
 blocks.get('LEX').init()
 blocks.get('LEX').call('add_lexem',
-        [90,    # Priority: must be higher than the 'word' lexem priority
-         'put', # Name
-         'put', # Regular expression to match
-         '#0F0' # Color
+        [90,          # Priority: must be higher than the 'word' lexem priority
+         'put'                , # Name
+         '[ \n\t]*put[ \n\t]*', # Regular expression to match
+         '#0F0'                 # Color
         ])
 
 ##############################################################################
@@ -34,12 +34,11 @@ blocks.get('YAC').call('update_rule', [8000, 'Statement', [['Put']]])
 ##############################################################################
 
 def ast_put(block, item):
-        child = ast_children(item) # Remove all separators
         return AST_item(
-                child[0], # Take color/highlightcursor from YAC 'put' lexem
-                "Put",    # Name in the AST tree
+                item.children[0], # Take color/highlightcursor from YAC 'put' lexem
+                "Put",            # Name in the AST tree
                 # The children of the AST node (only one here)
-                [ast_apply(block, child[1])]
+                [ast_apply(block, item.children[1])]
                 )
 blocks.get('AST').init()
 blocks.get('AST').call('update_rule', ['Put', ast_put])

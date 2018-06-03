@@ -51,9 +51,6 @@ def AST_update_rule(block, rule):
         block.rules[rule[0]] = rule[1]
 blocks.get('AST').add_filter('update_rule', AST_update_rule)
 
-def ast_children(item):
-        return [i for i in item.children if i.rule != 'separator']
-
 def ast_value(block, item):
         if item.children[0].lex:
                 return AST_item(item, 'Value', [AST_item(item.children[0])])
@@ -64,53 +61,49 @@ def ast_variable(block, item):
         return AST_item(item, 'Variable', [AST_item(item.children[0])])
 
 def ast_unary(block, item):
-        child = ast_children(item)
-        if len(child) == 2:
-                node = ast_apply(block, child[1])
-                if child[0].value == '-':
-                        return AST_item(child[0], None, [node])
+        if len(item.children) == 2:
+                node = ast_apply(block, item.children[1])
+                if item.children[0].value == '-':
+                        return AST_item(item.children[0], None, [node])
                 else:
                         return node
-        if len(child) == 3:
-                return AST_item(child[1], None,
-                                 [ast_apply(block, child[0]),
-                                  ast_apply(block, child[2])])
+        if len(item.children) == 3:
+                return AST_item(item.children[1], None,
+                                 [ast_apply(block, item.children[0]),
+                                  ast_apply(block, item.children[2])])
         bug
 
 def ast_unary_operation(block, item):
-        child = ast_children(item)
-        if len(child) == 2:
-                return [AST_item(child[0]), ast_apply(block, child[1])]
+        if len(item.children) == 2:
+                return [AST_item(item.children[0]),
+                        ast_apply(block, item.children[1])]
         else:
-                operation, tree = ast_unary_operation(block, child[0])
-                return [operation, AST_item(child[1], None,
-                        [tree, ast_apply(block, child[2])])]
+                operation, tree = ast_unary_operation(block, item.children[0])
+                return [operation, AST_item(item.children[1], None,
+                        [tree, ast_apply(block, item.children[2])])]
 
 def ast_binary(block, item):
-        child = ast_children(item)
-        if len(child) == 3:
-                return AST_item(child[1], None, [ast_apply(block, child[0]),
-                                  ast_apply(block, child[2])])
+        if len(item.children) == 3:
+                return AST_item(item.children[1], None,
+                                [ast_apply(block, item.children[0]),
+                                 ast_apply(block, item.children[2])])
         else:
-                operation, tree = ast_unary_operation(block, child[1])
-                operation.children = [ast_apply(block, child[0]), tree]
+                operation, tree = ast_unary_operation(block, item.children[1])
+                operation.children = [ast_apply(block, item.children[0]), tree]
                 return operation
 
 def ast_affectation(block, item):
-        child = ast_children(item)
-        item = AST_item(child[0].children[-1], '=',
-                [AST_item(child[0].children[0]), ast_apply(block, child[1])])
-        #item.previous_items = child[0].children
+        item = AST_item(item.children[0].children[-1], '=',
+                [AST_item(item.children[0].children[0]),
+                 ast_apply(block, item.children[1])])
         return item
 
 def ast_program(block, item):
-        t = []
-        for child in ast_children(item):
-                t.append(ast_apply(block, child))
-        return AST_item(item, 'Program', t)
+        return AST_item(item, 'Program', [ast_apply(block, child)
+                                          for child in item.children])
 
 def ast_group(block, item):
-        return ast_apply(block, ast_children(item)[1])
+        return ast_apply(block, item.children[1])
 
 def ast_nice(item):
         if len(item.children) == 0:
