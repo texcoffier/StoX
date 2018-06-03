@@ -19,8 +19,8 @@ class Item:
         def clone(self):
                 item = Item(self.value)
                 item.previous_items = [self]
-                item.rule           = self.rule
                 item.color          = self.color
+                item.char           = self.char
                 item.rule           = self.rule
                 item.value          = self.value
                 return item

@@ -114,8 +114,8 @@ def ast_group(block, item):
 
 def ast_nice(item):
         if len(item.children) == 0:
-                return item.char
-        s = '[' + item.char
+                return item.value
+        s = '[' + item.value
         for child in item.children:
                 s += ',' + ast_nice(child)
         s += ']'

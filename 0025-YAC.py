@@ -116,11 +116,11 @@ def yac_walk(block, item, x, y, depth, bad, expand=False):
 
 def yac_nice(item):
         if len(item.children) == 0:
-                return item.char
+                return item.value
         if len(item.children) == 1:
                 return yac_nice(item.children[0])
         if item.char == 'Unary' and len(item.children) == 2:
-                return (item.children[0].char
+                return (item.children[0].value
                         + yac_nice(item.children[1]))
         s = '(' + item.char[0]
         for i in item.children:
@@ -133,7 +133,7 @@ def YAC_set_time(block, t):
         block.path = []
         for i in block.previous_block.items:
                 item = i.clone()
-                item.char = item.char.replace("\n", "\\n")
+                item.char = item.value.replace("\n", "\\n")
                 item.lex = True
                 items.append(item)
         change = True
