@@ -185,6 +185,7 @@ def YAC_regtest(yac, dummy):
 ['a=-(1)'       , '(A (V a =) -(G ( 1 )))'],
 ['a=(1+2)*(3+4)', '(A (V a =) (B (G ( (B 1 +2) )) * (G ( (B 3 +4) ))))'],
 ['a=1+2/(+3)'   , '(A (V a =) (B 1 (U +2 / (G ( +3 )))))'],
+['a=6$7'        , '(A (V a =) 6)']
         ]:
                 blocks.get('SRC').call('set', input)
                 nice = yac_nice(yac.items[0])

@@ -81,7 +81,9 @@ def LEX_set_time(block, t):
                                         possibles.append(lexem)
                         item.possibles = possibles
                 if len(possibles) == 0:
-                        if len(previous_possibles) >= 1 and current != '':
+                        if (len(previous_possibles) >= 1
+                             and current != ''
+                             and len(previous_possibles) != len(block.lexem)):
                                 lexem = previous_possibles[0]
                                 item = Item('', 0, len(block.items),
                                             previous_items)
@@ -114,3 +116,15 @@ def LEX_set_time(block, t):
                         previous_current = current
         block.next_block.set_time(0)
 blocks.get('LEX').add_filter('set_time', LEX_set_time)
+
+def LEX_regtest(lex, dummy):
+        blocks.get('SRC').call('set', 'a$7')
+        for i, expected in enumerate([
+        '0×0:a (word:[ \n\t]*[a-zA-Z]+[ \n\t]*)<word>,previous=0×0:a<a>',
+        '0×1:$:UNEXPECTED<$:UNEXPECTED>,previous=1×0:$<$>·2×0:7<7>',
+        ]):
+                if lex.items[i].long() != backslash(expected):
+                        print(expected)
+                        print(lex.items[i].long())
+                        bug
+blocks.get('LEX').add_filter('regtest', LEX_regtest)
