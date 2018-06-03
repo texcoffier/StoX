@@ -29,7 +29,8 @@ blocks.get('OBJ').add_filter('html_draw', SRC_html_draw)
 def OBJ_html_draw(block, dummy):
         cpu = blocks.get('ASM').cpu
         if cpu.PC.value in cpu.memory:
-                cpu.memory[cpu.PC.value].asm.rectangle()
+                asm = cpu.memory[cpu.PC.value].asm
+                asm.feedback(asm)
 blocks.get('OBJ').add_filter('html_draw', OBJ_html_draw)
 
 

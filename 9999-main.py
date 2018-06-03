@@ -1,9 +1,10 @@
 #!/usr/bin/python3
 
-# binary PC feedback
-# load store feedback
+# backspace on last char
 
 blocks.init()
+
+# blocks.get('SRC').call('set', '+')
 
 body = None
 

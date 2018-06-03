@@ -42,7 +42,8 @@ def AST_set_time(block, t):
         block.items = []
         if len(block.previous_block.items):
                 block.ast = ast_apply(block, block.previous_block.items[0])
-                yac_walk(block, block.ast, 0, 0, 0, False, True)
+                if len(block.ast.children): # No AST elements
+                        yac_walk(block, block.ast, 0, 0, 0, False, True)
         block.next_block.set_time(0)
 blocks.get('AST').add_filter('set_time', AST_set_time)
 

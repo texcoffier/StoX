@@ -13,6 +13,7 @@ class ASM(Block):
                 return self.variables[variable]
         def add_code(self, item):
                 self.cpu.memory[self.segment_code] = item
+                item.addr = self.segment_code
                 self.segment_code += 1
                 item.asm = self.items[-1]
         def dump_cpu_and_memory(self):
@@ -134,7 +135,7 @@ blocks.get('ASM').add_filter('init', ASM_init)
 
 def asm_generate(block, item):
         if item.char in block.rules:
-                return block.rules[item.char](block, item)
+                block.rules[item.char](block, item)
 
 def ASM_update_rule(block, rule):
         block.rules[rule[0]] = rule[1]
@@ -156,18 +157,37 @@ def ASM_set_time(block, t):
         block.next_block.set_time(0)
 blocks.get('ASM').add_filter('set_time', ASM_set_time)
 
-def asm_Item(block, from_item, name, value='', codes=[]):
+def asm_enhanced_feedback(asm):
+        asm.rectangle()
+        asm.code.rectangle()
+        for i in range(asm.instruction.size):
+                asm.block.cpu.memory[asm.code.addr + i + 1].rectangle()
+        if asm.more_feedback:
+                asm.more_feedback(asm)
+
+def asm_feedback_push(asm):
+        asm.block.cpu.memory[asm.block.cpu.SP.value].rectangle("#F00")
+
+def asm_feedback_pop(asm):
+        asm.block.cpu.memory[asm.block.cpu.SP.value-1].rectangle("#0F0")
+
+def asm_Item(block, from_item, name, value='', codes=[], feedback=None):
         item = from_item.clone()
         item.char = name + ' ' + value
         item.y = len(block.items)
         block.append(item)
-        if name in block.cpu.by_name:
-                instruction = block.cpu.by_name[name]
-                if instruction.size != len(codes):
-                        bug
-                block.add_code(item.clone().set_byte(instruction.code))
-                for code in codes:
-                        block.add_code(item.clone().set_byte(code))
+        if name not in block.cpu.by_name:
+                return
+        instruction = block.cpu.by_name[name]
+        if instruction.size != len(codes):
+                bug
+        item.feedback = asm_enhanced_feedback
+        item.more_feedback = feedback
+        item.code = item.clone().set_byte(instruction.code)
+        item.instruction = instruction
+        block.add_code(item.code)
+        for code in codes:
+                block.add_code(item.clone().set_byte(code))
 
 def asm_program(block, item):
         for child in item.children:
@@ -180,12 +200,21 @@ def asm_affectation(block, item):
         asm_generate(block, item.children[1])
         variable_name = item.children[0].value
         addr = block.declare(item.children[0], variable_name)
+        def feedback(asm):
+                asm.block.cpu.memory[addr].rectangle("#F00")
+                asm_feedback_pop(asm)
         asm_Item(block, item, 'STORE AT ADDRESS', variable_name,
-                 asm_bytes(addr))
+                 asm_bytes(addr), feedback)
 
 def asm_value(block, item):
         value = item.children[0].value
-        asm_Item(block, item.children[0], 'LOAD IMMEDIATE', value, [int(value)])
+        asm_Item(block, item.children[0], 'LOAD IMMEDIATE', value,
+                 [int(value)], asm_feedback_push)
+
+def asm_feedback_variable(asm):
+        if asm.addr in asm.block.cpu.memory:
+                asm.block.cpu.memory[asm.addr].rectangle("#0F0")
+        asm_feedback_push(asm)
 
 def asm_variable(block, item):
         variable_name = item.children[0].value
@@ -195,33 +224,42 @@ def asm_variable(block, item):
         else:
                 addr = 0xFFFF
         asm_Item(block, item.children[0], 'LOAD AT ADDRESS', variable_name,
-                 asm_bytes(addr))
+                 asm_bytes(addr), asm_feedback_variable)
+        block.items[-1].addr = addr
         if addr == 0xFFFF:
                 block.items[-1].error = True
+
+
+def asm_feedback_binary(asm):
+        asm.block.cpu.memory[asm.block.cpu.SP.value-2].rectangle("#F80")
+        asm.block.cpu.memory[asm.block.cpu.SP.value-1].rectangle("#0F0")
+
+def asm_feedback_unary(asm):
+        asm.block.cpu.memory[asm.block.cpu.SP.value-1].rectangle("#F80")
 
 def asm_addition(block, item):
         asm_generate(block, item.children[0])
         asm_generate(block, item.children[1])
-        asm_Item(block, item, 'ADDITION')
+        asm_Item(block, item, 'ADDITION', '', [], asm_feedback_binary)
 
 def asm_subtraction(block, item):
         if len(item.children) == 1:
                 asm_generate(block, item.children[0])
-                asm_Item(block, item, 'NEGATE')
+                asm_Item(block, item, 'NEGATE', '', [], asm_feedback_unary)
         else:
                 asm_generate(block, item.children[0])
                 asm_generate(block, item.children[1])
-                asm_Item(block, item, 'SUBTRACTION')
+                asm_Item(block, item, 'SUBTRACTION', '', [], asm_feedback_binary)
 
 def asm_multiply(block, item):
         asm_generate(block, item.children[0])
         asm_generate(block, item.children[1])
-        asm_Item(block, item, 'MULTIPLY')
+        asm_Item(block, item, 'MULTIPLY', '', [], asm_feedback_binary)
 
 def asm_divide(block, item):
         asm_generate(block, item.children[0])
         asm_generate(block, item.children[1])
-        asm_Item(block, item, 'DIVIDE')
+        asm_Item(block, item, 'DIVIDE', '', [], asm_feedback_binary)
 
 def ASM_dump(block, dummy_arg):
         block.dump_cpu_and_memory()
