@@ -104,6 +104,7 @@ class Block:
         fontsize       = 10
         line_spacing   = 1.3
         time_travel    = False
+        initialized    = False
         fullline_highlight = False
         def __init__(self):
                 self.items          = []
@@ -149,7 +150,10 @@ class Block:
 
         # Standard hooks
         def dump       (self, args=None): self.call('dump'       , args)
-        def init       (self, args=None): self.call('init'       , args)
+        def init       (self, args=None):
+                if not self.initialized:
+                        self.call('init'       , args)
+                        self.initialized = True
         def html_init  (self, args=None): self.call('html_init'  , args)
         def html_draw  (self, args=None): self.call('html_draw'  , args)
         def draw_cursor(self, args=None): self.call('draw_cursor', args)

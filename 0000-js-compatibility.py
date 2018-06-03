@@ -11,6 +11,8 @@ try:
                         return m.group(0) == text
         def join(t):
                 return '·'.join(t)
+        context = "Python"
+        body = None
 except:
         o = Object
         o.defineProperty(Array.prototype, 'append' ,
@@ -21,3 +23,8 @@ except:
                 return t.join('·')
         def str(x):
                 return '' + x
+        context = "JavaScript"
+        try:
+                body = document.getElementsByTagName('BODY')[0]
+        except:
+                body = None

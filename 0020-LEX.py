@@ -17,30 +17,40 @@ blocks.get('LEX').add_filter('dump', LEX_dump)
 def LEX_init(block, dummy):
         block.lexem = []
         for lexem in [
-                ['word'        , '[a-zA-Z]+'   , '#088'],
-                ['number'      , '[0-9]+'      , '#880'],
-                ['separator'   , '[ \n\t]'     , '#000'],
-                ['plus'        , '[+]'         , '#808'],
-                ['minus'       , '[-]'         , '#808'],
-                ['star'        , '[*]'         , '#808'],
-                ['slash'       , '[/]'         , '#808'],
-                ['affectation' , '[=]'         , '#F00'],
-                ['open'        , '[(]'         , '#00F'],
-                ['close'       , '[)]'         , '#00F']
+                [100, 'word'        , '[a-zA-Z]+'   , '#088'],
+                [100, 'number'      , '[0-9]+'      , '#880'],
+                [100, 'separator'   , '[ \n\t]'     , '#000'],
+                [100, 'plus'        , '[+]'         , '#808'],
+                [100, 'minus'       , '[-]'         , '#808'],
+                [100, 'star'        , '[*]'         , '#808'],
+                [100, 'slash'       , '[/]'         , '#808'],
+                [100, 'affectation' , '[=]'         , '#F00'],
+                [100, 'open'        , '[(]'         , '#00F'],
+                [100, 'close'       , '[)]'         , '#00F']
         ]:
                 block.call('add_lexem', lexem)
 blocks.get('LEX').add_filter('init', LEX_init)
 
 class Lexem:
         def __init__(self, data):
-                self.name   = data[0]
-                self.regexp = data[1]
-                self.color  = data[2]
+                self.priority = data[0]
+                self.name     = data[1]
+                self.regexp   = data[2]
+                self.color    = data[3]
         def long(self):
                 return self.name + ':' + self.regexp
 
+def lex_compare_js(x, y):
+        return x.priority - y.priority
+def lex_compare_python(x):
+        return x.priority
+
 def LEX_add_lexem(block, lexem):
         block.lexem.append(Lexem(lexem))
+        if context == "JavaScript":
+                block.lexem.sort(lex_compare_js)
+        else:
+                block.lexem.sort(key=lex_compare_python)
 blocks.get('LEX').add_filter('add_lexem', LEX_add_lexem)
 
 def LEX_set_time(block, t):
@@ -71,7 +81,7 @@ def LEX_set_time(block, t):
                                         possibles.append(lexem)
                         item.possibles = possibles
                 if len(possibles) == 0:
-                        if len(previous_possibles) == 1:
+                        if len(previous_possibles) >= 1 and current != '':
                                 lexem = previous_possibles[0]
                                 item = Item('', 0, len(block.items),
                                             previous_items)
