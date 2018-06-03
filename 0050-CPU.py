@@ -23,6 +23,7 @@ def CPU_set_time(block, t):
                 asm.cpu.SP.y = 1
                 asm.cpu.SP.x = 3
                 asm.cpu.reset()
+                block.next_block.set_time(0)
         while block.t < t:
                 asm.cpu.step()
                 block.t += 1

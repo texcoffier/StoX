@@ -101,7 +101,7 @@ class Block:
         next_block     = None
         previous_block = None
         cursor         = 0
-        fontsize       = 12
+        fontsize       = 10
         line_spacing   = 1.3
         time_travel    = False
         fullline_highlight = False

@@ -68,7 +68,7 @@ def canvas_html_init(block, title):
                 tt.childNodes[0].onclick = time_travel_back
                 tt.childNodes[2].onclick = time_travel_forward
         block.element = div.childNodes[1]
-        block.element.width = 200
+        block.element.width = 170
         block.element.height = 500
         block.element.style.width  = str(block.element.width) + 'px'
         block.element.style.height = str(block.element.height) + 'px'
