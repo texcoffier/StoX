@@ -14,36 +14,37 @@ def YAC_init(block, dummy):
         block.line_spacing = 1
         s = ['separator', '*']
         for rule in [
-           ['Variable='  , [['word'], s, ['affectation']]],
-           ['Variable'   , [['word']]],
-           ['Value'      , [['Variable']]],
-           ['Value'      , [['number']]],
-           ['Value'      , [['Group']]],
-           ['Expression' , [['Value']]],
-           ['Group'      , [['open'], s, ['Expression']  , s, ['close']]],
-           ['Group'      , [['open'], s, ['Unary']  , s, ['close']]],
-           ['Binary'     , [['Expression'], s, ['star']  , s, ['Unary']]],
-           ['Binary'     , [['Expression'], s, ['slash'] , s, ['Unary']]],
-           ['Unary'      , [['plus'], s, ['Expression']]],
-           ['Unary'      , [['minus'], s, ['Expression']]],
-           ['Unary'      , [['Unary']     , s, ['star']  , s, ['Expression']]],
-           ['Unary'      , [['Unary']     , s, ['slash'] , s, ['Expression']]],
-           ['Unary'      , [['Unary']     , s, ['star']  , s, ['Unary']]],
-           ['Unary'      , [['Unary']     , s, ['slash'] , s, ['Unary']]],
-           ['Binary'     , [['Expression'], s, ['star']  , s, ['Expression']]],
-           ['Binary'     , [['Expression'], s, ['slash'] , s, ['Expression']]],
-           ['Binary'     , [['Expression'], s, ['Unary']]],
-           ['Expression' , [['Binary']]],
-           ['Value'      , [['Unary']]],
-           ['Affectation', [s, ['Variable='], s, ['Expression']]],
-           ['Statement'  , [['Affectation']]],
-           ['Program'    , [['Statement', '*']]],
+           [ 100, 'Variable='  , [['word'], s, ['affectation']]],
+           [ 200, 'Variable'   , [['word']]],
+           [ 300, 'Value'      , [['Variable']]],
+           [ 400, 'Value'      , [['number']]],
+           [ 500, 'Value'      , [['Group']]],
+           [ 600, 'Expression' , [['Value']]],
+           [ 700, 'Group'      , [['open'], s, ['Expression']  , s, ['close']]],
+           [ 800, 'Group'      , [['open'], s, ['Unary']  , s, ['close']]],
+           [ 900, 'Binary'     , [['Expression'], s, ['star']  , s, ['Unary']]],
+           [1000, 'Binary'     , [['Expression'], s, ['slash'] , s, ['Unary']]],
+           [1100, 'Unary'      , [['plus'], s, ['Expression']]],
+           [1200, 'Unary'      , [['minus'], s, ['Expression']]],
+           [1300, 'Unary'      , [['Unary']     , s, ['star']  , s, ['Expression']]],
+           [1400, 'Unary'      , [['Unary']     , s, ['slash'] , s, ['Expression']]],
+           [1500, 'Unary'      , [['Unary']     , s, ['star']  , s, ['Unary']]],
+           [1600, 'Unary'      , [['Unary']     , s, ['slash'] , s, ['Unary']]],
+           [1700, 'Binary'     , [['Expression'], s, ['star']  , s, ['Expression']]],
+           [1800, 'Binary'     , [['Expression'], s, ['slash'] , s, ['Expression']]],
+           [1900, 'Binary'     , [['Expression'], s, ['Unary']]],
+           [2000, 'Expression' , [['Binary']]],
+           [2100, 'Value'      , [['Unary']]],
+           [2200, 'Affectation', [s, ['Variable='], s, ['Expression']]],
+           [8000, 'Statement'  , [['Affectation']]],
+           [9000, 'Program'    , [['Statement', '*']]],
         ]:
                 block.call('update_rule', rule)
 blocks.get('YAC').add_filter('init', YAC_init)
 
 class Rule:
-        def __init__(self, name, data):
+        def __init__(self, priority, name, data):
+                self.priority = priority
                 self.name = name
                 self.lexems = []
                 for x in data:
@@ -54,7 +55,11 @@ class Rule:
                 return self.name + ':' + self.lexems
 
 def YAC_update_rule(block, rule):
-        block.rules.append(Rule(rule[0], rule[1]))
+        block.rules.append(Rule(rule[0], rule[1], rule[2]))
+        if context == "JavaScript":
+                block.rules.sort(lex_compare_js)
+        else:
+                block.rules.sort(key=lex_compare_python)
 blocks.get('YAC').add_filter('update_rule', YAC_update_rule)
 
 def rule_match(items, position, rule):
