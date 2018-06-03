@@ -57,4 +57,5 @@ def CPU_key(blocks, event):
         if event.key in CPU_key_codes:
                 cpu = blocks.get('CPU')
                 cpu.set_time(cpu.t + CPU_key_codes[event.key])
+                stop_event(event)
 blocks.add_filter('key', CPU_key)
