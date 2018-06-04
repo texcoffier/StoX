@@ -19,12 +19,12 @@ def AST_init(block, dummy):
         block.rules = {}
         for rule in [
                 ['Affectation', ast_affectation],
-                ['Unary', ast_unary],
-                ['Variable', ast_variable],
-                ['Binary', ast_binary],
-                ['Value', ast_value],
-                ['Group', ast_group],
-                ['Program', ast_program],
+                ['Unary'      , ast_unary],
+                ['Variable'   , ast_variable],
+                ['Binary'     , ast_binary],
+                ['Value'      , ast_value],
+                ['Group'      , ast_group],
+                ['Statement'  , ast_program],
                 ]:
                 blocks.get('AST').call('update_rule', rule)
 blocks.get('AST').add_filter('init', AST_init)
@@ -99,8 +99,8 @@ def ast_affectation(block, item):
         return item
 
 def ast_program(block, item):
-        return AST_item(item, 'Program', [ast_apply(block, child)
-                                          for child in item.children])
+        return AST_item(item, 'Statement', [ast_apply(block, child)
+                                            for child in item.children])
 
 def ast_group(block, item):
         return ast_apply(block, item.children[1])
@@ -116,24 +116,24 @@ def ast_nice(item):
 
 def AST_regtest(ast, dummy):
         for input, output in [
-['a=1'          , "[Program,[=,a,[Value,1]]]"],
-['a=+1'         , "[Program,[=,a,[Value,1]]]"],
-['a=-1'         , "[Program,[=,a,[-,[Value,1]]]]"],
-['a=1+2'        , "[Program,[=,a,[+,[Value,1],[Value,2]]]]"],
-['a=1+2*3'      , "[Program,[=,a,[+,[Value,1],[*,[Value,2],[Value,3]]]]]"],
-['a=++1'        , "[Program,[=,a,[Value,1]]]"],
-['a=1++2'       , "[Program,[=,a,[+,[Value,1],[Value,2]]]]"],
-['a=1+2+3'      , "[Program,[=,a,[+,[+,[Value,1],[Value,2]],[Value,3]]]]"],
-['a=1+2+3+4'    , "[Program,[=,a,[+,[+,[+,[Value,1],[Value,2]],[Value,3]],[Value,4]]]]"],
-['a=2*+3+4'     , "[Program,[=,a,[+,[*,[Value,2],[Value,3]],[Value,4]]]]"],
-['a=2*+3/4'     , "[Program,[=,a,[/,[*,[Value,2],[Value,3]],[Value,4]]]]"],
-['a=1*2+3*4'    , "[Program,[=,a,[+,[*,[Value,1],[Value,2]],[*,[Value,3],[Value,4]]]]]"],
-['a=+1*+2++3*+4', "[Program,[=,a,[+,[*,[Value,1],[Value,2]],[*,[Value,3],[Value,4]]]]]"],
-['a=-(1)'       , "[Program,[=,a,[-,[Value,1]]]]"],
-['a=(1+2)*(3+4)', "[Program,[=,a,[*,[+,[Value,1],[Value,2]],[+,[Value,3],[Value,4]]]]]"],
-[' a = 5 ', '[Program,[=,a,[Value,5]]]'],
-[' a = ( 1 * 3 ) + 5 ', '[Program,[=,a,[+,[*,[Value,1],[Value,3]],[Value,5]]]]'],
-['a=1+2/+3', '[Program,[=,a,[+,[Value,1],[/,[Value,2],[Value,3]]]]]'],
+['a=1'          , "[Statement,[=,a,[Value,1]]]"],
+['a=+1'         , "[Statement,[=,a,[Value,1]]]"],
+['a=-1'         , "[Statement,[=,a,[-,[Value,1]]]]"],
+['a=1+2'        , "[Statement,[=,a,[+,[Value,1],[Value,2]]]]"],
+['a=1+2*3'      , "[Statement,[=,a,[+,[Value,1],[*,[Value,2],[Value,3]]]]]"],
+['a=++1'        , "[Statement,[=,a,[Value,1]]]"],
+['a=1++2'       , "[Statement,[=,a,[+,[Value,1],[Value,2]]]]"],
+['a=1+2+3'      , "[Statement,[=,a,[+,[+,[Value,1],[Value,2]],[Value,3]]]]"],
+['a=1+2+3+4'    , "[Statement,[=,a,[+,[+,[+,[Value,1],[Value,2]],[Value,3]],[Value,4]]]]"],
+['a=2*+3+4'     , "[Statement,[=,a,[+,[*,[Value,2],[Value,3]],[Value,4]]]]"],
+['a=2*+3/4'     , "[Statement,[=,a,[/,[*,[Value,2],[Value,3]],[Value,4]]]]"],
+['a=1*2+3*4'    , "[Statement,[=,a,[+,[*,[Value,1],[Value,2]],[*,[Value,3],[Value,4]]]]]"],
+['a=+1*+2++3*+4', "[Statement,[=,a,[+,[*,[Value,1],[Value,2]],[*,[Value,3],[Value,4]]]]]"],
+['a=-(1)'       , "[Statement,[=,a,[-,[Value,1]]]]"],
+['a=(1+2)*(3+4)', "[Statement,[=,a,[*,[+,[Value,1],[Value,2]],[+,[Value,3],[Value,4]]]]]"],
+[' a = 5 ', '[Statement,[=,a,[Value,5]]]'],
+[' a = ( 1 * 3 ) + 5 ', '[Statement,[=,a,[+,[*,[Value,1],[Value,3]],[Value,5]]]]'],
+['a=1+2/+3', '[Statement,[=,a,[+,[Value,1],[/,[Value,2],[Value,3]]]]]'],
         ]:
                 blocks.get('SRC').call('set', input)
                 nice = ast_nice(ast.ast)

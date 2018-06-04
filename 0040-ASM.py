@@ -100,14 +100,14 @@ def ASM_init(block, dummy):
         block.rules = {}
         block.cpu = CPU_emulator()
         for rule in [
-                ['Program' , asm_program],
-                ['='       , asm_affectation],
-                ['Value'   , asm_value],
-                ['Variable', asm_variable],
-                ["+"       , asm_addition],
-                ["-"       , asm_subtraction],
-                ["*"       , asm_multiply],
-                ["/"       , asm_divide],
+                ['Statement', asm_program],
+                ['='        , asm_affectation],
+                ['Value'    , asm_value],
+                ['Variable' , asm_variable],
+                ["+"        , asm_addition],
+                ["-"        , asm_subtraction],
+                ["*"        , asm_multiply],
+                ["/"        , asm_divide],
                 ]:
                 blocks.get('ASM').call('update_rule', rule)
         def x00(cpu): cpu.stack_push(cpu.get_data_byte())

@@ -40,7 +40,7 @@ blocks.get('YAC').init()
 blocks.get('YAC').call('update_rule',
         [450,   # Before the promotion of 'Group' to 'Value'
          'While', # Name
-         [['while'], ['Expression'], ['open-brace'],['Program'],['close-brace']]
+         [['while'], ['Expression'], ['open-brace'],['Statement'],['close-brace']]
         ])
 # 'While' is a 'Statement'
 blocks.get('YAC').call('update_rule', [8000, 'Statement', [['While']]])

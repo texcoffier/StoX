@@ -36,8 +36,7 @@ def YAC_init(block, dummy):
            [2100, 'Value'      , [['Unary']]],
            [2200, 'Affectation', [['Variable='] , ['Expression']]],
            [8000, 'Statement'  , [['Affectation']]],
-           [9000, 'Program'    , [['Statement', '*']]],
-           [9000, 'Program'    , [['Program'], ['Program']]]
+           [9000, 'Statement'  , [['Statement'], ['Statement']]],
         ]:
                 block.call('update_rule', rule)
 blocks.get('YAC').add_filter('init', YAC_init)
