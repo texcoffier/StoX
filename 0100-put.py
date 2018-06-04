@@ -19,12 +19,11 @@ blocks.get('LEX').call('add_lexem',
 # Syntaxic analyser
 ##############################################################################
 
-s = ['separator', '*']
 blocks.get('YAC').init()
 blocks.get('YAC').call('update_rule',
         [450,   # Before the promotion of 'Group' to 'Value'
          'Put', # Name
-         [s, ['put'], s, ['Group']] # Lexem 'put' followed by '(expression)'
+         [['put'], ['Group']] # Lexem 'put' followed by '(expression)'
         ])
 # 'Put' is a 'Statement'
 blocks.get('YAC').call('update_rule', [8000, 'Statement', [['Put']]])
