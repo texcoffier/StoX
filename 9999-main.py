@@ -19,7 +19,7 @@ if body:
                 src.cursor_visible = 1 - src.cursor_visible
 
         blocks.html_init(body)
-        blocks.get('SRC').call('set', 'a=62\nwhile(a)\n {\n  put(127-a)\n  a = a - 1\n }')
+        blocks.get('SRC').call('set', 'a=65\nwhile(a != 70)\n {\n  put(a)\n  a = a + 1\n }')
         setInterval(drawevent, 400)
         window.addEventListener('keypress', keyevent, False)
 else:

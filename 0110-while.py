@@ -60,17 +60,12 @@ blocks.get('AST').init()
 blocks.get('AST').call('update_rule', ['While', ast_while])
 
 ##############################################################################
-# Add processor 'JUMP' ans 'JUMP IF ZERO' instructions
+# Add processor 'JUMP' instruction
 ##############################################################################
 
-blocks.get('ASM').init()
 def x09(cpu):
         cpu.set_PC(cpu.get_data_word())
 Instruction(0x09, "JUMP", 2, x09)
-def x0A(cpu):
-        if cpu.stack_pop() == 0:
-                cpu.set_PC(cpu.get_data_word())
-Instruction(0x0A, "JUMP IF ZERO", 2, x0A)
 
 ##############################################################################
 # Generate assembly code
@@ -84,7 +79,7 @@ def asm_while(block, item):
         # Stop the loop if zero
         asm_Item(block,
                  item,             # Take color/highlightcursor from AST 'While'
-                 'JUMP IF ZERO',   # Processor instruction
+                 'JUMP ==0',       # Processor instruction
                  'WHILE_END',      # Instruction parameter (only for user feedback)
                  asm_bytes(0xFFFF),# Data byte to put after instruction code
                  asm_feedback_pop  # Rectangle feedback on execution
@@ -99,9 +94,7 @@ def asm_while(block, item):
                  asm_bytes(while_start)
                  )
         asm_Item(block, item, 'WHILE_END:')
-        while_end = block.segment_code
-        block.cpu.memory[address_to_patch].set_byte(clamp(while_end >> 8))
-        block.cpu.memory[address_to_patch+1].set_byte(clamp(while_end & 0xFF))
+        block.cpu.set_data_word(address_to_patch, block.segment_code)
 blocks.get('ASM').call('update_rule',
                         ['While',   # AST node name
                          asm_while  # Generating function

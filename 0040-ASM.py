@@ -79,6 +79,9 @@ class CPU_emulator:
                       + self.memory[self.PC.value+2].unsigned_value)
         def get_data_byte(self):
                 return self.memory[self.PC.value+1].value
+        def set_data_word(self, address, value):
+                self.memory[address].set_byte(clamp(value >> 8))
+                self.memory[address+1].set_byte(clamp(value & 0xFF))
         def stack_push(self, value):
                 self.memory[self.SP.value].set_byte(value)
                 self.memory[self.SP.value].color = "#000"
