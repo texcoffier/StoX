@@ -16,6 +16,7 @@ blocks.get('LEX').add_filter('dump', LEX_dump)
 
 def LEX_init(block, dummy):
         block.lexem = []
+        block.lexem_by_rule = {}
         for lexem in [
                 [100, 'word'        , '[ \n\t]*[a-zA-Z]+[ \n\t]*', '#088'],
                 [100, 'number'      , '[ \n\t]*[0-9]+[ \n\t]*'   , '#880'],
@@ -46,7 +47,9 @@ def lex_compare_python(x):
         return x.priority
 
 def LEX_add_lexem(block, lexem):
-        block.lexem.append(Lexem(lexem))
+        l = Lexem(lexem)
+        block.lexem.append(l)
+        block.lexem_by_rule[l.name] = l
         if context == "JavaScript":
                 block.lexem.sort(lex_compare_js)
         else:
@@ -90,9 +93,7 @@ def LEX_set_time(block, t):
                                 item.rule  = lexem.name
                                 item.value = strip(previous_current)
                                 item.char  = (backslash(item.value)
-                                              + ' (' + item.rule
-                                              + ':' + backslash(lexem.regexp)
-                                              + ')')
+                                              + ' → ' + item.rule)
                                 item.color       = lexem.color
                                 block.append(item)
                                 current = ''
@@ -101,7 +102,7 @@ def LEX_set_time(block, t):
                                 previous_current = ''
                         else:
                                 if current != '':
-                                        item = Item(current + ':UNEXPECTED',
+                                        item = Item(current + ' is UNEXPECTED',
                                             0, len(block.items),
                                             previous_items)
                                         item.previous_items = items[i:]
@@ -117,11 +118,30 @@ def LEX_set_time(block, t):
         block.next_block.set_time(0)
 blocks.get('LEX').add_filter('set_time', LEX_set_time)
 
+def LEX_html_draw(block, dummy):
+        for item in block.items:
+                if item.highlight:
+                        feedback = Item('', 0, len(block.items) + 1)
+                        feedback.block = block
+                        for text in ['Rule:',
+                                     item.rule,
+                                     '',
+                                     'Regular expression:',
+                                     block.lexem_by_rule[item.rule].regexp
+                                     ]:
+                                feedback.char = text
+                                feedback.fillText()
+                                feedback.y += 1
+        blocks.get('SRC').cursor
+
+blocks.get('LEX').add_filter('html_draw', LEX_html_draw)
+
+
 def LEX_regtest(lex, dummy):
         blocks.get('SRC').call('set', 'a$7')
         for i, expected in enumerate([
-        '0×0:a (word:[ \n\t]*[a-zA-Z]+[ \n\t]*)<word>,previous=0×0:a<a>',
-        '0×1:$:UNEXPECTED<$:UNEXPECTED>,previous=1×0:$<$>·2×0:7<7>',
+        '0×0:a → word<word>,previous=0×0:a<a>',
+        '0×1:$ is UNEXPECTED<$ is UNEXPECTED>,previous=1×0:$<$>·2×0:7<7>',
         ]):
                 if lex.items[i].long() != backslash(expected):
                         print(expected)
