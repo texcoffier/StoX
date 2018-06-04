@@ -1,12 +1,9 @@
 #!/usr/bin/python3
 
-blocks.init()
-
 for block in blocks.blocks:
         print('Regression tests for «', block.title, "»")
         block.call('regtest')
         print("OK")
-
 
 if body:
         def keyevent(event):

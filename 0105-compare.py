@@ -7,11 +7,6 @@
 #   JUMP >=0
 #   JUMP >0
 
-
-blocks.get('LEX').init()
-blocks.get('YAC').init()
-blocks.get('ASM').init()
-
 # To let the lexer find '!='
 blocks.get('LEX').call('add_lexem',
                        [100, 'negate', '[ \n\t]*[!][ \n\t]*', '#808'])

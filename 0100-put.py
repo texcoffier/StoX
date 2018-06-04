@@ -7,7 +7,6 @@
 # Lexical analyser
 ##############################################################################
 
-blocks.get('LEX').init()
 blocks.get('LEX').call('add_lexem',
         [90,          # Priority: must be higher than the 'word' lexem priority
          'put'                , # Name
@@ -19,7 +18,6 @@ blocks.get('LEX').call('add_lexem',
 # Syntaxic analyser
 ##############################################################################
 
-blocks.get('YAC').init()
 blocks.get('YAC').call('update_rule',
         [450,   # Before the promotion of 'Group' to 'Value'
          'Put', # Name
@@ -39,14 +37,12 @@ def ast_put(block, item):
                 # The children of the AST node (only one here)
                 [ast_apply(block, item.children[1])]
                 )
-blocks.get('AST').init()
 blocks.get('AST').call('update_rule', ['Put', ast_put])
 
 ##############################################################################
 # Add processor 'PUT' instruction
 ##############################################################################
 
-blocks.get('ASM').init()
 def x08(cpu):
         # Execute the instruction
         blocks.get('TTY').call('put', cpu.stack_pop())

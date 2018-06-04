@@ -12,7 +12,6 @@
 # Lexical analyser
 ##############################################################################
 
-blocks.get('LEX').init()
 blocks.get('LEX').call('add_lexem',
         [90,      # Priority: must be higher than the 'word' lexem priority
          'while',                 # Name
@@ -36,7 +35,6 @@ blocks.get('LEX').call('add_lexem',
 # Syntaxic analyser
 ##############################################################################
 
-blocks.get('YAC').init()
 blocks.get('YAC').call('update_rule',
         [450,   # Before the promotion of 'Group' to 'Value'
          'While', # Name
@@ -56,7 +54,6 @@ def ast_while(block, item):
                 [ast_apply(block, item.children[1]),
                  ast_apply(block, item.children[3])]
                 )
-blocks.get('AST').init()
 blocks.get('AST').call('update_rule', ['While', ast_while])
 
 ##############################################################################
