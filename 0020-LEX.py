@@ -120,7 +120,7 @@ blocks.get('LEX').add_filter('set_time', LEX_set_time)
 
 def LEX_html_draw(block, dummy):
         for item in block.items:
-                if item.highlight:
+                if item.highlight and item.rule in block.lexem_by_rule:
                         feedback = Item('', 0, len(block.items) + 1)
                         feedback.block = block
                         for text in ['Rule:',
