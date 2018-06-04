@@ -15,6 +15,18 @@ def OPT_walk(block, old_item):
                 and old_item.children[0].rule == 'minus'
                 and len(old_item.children[0].children) == 1):
                 return OPT_walk(block, old_item.children[0].children[0])
+        # Replace Statement(Statement,Statement) by Statement
+        if (old_item.rule == 'Statement'
+            and len(old_item.children) == 2
+            and old_item.children[0].rule == 'Statement'
+            and old_item.children[1].rule == 'Statement'
+                ):
+                item = old_item.clone()
+                for child in old_item.children[0].children:
+                        item.children.append(OPT_walk(block, child))
+                for child in old_item.children[1].children:
+                        item.children.append(OPT_walk(block, child))
+                return item
         item = old_item.clone()
         for child in old_item.children:
                 item.children.append(OPT_walk(block, child))
