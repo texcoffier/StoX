@@ -17,3 +17,6 @@ RapydScript:
 
 clean:
 	rm xxx*
+
+install:
+	cp xxx.js pedago.html $(HOME)/public_html/PARSER
