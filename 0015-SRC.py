@@ -49,7 +49,11 @@ blocks.get('SRC').add_filter('set_time', SRC_set_time)
 
 def canvas_html_init(block, title):
         div = document.createElement('DIV')
-        div.innerHTML = "<p>" + title + "</p><canvas></canvas><div></div>"
+        div.innerHTML = ('<p class="title">'
+                         + title
+                         + '</p>'
+                         + '<canvas></canvas>'
+                         + '<div class="footer"></div>')
         div.style.display = "inline-block"
         div.style.verticalAlign = 'top'
         block.blocks.element.appendChild(div)
@@ -68,11 +72,14 @@ def canvas_html_init(block, title):
                 tt.childNodes[0].onclick = time_travel_back
                 tt.childNodes[2].onclick = time_travel_forward
         block.element = div.childNodes[1]
-        block.element.width = 170
-        block.element.height = 500
-        block.element.style.width  = str(block.element.width) + 'px'
+        block.element.width = (window_width - 50) / len(blocks.blocks)
+        block.element.height = window_height - 100
+        block.element.style.width = str(block.element.width) + 'px'
         block.element.style.height = str(block.element.height) + 'px'
         block.ctx = block.element.getContext("2d")
+        div.style.overflow = 'hidden'
+        div.style.width = str(block.element.width) + 'px'
+        div.style.height = str(block.element.height + 100) + 'px'
 blocks.get('SRC').add_filter('html_init', canvas_html_init)
 
 def SRC_html_draw(block, dummy):
@@ -114,11 +121,8 @@ def SRC_draw_cursor(block, dummy):
                         x = block.empty.xy()[0] + 3
                 else:
                         x += w
-        block.ctx.fillStyle = "#000"
-        block.ctx.strokeStyle = "#F00"
-        block.ctx.lineWidth = 3
-        block.ctx.fillRect(x - 3, y - h, 3, block.fontsize + 2)
-        block.ctx.lineWidth = 1
+        block.ctx.fillStyle = "#00F"
+        block.ctx.fillRect(x - 2, y - h, 2, block.fontsize + 2)
 blocks.get('SRC').add_filter('draw_cursor', SRC_draw_cursor)
 
 def stop_event(event):

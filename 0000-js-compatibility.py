@@ -2,6 +2,9 @@
 # JavaScript compatibility layer
 ###############################################################################
 
+window_width = 1000
+window_height = 500
+
 try:
         [].append(0)
         import re
@@ -35,5 +38,7 @@ except:
         context = "JavaScript"
         try:
                 body = document.getElementsByTagName('BODY')[0]
+                window_width = window.innerWidth
+                window_height = window.innerHeight
         except:
                 body = None
