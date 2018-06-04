@@ -180,9 +180,7 @@ class Blocks(Block):
                 if len(self.blocks) > 1:
                         self.blocks[-2].next_block = block
                         block.previous_block = self.blocks[-2]
-        def get(self, name):
-                for block in self.blocks:
-                        if block.name == name:
-                                return block
-        def key(self, key): self.call('key', key)
+                return block
+        def key(self, key):
+                self.call('key', key)
 

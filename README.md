@@ -88,11 +88,11 @@ Defining the behavior:
 Adding a hook:
 
 ```python
-  blocks.get('block-name').add_filter('hook-name', function_to_call)
+  XYZ.add_filter('hook-name', function_to_call)
 ```
 
 Calling a hook and so all the functions added:
 
 ```python
-  blocks.get('block-name').call('hook-name', data)
+  XYZ.call('hook-name', data)
 ```

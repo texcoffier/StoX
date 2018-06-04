@@ -1,12 +1,12 @@
-class YAC(Block):
+class _YAC_(Block):
         title = "Syntaxic analyser"
         name = "YAC"
         fullline_highlight = True
-blocks.append(YAC())
+YAC = blocks.append(_YAC_())
 
-blocks.get('YAC').add_filter('dump', LEX_dump)
-blocks.get('YAC').add_filter('html_init', canvas_html_init)
-blocks.get('YAC').add_filter('html_draw', SRC_html_draw)
+YAC.add_filter('dump', LEX_dump)
+YAC.add_filter('html_init', canvas_html_init)
+YAC.add_filter('html_draw', SRC_html_draw)
 
 def YAC_init(block, dummy):
         block.rules = []
@@ -39,7 +39,7 @@ def YAC_init(block, dummy):
            [9000, 'Statement'  , [['Statement'], ['Statement']]],
         ]:
                 block.call('update_rule', rule)
-blocks.get('YAC').add_filter('init', YAC_init)
+YAC.add_filter('init', YAC_init)
 
 class Rule:
         def __init__(self, priority, name, data):
@@ -59,7 +59,7 @@ def YAC_update_rule(block, rule):
                 block.rules.sort(lex_compare_js)
         else:
                 block.rules.sort(key=lex_compare_python)
-blocks.get('YAC').add_filter('update_rule', YAC_update_rule)
+YAC.add_filter('update_rule', YAC_update_rule)
 
 def rule_match(items, position, rule):
         for name, repeat in rule.lexems:
@@ -152,13 +152,12 @@ def YAC_set_time(block, t):
                 y = yac_walk(block, root, 0, y, 0, bad)
                 bad = True
         block.next_block.set_time(0)
-blocks.get('YAC').add_filter('set_time', YAC_set_time)
+YAC.add_filter('set_time', YAC_set_time)
 
 def YAC_key(blocks, event):
         if event.key == 'F1':
-                yac = blocks.get('YAC')
                 s = ''
-                for path in yac.path:
+                for path in YAC.path:
                         for rule in path:
                                 s += ' ' + rule
                         s += '\n'
@@ -186,7 +185,7 @@ def YAC_regtest(yac, dummy):
 ['a=1+2/(+3)'   , '(A (V a =) (B 1 (U +2 / (G ( +3 )))))'],
 ['a=6$7'        , '(A (V a =) 6)']
         ]:
-                blocks.get('SRC').call('set', input)
+                SRC.call('set', input)
                 nice = yac_nice(yac.items[0])
                 if nice != output:
                         print("input:", input)
@@ -195,5 +194,5 @@ def YAC_regtest(yac, dummy):
                         for path in yac.path:
                                 print(path)
                         bug
-blocks.get('YAC').add_filter('regtest', YAC_regtest)
+YAC.add_filter('regtest', YAC_regtest)
 

@@ -7,7 +7,7 @@
 # Lexical analyser
 ##############################################################################
 
-blocks.get('LEX').call('add_lexem',
+LEX.call('add_lexem',
         [90,          # Priority: must be higher than the 'word' lexem priority
          'put'                , # Name
          '[ \n\t]*put[ \n\t]*', # Regular expression to match
@@ -18,13 +18,13 @@ blocks.get('LEX').call('add_lexem',
 # Syntaxic analyser
 ##############################################################################
 
-blocks.get('YAC').call('update_rule',
+YAC.call('update_rule',
         [450,   # Before the promotion of 'Group' to 'Value'
          'Put', # Name
          [['put'], ['Group']] # Lexem 'put' followed by '(expression)'
         ])
 # 'Put' is a 'Statement'
-blocks.get('YAC').call('update_rule', [8000, 'Statement', [['Put']]])
+YAC.call('update_rule', [8000, 'Statement', [['Put']]])
 
 ##############################################################################
 # Abstract syntax tree
@@ -37,7 +37,7 @@ def ast_put(block, item):
                 # The children of the AST node (only one here)
                 [ast_apply(block, item.children[1])]
                 )
-blocks.get('AST').call('update_rule', ['Put', ast_put])
+AST.call('update_rule', ['Put', ast_put])
 
 ##############################################################################
 # Add processor 'PUT' instruction
@@ -45,7 +45,7 @@ blocks.get('AST').call('update_rule', ['Put', ast_put])
 
 def x08(cpu):
         # Execute the instruction
-        blocks.get('TTY').call('put', cpu.stack_pop())
+        TTY.call('put', cpu.stack_pop())
 
 # Add the instruction to the CPU instruction set.
 Instruction(0x08,    # Instruction byte code
@@ -68,7 +68,7 @@ def asm_put(block, item):
                  [],    # Data byte to put after instruction code
                  asm_feedback_pop # Rectangle feedback on execution
                  )
-blocks.get('ASM').call('update_rule',
+ASM.call('update_rule',
                         ['Put',   # AST node name
                          asm_put  # Generating function
                          ])
@@ -78,9 +78,9 @@ blocks.get('ASM').call('update_rule',
 ##############################################################################
 
 def put_regtest(tty, dummy):
-        blocks.get('SRC').call('set', 'put(65)put(10)\nput(66)put(67)')
+        SRC.call('set', 'put(65)put(10)\nput(66)put(67)')
         for i in range(100):
-                blocks.get('ASM').cpu.step()
+                ASM.cpu.step()
         for i, expect in enumerate(['0×0:A<A>,previous=8×2:08<put>',
                                     '1×0: < >,previous=14×2:08<put>',
                                     '0×1:B<B>,previous=4×3:08<put>',
@@ -88,4 +88,4 @@ def put_regtest(tty, dummy):
                 if tty.items[i].long() != expect:
                         print(tty.items[i].long())
                         bug
-blocks.get('TTY').add_filter('regtest', put_regtest)
+TTY.add_filter('regtest', put_regtest)

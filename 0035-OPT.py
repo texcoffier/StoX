@@ -1,12 +1,12 @@
-class OPT(Block):
+class _OPT_(Block):
         title = "Code optimizer"
         name = "OPT"
         fullline_highlight = True
-blocks.append(OPT())
+OPT = blocks.append(_OPT_())
 
-blocks.get('OPT').add_filter('dump', LEX_dump)
-blocks.get('OPT').add_filter('html_init', canvas_html_init)
-blocks.get('OPT').add_filter('html_draw', SRC_html_draw)
+OPT.add_filter('dump', LEX_dump)
+OPT.add_filter('html_init', canvas_html_init)
+OPT.add_filter('html_draw', SRC_html_draw)
 
 def OPT_walk(block, old_item):
         # Remove double negation
@@ -39,4 +39,4 @@ def OPT_set_time(block, t):
                 root = OPT_walk(block, block.previous_block.items[0])
                 yac_walk(block, root, 0, 0, 0, False, True)
         block.next_block.set_time(0)
-blocks.get('OPT').add_filter('set_time', OPT_set_time)
+OPT.add_filter('set_time', OPT_set_time)

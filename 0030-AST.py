@@ -1,12 +1,12 @@
-class AST(Block):
+class _AST_(Block):
         title = "Abstract Syntax Tree"
         name = "AST"
         fullline_highlight = True
-blocks.append(AST())
+AST = blocks.append(_AST_())
 
-blocks.get('AST').add_filter('dump', LEX_dump)
-blocks.get('AST').add_filter('html_init', canvas_html_init)
-blocks.get('AST').add_filter('html_draw', SRC_html_draw)
+AST.add_filter('dump', LEX_dump)
+AST.add_filter('html_init', canvas_html_init)
+AST.add_filter('html_draw', SRC_html_draw)
 
 def AST_item(previous, name=None, children=[]):
         item = previous.clone()
@@ -26,8 +26,8 @@ def AST_init(block, dummy):
                 ['Group'      , ast_group],
                 ['Statement'  , ast_program],
                 ]:
-                blocks.get('AST').call('update_rule', rule)
-blocks.get('AST').add_filter('init', AST_init)
+                AST.call('update_rule', rule)
+AST.add_filter('init', AST_init)
 
 def ast_apply(block, item):
         if item.lex:
@@ -45,11 +45,11 @@ def AST_set_time(block, t):
                 if len(block.ast.children): # No AST elements
                         yac_walk(block, block.ast, 0, 0, 0, False, True)
         block.next_block.set_time(0)
-blocks.get('AST').add_filter('set_time', AST_set_time)
+AST.add_filter('set_time', AST_set_time)
 
 def AST_update_rule(block, rule):
         block.rules[rule[0]] = rule[1]
-blocks.get('AST').add_filter('update_rule', AST_update_rule)
+AST.add_filter('update_rule', AST_update_rule)
 
 def ast_value(block, item):
         if item.children[0].lex:
@@ -135,14 +135,14 @@ def AST_regtest(ast, dummy):
 [' a = ( 1 * 3 ) + 5 ', '[Statement,[=,a,[+,[*,[Value,1],[Value,3]],[Value,5]]]]'],
 ['a=1+2/+3', '[Statement,[=,a,[+,[Value,1],[/,[Value,2],[Value,3]]]]]'],
         ]:
-                blocks.get('SRC').call('set', input)
+                SRC.call('set', input)
                 nice = ast_nice(ast.ast)
                 if nice != output:
                         print("input:", input)
                         print("expected:", output)
                         print("computed:", nice)
-                        blocks.get('YAC').dump()
-                        print(yac_nice(blocks.get('YAC').items[0]))
+                        YAC.dump()
+                        print(yac_nice(YAC.items[0]))
                         bug
-blocks.get('AST').add_filter('regtest', AST_regtest)
+AST.add_filter('regtest', AST_regtest)
 

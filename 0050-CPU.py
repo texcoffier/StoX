@@ -1,15 +1,15 @@
-class CPU(Block):
+class _CPU_(Block):
         title = "Processor"
         name = "CPU"
         time_travel = ['⇞', '⇟']
-blocks.append(CPU())
+CPU = blocks.append(_CPU_())
 
-blocks.get('CPU').add_filter('dump', LEX_dump)
-blocks.get('CPU').add_filter('html_init', canvas_html_init)
-blocks.get('CPU').add_filter('html_draw', SRC_html_draw)
+CPU.add_filter('dump', LEX_dump)
+CPU.add_filter('html_init', canvas_html_init)
+CPU.add_filter('html_draw', SRC_html_draw)
 
 def CPU_set_time(block, t):
-        asm = blocks.get('ASM')
+        asm = ASM
         if t < 0:
                 t = 0
         if t <= block.t:
@@ -27,10 +27,10 @@ def CPU_set_time(block, t):
         while block.t < t:
                 asm.cpu.step()
                 block.t += 1
-blocks.get('CPU').add_filter('set_time', CPU_set_time)
+CPU.add_filter('set_time', CPU_set_time)
 
 def CPU_regtest(block, dummy):
-        asm = blocks.get('ASM')
+        asm = ASM
         for input, output in [
                 ['a=1'          ,    1],
                 ['a=-1'         ,   -1],
@@ -40,7 +40,7 @@ def CPU_regtest(block, dummy):
                 ['a=127+1'      , -128],
                 ['a=-128-1'     ,  127],
         ]:
-                blocks.get('SRC').call('set', input)
+                SRC.call('set', input)
                 for i in range(100):
                         asm.cpu.step()
                 computed = asm.cpu.memory[asm.segment_heap].value
@@ -50,12 +50,11 @@ def CPU_regtest(block, dummy):
                         print("computed:", computed)
                         print(asm.cpu.memory[asm.segment_heap].long())
                         bug
-blocks.get('CPU').add_filter('regtest', CPU_regtest)
+CPU.add_filter('regtest', CPU_regtest)
 
 CPU_key_codes = {'PageUp': -1, 'PageDown': +1}
 def CPU_key(blocks, event):
         if event.key in CPU_key_codes:
-                cpu = blocks.get('CPU')
-                cpu.set_time(cpu.t + CPU_key_codes[event.key])
+                CPU.set_time(CPU.t + CPU_key_codes[event.key])
                 stop_event(event)
 blocks.add_filter('key', CPU_key)

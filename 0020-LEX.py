@@ -1,10 +1,10 @@
-class LEX(Block):
+class _LEX_(Block):
         title = "Lexical analyser"
         name = "LEX"
-blocks.append(LEX())
+LEX = blocks.append(_LEX_())
 
-blocks.get('LEX').add_filter('html_init', canvas_html_init)
-blocks.get('LEX').add_filter('html_draw', SRC_html_draw)
+LEX.add_filter('html_init', canvas_html_init)
+LEX.add_filter('html_draw', SRC_html_draw)
 
 def LEX_dump(block, dummy_args):
         dump_item = block.get_filter('dumpitem')
@@ -12,7 +12,7 @@ def LEX_dump(block, dummy_args):
                 item.dump()
                 for function in dump_item:
                         function(item)
-blocks.get('LEX').add_filter('dump', LEX_dump)
+LEX.add_filter('dump', LEX_dump)
 
 def LEX_init(block, dummy):
         block.lexem = []
@@ -30,7 +30,7 @@ def LEX_init(block, dummy):
                 [999, 'nothing'     , '[ \n\t]+'                 , '#000']
         ]:
                 block.call('add_lexem', lexem)
-blocks.get('LEX').add_filter('init', LEX_init)
+LEX.add_filter('init', LEX_init)
 
 class Lexem:
         def __init__(self, data):
@@ -54,7 +54,7 @@ def LEX_add_lexem(block, lexem):
                 block.lexem.sort(lex_compare_js)
         else:
                 block.lexem.sort(key=lex_compare_python)
-blocks.get('LEX').add_filter('add_lexem', LEX_add_lexem)
+LEX.add_filter('add_lexem', LEX_add_lexem)
 
 def LEX_set_time(block, t):
         block.t = t
@@ -116,7 +116,7 @@ def LEX_set_time(block, t):
                         previous_possibles = possibles
                         previous_current = current
         block.next_block.set_time(0)
-blocks.get('LEX').add_filter('set_time', LEX_set_time)
+LEX.add_filter('set_time', LEX_set_time)
 
 def LEX_html_draw(block, dummy):
         for item in block.items:
@@ -132,13 +132,13 @@ def LEX_html_draw(block, dummy):
                                 feedback.char = text
                                 feedback.fillText()
                                 feedback.y += 1
-        blocks.get('SRC').cursor
+        SRC.cursor
 
-blocks.get('LEX').add_filter('html_draw', LEX_html_draw)
+LEX.add_filter('html_draw', LEX_html_draw)
 
 
 def LEX_regtest(lex, dummy):
-        blocks.get('SRC').call('set', 'a$7')
+        SRC.call('set', 'a$7')
         for i, expected in enumerate([
         '0×0:a → word<word>,previous=0×0:a<a>',
         '0×1:$ is UNEXPECTED<$ is UNEXPECTED>,previous=1×0:$<$>·2×0:7<7>',
@@ -147,4 +147,4 @@ def LEX_regtest(lex, dummy):
                         print(expected)
                         print(lex.items[i].long())
                         bug
-blocks.get('LEX').add_filter('regtest', LEX_regtest)
+LEX.add_filter('regtest', LEX_regtest)

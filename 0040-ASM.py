@@ -1,4 +1,4 @@
-class ASM(Block):
+class _ASM_(Block):
         title = "Assembly language"
         name = "ASM"
         def declare(self, item, variable):
@@ -27,11 +27,11 @@ class ASM(Block):
                 for i in range(self.segment_heap, self.segment_stack):
                         print('\t', i, self.cpu.memory[i].long())
                 print('</memory>')
-blocks.append(ASM())
+ASM = blocks.append(_ASM_())
 
-blocks.get('ASM').add_filter('dump', LEX_dump)
-blocks.get('ASM').add_filter('html_init', canvas_html_init)
-blocks.get('ASM').add_filter('html_draw', SRC_html_draw)
+ASM.add_filter('dump', LEX_dump)
+ASM.add_filter('html_init', canvas_html_init)
+ASM.add_filter('html_draw', SRC_html_draw)
 
 class Instruction:
         def __init__(self, code, name, size, execute):
@@ -39,7 +39,7 @@ class Instruction:
                 self.name = name
                 self.size = size
                 self.execute = execute
-                self.block = blocks.get('ASM')
+                self.block = ASM
                 self.block.cpu.by_code[code] = self
                 self.block.cpu.by_name[name] = self
 
@@ -112,7 +112,7 @@ def ASM_init(block, dummy):
                 ["*"        , asm_multiply],
                 ["/"        , asm_divide],
                 ]:
-                blocks.get('ASM').call('update_rule', rule)
+                ASM.call('update_rule', rule)
         def x00(cpu): cpu.stack_push(cpu.get_data_byte())
         Instruction(0x00, "LOAD IMMEDIATE"  , 1, x00)
         def x01(cpu): cpu.store_at(cpu.get_data_word())
@@ -136,7 +136,7 @@ def ASM_init(block, dummy):
         def x07(cpu): cpu.stack_push(-cpu.stack_pop())
         Instruction(0x07, "NEGATE"          , 0, x07)
 
-blocks.get('ASM').add_filter('init', ASM_init)
+ASM.add_filter('init', ASM_init)
 
 def asm_generate(block, item):
         if item.char in block.rules:
@@ -144,7 +144,7 @@ def asm_generate(block, item):
 
 def ASM_update_rule(block, rule):
         block.rules[rule[0]] = rule[1]
-blocks.get('ASM').add_filter('update_rule', ASM_update_rule)
+ASM.add_filter('update_rule', ASM_update_rule)
 
 def ASM_set_time(block, t):
         block.t = t
@@ -160,7 +160,7 @@ def ASM_set_time(block, t):
         if len(block.previous_block.items):
                 asm_generate(block, block.previous_block.items[0])
         block.next_block.set_time(0)
-blocks.get('ASM').add_filter('set_time', ASM_set_time)
+ASM.add_filter('set_time', ASM_set_time)
 
 def asm_past_feedback(item):
         item.rectangle()
@@ -273,10 +273,10 @@ def asm_divide(block, item):
 
 def ASM_dump(block, dummy_arg):
         block.dump_cpu_and_memory()
-blocks.get('ASM').add_filter('dump', ASM_dump)
+ASM.add_filter('dump', ASM_dump)
 
 def ASM_regtest(block, dummy):
-        blocks.get('SRC').call('set', 'a=1')
+        SRC.call('set', 'a=1')
         m = block.cpu.memory[0]
         for input, char, value in [
                 [-257, "FF",   -1],
@@ -296,5 +296,5 @@ def ASM_regtest(block, dummy):
                 if m.char != char or m.value != value:
                         print("set_byte", input, "=>", m.char, m.value)
                         bug_set_byte
-blocks.get('ASM').add_filter('regtest', ASM_regtest)
+ASM.add_filter('regtest', ASM_regtest)
 

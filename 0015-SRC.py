@@ -1,4 +1,4 @@
-class SRC(Block):
+class _SRC_(Block):
         title = "Source code editor"
         name = "SRC"
         time_travel = ['^Z', '^Y']
@@ -12,13 +12,13 @@ class SRC(Block):
                                 y += 1
                         else:
                                 x += 1
-blocks.append(SRC())
+SRC = blocks.append(_SRC_())
 
 def SRC_init(block, dummy_args):
         block.cursor_visible = 1
         block.t = -1
         block.history = []
-blocks.get('SRC').add_filter('init', SRC_init)
+SRC.add_filter('init', SRC_init)
 
 def SRC_dump(block, dummy_args):
         dump_item = block.get_filter('dumpitem')
@@ -26,7 +26,7 @@ def SRC_dump(block, dummy_args):
                 item.dump()
                 for function in dump_item:
                         function(item)
-blocks.get('SRC').add_filter('dump', SRC_dump)
+SRC.add_filter('dump', SRC_dump)
 
 def SRC_set(block, text):
         if len(block.history) != block.t + 1:
@@ -35,7 +35,7 @@ def SRC_set(block, text):
         block.analyse(text)
         block.set_time(block.t + 1)
         block.next_block.set_time(0)
-blocks.get('SRC').add_filter('set', SRC_set)
+SRC.add_filter('set', SRC_set)
 
 def SRC_set_time(block, t):
         if t < 0 or t >= len(block.history):
@@ -45,7 +45,7 @@ def SRC_set_time(block, t):
         if block.cursor > len(block.items):
                 block.cursor = len(block.items)
         block.next_block.set_time(0)
-blocks.get('SRC').add_filter('set_time', SRC_set_time)
+SRC.add_filter('set_time', SRC_set_time)
 
 def canvas_html_init(block, title):
         div = document.createElement('DIV')
@@ -80,7 +80,7 @@ def canvas_html_init(block, title):
         div.style.overflow = 'hidden'
         div.style.width = str(block.element.width) + 'px'
         div.style.height = str(block.element.height + 100) + 'px'
-blocks.get('SRC').add_filter('html_init', canvas_html_init)
+SRC.add_filter('html_init', canvas_html_init)
 
 def SRC_html_draw(block, dummy):
         block.ctx.fillStyle = "#FFF"
@@ -98,7 +98,7 @@ def SRC_html_draw(block, dummy):
                 else:
                         item.fillText()
                 item.lines_to_children()
-blocks.get('SRC').add_filter('html_draw', SRC_html_draw)
+SRC.add_filter('html_draw', SRC_html_draw)
 
 def SRC_draw_cursor(block, dummy):
         for item in block.items:
@@ -123,7 +123,7 @@ def SRC_draw_cursor(block, dummy):
                         x += w
         block.ctx.fillStyle = "#00F"
         block.ctx.fillRect(x - 2, y - h, 2, block.fontsize + 2)
-blocks.get('SRC').add_filter('draw_cursor', SRC_draw_cursor)
+SRC.add_filter('draw_cursor', SRC_draw_cursor)
 
 def stop_event(event):
         event.preventDefault(True)
@@ -133,69 +133,68 @@ def SRC_key(blocks, event):
         if event.metaKey or event.altKey:
                 return
         key = event.key
-        src = blocks.get('SRC')
         if event.ctrlKey:
                 if key == 'z':
-                        src.set_time(src.t - 1)
+                        SRC.set_time(SRC.t - 1)
                 elif key == 'y':
-                        src.set_time(src.t + 1)
+                        SRC.set_time(SRC.t + 1)
                 return
-        content = src.history[src.t]
+        content = SRC.history[SRC.t]
         if key == 'ArrowRight':
-                if src.cursor < len(content):
-                        src.cursor += 1
+                if SRC.cursor < len(content):
+                        SRC.cursor += 1
                 stop_event(event)
         elif key == 'ArrowLeft':
-                if src.cursor > 0:
-                        src.cursor -= 1
+                if SRC.cursor > 0:
+                        SRC.cursor -= 1
         elif key == 'Home':
-                y = src.items[min(src.cursor, len(src.items)-1)].y
-                while src.cursor > 0 and src.items[src.cursor-1].y == y:
-                        src.cursor -= 1
+                y = SRC.items[min(SRC.cursor, len(SRC.items)-1)].y
+                while SRC.cursor > 0 and SRC.items[SRC.cursor-1].y == y:
+                        SRC.cursor -= 1
                 stop_event(event)
         elif key == 'End':
-                y = src.items[min(src.cursor, len(src.items)-1)].y
-                while src.cursor < len(src.items)-1 and src.items[src.cursor+1].y == y:
-                        src.cursor += 1
-                if src.cursor == len(src.items)-1 and src.items[-1].char != '\n':
-                        src.cursor += 1
+                y = SRC.items[min(SRC.cursor, len(SRC.items)-1)].y
+                while SRC.cursor < len(SRC.items)-1 and SRC.items[SRC.cursor+1].y == y:
+                        SRC.cursor += 1
+                if SRC.cursor == len(SRC.items)-1 and SRC.items[-1].char != '\n':
+                        SRC.cursor += 1
                 stop_event(event)
         elif key == 'ArrowUp' or key == 'ArrowDown':
-                if src.cursor == len(content):
+                if SRC.cursor == len(content):
                         if content[-1] == '\n':
                                 after = 0
                         else:
                                 after = 1
-                        item = src.items[-1]
+                        item = SRC.items[-1]
                 else:
                         after = 0
-                        item = src.items[src.cursor]
+                        item = SRC.items[SRC.cursor]
                 if key == 'ArrowUp':
                         direction = -1
                 else:
                         direction = 1
-                item, after = src.change_line(item, direction, after)
-                src.cursor = item.index + after
+                item, after = SRC.change_line(item, direction, after)
+                SRC.cursor = item.index + after
                 stop_event(event)
         elif key == 'Backspace':
-                if src.cursor != 0:
-                        new_content = content[:src.cursor-1] + content[src.cursor:]
-                        src.cursor -= 1
-                        src.call('set', new_content)
+                if SRC.cursor != 0:
+                        new_content = content[:SRC.cursor-1] + content[SRC.cursor:]
+                        SRC.cursor -= 1
+                        SRC.call('set', new_content)
         elif key == 'Delete':
-                if src.cursor != len(content):
-                        new_content = content[:src.cursor] + content[src.cursor+1:]
-                        src.call('set', new_content)
+                if SRC.cursor != len(content):
+                        new_content = content[:SRC.cursor] + content[SRC.cursor+1:]
+                        SRC.call('set', new_content)
         elif len(key) == 1 or key == 'Enter':
                 if key == 'Enter':
                         key = '\n'
-                new_content = content[:src.cursor] + key + content[src.cursor:]
-                src.call('set', new_content)
-                src.cursor += 1
+                new_content = content[:SRC.cursor] + key + content[SRC.cursor:]
+                SRC.call('set', new_content)
+                SRC.cursor += 1
                 stop_event(event)
         else:
                 print('key=', key)
-        src.cursor_visible = 1
+        SRC.cursor_visible = 1
 blocks.add_filter('key', SRC_key)
 
 def SRC_regtest(src, dummy):
@@ -242,4 +241,4 @@ def SRC_regtest(src, dummy):
                                               "computed after=", after)
                                         zeraze
                         char += 1
-blocks.get('SRC').add_filter('regtest', SRC_regtest)
+SRC.add_filter('regtest', SRC_regtest)
