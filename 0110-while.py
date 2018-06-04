@@ -112,7 +112,6 @@ blocks.get('ASM').call('update_rule',
 ##############################################################################
 
 def while_regtest(tty, dummy):
-        return
         blocks.get('SRC').call('set', 'put(65)put(10)\nput(66)put(67)')
         for i in range(100):
                 blocks.get('ASM').cpu.step()

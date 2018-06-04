@@ -118,6 +118,7 @@ def SRC_draw_cursor(block, dummy):
         block.ctx.strokeStyle = "#F00"
         block.ctx.lineWidth = 3
         block.ctx.fillRect(x - 3, y - h, 3, block.fontsize + 2)
+        block.ctx.lineWidth = 1
 blocks.get('SRC').add_filter('draw_cursor', SRC_draw_cursor)
 
 def stop_event(event):

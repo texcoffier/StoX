@@ -159,8 +159,13 @@ def ASM_set_time(block, t):
         block.next_block.set_time(0)
 blocks.get('ASM').add_filter('set_time', ASM_set_time)
 
+def asm_past_feedback(item):
+        item.rectangle()
+        for i in item.previous_items:
+                asm_past_feedback(i)
+
 def asm_enhanced_feedback(asm):
-        asm.rectangle()
+        asm_past_feedback(asm)
         asm.code.rectangle()
         for i in range(asm.instruction.size):
                 asm.block.cpu.memory[asm.code.addr + i + 1].rectangle()
