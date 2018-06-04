@@ -49,10 +49,13 @@ blocks.get('AST').call('update_rule', ['Put', ast_put])
 
 blocks.get('ASM').init()
 def x08(cpu):
+        # Execute the instruction
         blocks.get('TTY').call('put', cpu.stack_pop())
+
+# Add the instruction to the CPU instruction set.
 Instruction(0x08,    # Instruction byte code
             "PUT",   # Instruction in assembly
-            0,       # ZERO byte of date after instruction code
+            0,       # ZERO byte of data after instruction code
             x08)     # The function emulating the processor instruction
 
 ##############################################################################

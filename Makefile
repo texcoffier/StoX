@@ -16,7 +16,7 @@ RapydScript:
 	# git checkout f121b356dea6dfc558884af69dd780754d8c5332
 
 clean:
-	rm xxx*
+	-rm xxx*
 
-install:
-	cp xxx.js pedago.html $(HOME)/public_html/PARSER
+install:run-tests
+	cp xxx.js StoX.html $(HOME)/public_html/PARSER
