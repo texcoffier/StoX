@@ -17,7 +17,7 @@ if body:
         blocks.html_init(body)
         SRC.call('set', 'a=65\nwhile(a != 70)\n {\n  put(a)\n  a = a + 1\n }')
         setInterval(drawevent, 400)
-        window.addEventListener('keypress', keyevent, False)
+        window.addEventListener('keydown', keyevent, False)
 else:
         blocks.dump()
         
