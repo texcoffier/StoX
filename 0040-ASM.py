@@ -5,12 +5,23 @@ class _ASM_(Block):
                 if variable not in self.variables:
                         self.segment_heap -= 1
                         self.variables[variable] = self.segment_heap
-                        asm_Item(self, item, '.HEAP # keep 2 bytes for «'
+                        asm_Item(self, item, '.heap # keep 2 bytes for «'
                                  + variable + '»')
                         self.cpu.memory[self.segment_heap] = item.clone().set_byte(0)
                 else:
                         self.cpu.memory[self.variables[variable]].previous_items.append(item)
                 return self.variables[variable]
+        def new_label(self, text):
+                if text not in self.labels:
+                        self.labels[text] = 0
+                label = text + '_' + str(self.labels[text])
+                self.labels[text] += 1
+                return label
+        def add_label(self, from_item, label):
+                item = from_item.clone()
+                item.char = label + ':'
+                item.y = len(self.items)
+                self.append(item)
         def add_code(self, item):
                 self.cpu.memory[self.segment_code] = item
                 item.addr = self.segment_code
@@ -151,6 +162,7 @@ def ASM_set_time(block, t):
         block.cpu.reset()
         block.cpu.memory = {}
         block.variables = {}
+        block.labels = {}
         block.segment_heap = 0x8000
         block.segment_code = 0x0000
         block.segment_stack = 0x8020
@@ -183,7 +195,7 @@ def asm_feedback_pop(asm):
 
 def asm_Item(block, from_item, name, value='', codes=[], feedback=None):
         item = from_item.clone()
-        item.char = name + ' ' + value
+        item.char = '  ' + name + ' ' + value
         item.y = len(block.items)
         block.append(item)
         if name not in block.cpu.by_name:

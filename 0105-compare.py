@@ -20,19 +20,24 @@ def ne(cpu): cpu.stack_pop() != 0 and cpu.set_PC(cpu.get_data_word())
 
 def define_operator(operator):
         def asm_operator(block, item):
+            label_ok  = block.new_label('compare_ok')
+            label_end = block.new_label('compare_end')
+
             asm_generate(block, item.children[0])
             asm_generate(block, item.children[1])
             asm_Item(block, item, 'SUBTRACTION', '', [], asm_feedback_binary)
-            asm_Item(block, item, 'JUMP ' + operator + '0', 'OK',
+            asm_Item(block, item, 'JUMP ' + operator + '0', label_ok,
                      asm_bytes(0xFFFF), asm_feedback_pop)
             address_to_patch = block.segment_code - 2
             asm_Item(block, item, 'LOAD IMMEDIATE', '0', [0], asm_feedback_push)
-            asm_Item(block, item, 'JUMP', 'COMPARE_END', asm_bytes(0xFFFF))
+            asm_Item(block, item, 'JUMP', label_end, asm_bytes(0xFFFF))
+
+            block.add_label(item, label_ok)
             block.cpu.set_data_word(address_to_patch, block.segment_code)
             address_to_patch = block.segment_code - 2
-            asm_Item(block, item, 'COMPARE_OK:')
             asm_Item(block, item, 'LOAD IMMEDIATE', '1', [1], asm_feedback_push)
-            asm_Item(block, item, 'COMPARE_END:')
+
+            block.add_label(item, label_end)
             block.cpu.set_data_word(address_to_patch, block.segment_code)
         return asm_operator
 

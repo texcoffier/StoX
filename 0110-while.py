@@ -69,15 +69,18 @@ Instruction(0x09, "JUMP", 2, x09)
 ##############################################################################
 
 def asm_while(block, item):
+        label_start  = block.new_label('while_start')
+        label_end    = block.new_label('while_end')
+
         while_start = block.segment_code
-        asm_Item(block, item, 'WHILE_START:')
+        block.add_label(item, label_start)
         # The generate assembly will let the expression result on the stack
         asm_generate(block, item.children[0])
         # Stop the loop if zero
         asm_Item(block,
                  item,             # Take color/highlightcursor from AST 'While'
                  'JUMP ==0',       # Processor instruction
-                 'WHILE_END',      # Instruction parameter (only for user feedback)
+                 label_end,        # Instruction parameter (only for user feedback)
                  asm_bytes(0xFFFF),# Data byte to put after instruction code
                  asm_feedback_pop  # Rectangle feedback on execution
                  )
@@ -87,10 +90,10 @@ def asm_while(block, item):
         asm_Item(block,
                  item,            # Take color/highlightcursor from AST 'While'
                  'JUMP',          # Processor instruction
-                 'WHILE_START',   # Instruction parameter (only for user feedback)
+                 label_start,    # Instruction parameter (only for user feedback)
                  asm_bytes(while_start)
                  )
-        asm_Item(block, item, 'WHILE_END:')
+        block.add_label(item, label_end)
         block.cpu.set_data_word(address_to_patch, block.segment_code)
 ASM.call('update_rule',
                         ['While',   # AST node name
