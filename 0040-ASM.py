@@ -19,8 +19,10 @@ class _ASM_(Block):
                 return label
         def add_label(self, from_item, label):
                 item = from_item.clone()
-                item.char = label + ':'
+                item.char = '   ' + label + ':'
+                item.value = label
                 item.y = len(self.items)
+                item.instruction = None
                 self.append(item)
         def add_code(self, item):
                 self.cpu.memory[self.segment_code] = item
@@ -157,6 +159,7 @@ def ASM_update_rule(block, rule):
         block.rules[rule[0]] = rule[1]
 ASM.add_filter('update_rule', ASM_update_rule)
 
+
 def ASM_set_time(block, t):
         block.t = t
         block.cpu.reset()
@@ -171,6 +174,14 @@ def ASM_set_time(block, t):
         block.items = []
         if len(block.previous_block.items):
                 asm_generate(block, block.previous_block.items[0])
+                # Add arrows
+                labels_addr = {}
+                for item in block.items:
+                        if item.char and item.char[-1] == ':':
+                                labels_addr[item.value] = item.index
+                for item in block.items:
+                        if item.instruction and item.instruction.name[:4] == 'JUMP':
+                                item.arrow_to = labels_addr[item.more]
         block.next_block.set_time(0)
 ASM.add_filter('set_time', ASM_set_time)
 
@@ -186,6 +197,9 @@ def asm_enhanced_feedback(asm):
                 asm.block.cpu.memory[asm.code.addr + i + 1].rectangle()
         if asm.more_feedback:
                 asm.more_feedback(asm)
+        if asm.arrow_to:
+                asm.block.ctx.strokeStyle = "#0F0"
+                asm.draw_arrow()
 
 def asm_feedback_push(asm):
         asm.block.cpu.memory[asm.block.cpu.SP.value].rectangle("#F00")
@@ -195,10 +209,12 @@ def asm_feedback_pop(asm):
 
 def asm_Item(block, from_item, name, value='', codes=[], feedback=None):
         item = from_item.clone()
-        item.char = '  ' + name + ' ' + value
+        item.char = '    ' + name + ' ' + value
+        item.more = value
         item.y = len(block.items)
         block.append(item)
         if name not in block.cpu.by_name:
+                item.instruction = None
                 return
         instruction = block.cpu.by_name[name]
         if instruction.size != len(codes):

@@ -88,6 +88,19 @@ def SRC_html_draw(block, dummy):
         block.ctx.font = str(block.fontsize) + "px monospace"
 
         for item in block.items:
+                item.delta_arrow = 0
+        for item in block.items:
+                if item.arrow_to is None:
+                        continue
+                dest_item = block.items[item.arrow_to]
+                if item.arrow_to > item.index:
+                        item.delta_arrow += 1
+                        dest_item.delta_arrow -= 1
+                else:
+                        item.delta_arrow -= 1
+                        dest_item.delta_arrow += 1
+        nr_arrows = 0
+        for item in block.items:
                 item.highlight = False
                 for i in item.previous_items:
                         if i.highlight:
@@ -98,6 +111,11 @@ def SRC_html_draw(block, dummy):
                 else:
                         item.fillText()
                 item.lines_to_children()
+                nr_arrows += item.delta_arrow
+                item.nr_arrows = nr_arrows
+                if item.arrow_to:
+                        block.ctx.strokeStyle = "#000"
+                        item.draw_arrow()
 SRC.add_filter('html_draw', SRC_html_draw)
 
 def SRC_draw_cursor(block, dummy):

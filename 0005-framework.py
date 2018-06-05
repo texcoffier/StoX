@@ -5,6 +5,7 @@
 class Item:
         error = False
         color = "#000" # The text color
+        arrow_to = None
         def __init__(self, char='', x=0, y=0, previous_items=[], next_items=[]):
                 self.next_items     = next_items
                 self.previous_items = previous_items
@@ -68,7 +69,7 @@ class Item:
                         self.block.ctx.fillRect(x - 1, y - h, w, h + 2)
                 self.block.ctx.fillStyle = '#000'
                 self.block.ctx.fillText(self.char, x, y)
-        def rectangle(self, color="#000"):
+        def rectangle(self, color="#0008"):
                 x, y = self.xy()
                 w, h = self.wh()
                 self.block.ctx.strokeStyle = color
@@ -96,6 +97,22 @@ class Item:
                         self.block.ctx.lineTo(x2 - 2*fs, y2 - fs)
                         self.block.ctx.lineTo(x2 - 1, y2 - fs)
                         self.block.ctx.stroke()
+        def draw_arrow(self):
+                fs = self.block.fontsize
+                tx = fs * (self.nr_arrows + 1) / 3
+                x, y = self.xy()
+                x += 1.7 * fs
+                x2, y2 = self.block.items[self.arrow_to].xy()
+                y2 -= fs / 3
+                self.block.ctx.beginPath()
+                self.block.ctx.moveTo(x + fs  , y - fs/2)
+                self.block.ctx.lineTo(x - tx  , y - fs/2)
+                self.block.ctx.lineTo(x - tx  , y2)
+                self.block.ctx.lineTo(x       , y2)
+                self.block.ctx.lineTo(x - fs/3, y2 - fs/3)
+                self.block.ctx.lineTo(x - fs/3, y2 + fs / 3)
+                self.block.ctx.lineTo(x       , y2)
+                self.block.ctx.stroke()
 
 class Block:
         next_block     = None
