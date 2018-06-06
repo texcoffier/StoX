@@ -46,18 +46,15 @@ AST.call('update_rule', ['Put', ast_put])
 def PUT(cpu):
         # Execute the instruction
         TTY.call('put', cpu.stack_pop())
-
-# Add the instruction to the CPU instruction set.
-Instruction("PUT",   # Instruction in assembly
-            0,       # ZERO byte of data after instruction code
-            PUT)     # The function emulating the processor instruction
+PUT.stox_size = 0 # ZERO byte of data after instruction code (default value)
+ASM.new_instruction(PUT) # Add the instruction to the CPU instruction set
 
 ##############################################################################
 # Generate assembly code
 ##############################################################################
 
 def asm_put(block, item):
-        # The generate assembly will let result on stack
+        # The generated assembly code will let the result on the stack
         asm_generate(block, item.children[0])
         # The 'PUT' will pop the stack top.
         asm_Item(block,

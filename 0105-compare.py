@@ -28,13 +28,13 @@ def define_operator(operator):
             asm_Item(block, item, 'JUMP ' + operator + '0', label_ok,
                      asm_bytes(0xFFFF), asm_feedback_pop)
             address_to_patch = block.segment_code - 2
-            asm_Item(block, item, 'LOAD IMMEDIATE', '0', [0], asm_feedback_push)
+            asm_Item(block, item, 'LOAD_IMMEDIATE', '0', [0], asm_feedback_push)
             asm_Item(block, item, 'JUMP', label_end, asm_bytes(0xFFFF))
 
             block.add_label(item, label_ok)
             block.cpu.set_data_word(address_to_patch, block.segment_code)
             address_to_patch = block.segment_code - 2
-            asm_Item(block, item, 'LOAD IMMEDIATE', '1', [1], asm_feedback_push)
+            asm_Item(block, item, 'LOAD_IMMEDIATE', '1', [1], asm_feedback_push)
 
             block.add_label(item, label_end)
             block.cpu.set_data_word(address_to_patch, block.segment_code)
@@ -51,7 +51,10 @@ for name, operator in [['le', '<='], ['ge', '>='],
         YAC.call('update_rule',
             [1950, 'Binary', [['Expression'], [name], ['Expression']]])
 
-        Instruction('JUMP ' + operator + '0', 2, eval(name))
+        fct = eval(name)
+        fct.stox_name = 'JUMP ' + operator + '0'
+        fct.stox_size = 2 # 2 bytes of data after instruction code
+        ASM.new_instruction(fct)
 
         ASM.call('update_rule', [operator, define_operator(operator)])
 
@@ -63,6 +66,7 @@ def compare_regtest(tty, dummy):
                 if (TTY.items[0].char != '0') != expected:
                         print('computed:', TTY.items[0].char)
                         print('expected:', expected)
+                        ASM.dump()
                         bug
         for i in [5, 6, 7]:
                 for j in [5, 6, 7]:

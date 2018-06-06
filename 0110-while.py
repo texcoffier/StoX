@@ -62,7 +62,8 @@ AST.call('update_rule', ['While', ast_while])
 
 def JUMP(cpu):
         cpu.set_PC(cpu.get_data_word())
-Instruction("JUMP", 2, JUMP)
+JUMP.stox_size = 2 # 2 bytes of data after instruction code
+ASM.new_instruction(JUMP) # Add the instruction to the CPU instruction set
 
 ##############################################################################
 # Generate assembly code

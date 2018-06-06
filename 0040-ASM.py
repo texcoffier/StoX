@@ -40,25 +40,30 @@ class _ASM_(Block):
                 for i in range(self.segment_heap, self.segment_stack):
                         print('\t', i, self.cpu.memory[i].long())
                 print('</memory>')
+        def new_instruction(self, fct):
+                self.call('new_instruction', fct)
 ASM = blocks.append(_ASM_())
 
 ASM.add_filter('dump', LEX_dump)
 ASM.add_filter('html_init', canvas_html_init)
 ASM.add_filter('html_draw', SRC_html_draw)
 
-class Instruction:
-        def __init__(self, name, size, execute, code=None):
-                self.block = ASM
-                if code is None:
-                        code = len(self.block.cpu.by_code)
-                        while code in self.block.cpu.by_code:
-                                code += 1
-                self.code = code
-                self.name = name
-                self.size = size
-                self.execute = execute
-                self.block.cpu.by_code[code] = self
-                self.block.cpu.by_name[name] = self
+def ASM_new_instruction(block, fct):
+        if hasattr(fct, 'stox_code'):
+                if fct.stox_code in block.cpu.by_code:
+                        alert('code yet used:', fct.stox_code)
+        else:
+                fct.stox_code = len(block.cpu.by_code)
+                while fct.stox_code in block.cpu.by_code:
+                        fct.stox_code += 1
+        if not hasattr(fct, 'stox_name'):
+                fct.stox_name = fct.__name__ or fct.name
+        if not hasattr(fct, 'stox_size'):
+                fct.stox_size = 0
+        fct.stox_block = block
+        block.cpu.by_code[fct.stox_code] = fct
+        block.cpu.by_name[fct.stox_name] = fct
+ASM.add_filter('new_instruction', ASM_new_instruction)
 
 class CPU_emulator:
         def __init__(self):
@@ -82,15 +87,15 @@ class CPU_emulator:
                         code = self.memory[self.PC.value]
                         self.PC.color = code.color
                         instruction = self.by_code[code.value]
-                        self.PC.char += " " + instruction.name
+                        self.PC.char += " " + instruction.stox_name
         def step(self):
                 PC = self.PC.value
                 if PC not in self.memory:
                         return
                 instruction = self.by_code[self.memory[PC].value]
-                instruction.execute(self)
+                instruction(self)
                 if self.PC.value == PC: # Not a JUMP
-                        self.set_PC(PC + instruction.size + 1)
+                        self.set_PC(PC + instruction.stox_size + 1)
         def get_data_word(self):
                 return (self.memory[self.PC.value+1].unsigned_value * 256
                       + self.memory[self.PC.value+2].unsigned_value)
@@ -130,28 +135,33 @@ def ASM_init(block, dummy):
                 ["/"        , asm_divide],
                 ]:
                 ASM.call('update_rule', rule)
-        def LOAD_IMMEDIATE(cpu): cpu.stack_push(cpu.get_data_byte())
-        Instruction("LOAD IMMEDIATE"  , 1, LOAD_IMMEDIATE)
-        def STORE_AT_ADDRESS(cpu): cpu.store_at(cpu.get_data_word())
-        Instruction("STORE AT ADDRESS", 2, STORE_AT_ADDRESS)
-        def LOAD_AT_ADDRESS(cpu): cpu.load_at(cpu.get_data_word())
-        Instruction("LOAD AT ADDRESS" , 2, LOAD_AT_ADDRESS)
-        def ADDITION(cpu): cpu.stack_push(cpu.stack_pop() + cpu.stack_pop())
-        Instruction("ADDITION"        , 0, ADDITION)
+
+        def LOAD_IMMEDIATE(cpu):
+                cpu.stack_push(cpu.get_data_byte())
+        LOAD_IMMEDIATE.stox_size = 1
+        def STORE_AT_ADDRESS(cpu):
+                cpu.store_at(cpu.get_data_word())
+        STORE_AT_ADDRESS.stox_size = 2
+        def LOAD_AT_ADDRESS(cpu):
+                cpu.load_at(cpu.get_data_word())
+        LOAD_AT_ADDRESS.stox_size = 2
+        def ADDITION(cpu):
+                cpu.stack_push(cpu.stack_pop() + cpu.stack_pop())
         def SUBTRACTION(cpu):
                 a = cpu.stack_pop()
                 b = cpu.stack_pop()
                 cpu.stack_push(b - a)
-        Instruction("SUBTRACTION"     , 0, SUBTRACTION)
-        def MULTIPLY(cpu): cpu.stack_push(cpu.stack_pop() * cpu.stack_pop())
-        Instruction("MULTIPLY"        , 0, MULTIPLY)
+        def MULTIPLY(cpu):
+                cpu.stack_push(cpu.stack_pop() * cpu.stack_pop())
         def DIVIDE(cpu):
                 a = cpu.stack_pop()
                 b = cpu.stack_pop()
                 cpu.stack_push(b // a)
-        Instruction("DIVIDE"          , 0, DIVIDE)
         def NEGATE(cpu): cpu.stack_push(-cpu.stack_pop())
-        Instruction("NEGATE"          , 0, NEGATE)
+
+        for fct in [LOAD_IMMEDIATE, STORE_AT_ADDRESS, LOAD_AT_ADDRESS,
+                    ADDITION, SUBTRACTION, MULTIPLY, DIVIDE, NEGATE]:
+                block.new_instruction(fct)
 
 ASM.add_filter('init', ASM_init)
 
@@ -184,7 +194,8 @@ def ASM_set_time(block, t):
                         if item.char and item.char[-1] == ':':
                                 labels_addr[item.value] = item.index
                 for item in block.items:
-                        if item.instruction and item.instruction.name[:4] == 'JUMP':
+                        if (item.instruction
+                            and item.instruction.stox_name[:4] == 'JUMP'):
                                 item.arrow_to = labels_addr[item.more]
         block.next_block.set_time(0)
 ASM.add_filter('set_time', ASM_set_time)
@@ -221,11 +232,13 @@ def asm_Item(block, from_item, name, value='', codes=[], feedback=None):
                 item.instruction = None
                 return
         instruction = block.cpu.by_name[name]
-        if instruction.size != len(codes):
+        if instruction.stox_size != len(codes):
+                print(name, value, instruction.stox_name,
+                      instruction.stox_size, codes)
                 bug
         item.feedback = asm_enhanced_feedback
         item.more_feedback = feedback
-        item.code = item.clone().set_byte(instruction.code)
+        item.code = item.clone().set_byte(instruction.stox_code)
         item.instruction = instruction
         block.add_code(item.code)
         for code in codes:
@@ -245,12 +258,12 @@ def asm_affectation(block, item):
         def feedback(asm):
                 asm.block.cpu.memory[addr].rectangle("#F00")
                 asm_feedback_pop(asm)
-        asm_Item(block, item, 'STORE AT ADDRESS', variable_name,
+        asm_Item(block, item, 'STORE_AT_ADDRESS', variable_name,
                  asm_bytes(addr), feedback)
 
 def asm_value(block, item):
         value = item.children[0].value
-        asm_Item(block, item.children[0], 'LOAD IMMEDIATE', value,
+        asm_Item(block, item.children[0], 'LOAD_IMMEDIATE', value,
                  [int(value)], asm_feedback_push)
 
 def asm_feedback_variable(asm):
@@ -265,7 +278,7 @@ def asm_variable(block, item):
                 block.cpu.memory[addr].previous_items.append(item.children[0])
         else:
                 addr = 0xFFFF
-        asm_Item(block, item.children[0], 'LOAD AT ADDRESS', variable_name,
+        asm_Item(block, item.children[0], 'LOAD_AT_ADDRESS', variable_name,
                  asm_bytes(addr), asm_feedback_variable)
         block.items[-1].addr = addr
         if addr == 0xFFFF:

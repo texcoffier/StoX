@@ -60,6 +60,9 @@ of functionality addition.
 The following files, enhance the behavior of previous blocks:
 
   * `0100-put.py`: 'put' function and CPU instruction.
+  * `0105-compare.py`: Add `<`, `>`, `<=`, `>=`, `==`, `!=` to the language and
+                    `JUMP <0`, `JUMP >0`... to the instruction set.
+                    There are no CPU instruction for `<`, `>`.
   * `0110-while.py`: 'while(){}' statement and 'JUMP', 'JUMP IF ZERO' CPU
                    instructions.
 
