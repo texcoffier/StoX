@@ -43,15 +43,14 @@ AST.call('update_rule', ['Put', ast_put])
 # Add processor 'PUT' instruction
 ##############################################################################
 
-def x08(cpu):
+def PUT(cpu):
         # Execute the instruction
         TTY.call('put', cpu.stack_pop())
 
 # Add the instruction to the CPU instruction set.
-Instruction(0x08,    # Instruction byte code
-            "PUT",   # Instruction in assembly
+Instruction("PUT",   # Instruction in assembly
             0,       # ZERO byte of data after instruction code
-            x08)     # The function emulating the processor instruction
+            PUT)     # The function emulating the processor instruction
 
 ##############################################################################
 # Generate assembly code

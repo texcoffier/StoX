@@ -47,12 +47,16 @@ ASM.add_filter('html_init', canvas_html_init)
 ASM.add_filter('html_draw', SRC_html_draw)
 
 class Instruction:
-        def __init__(self, code, name, size, execute):
+        def __init__(self, name, size, execute, code=None):
+                self.block = ASM
+                if code is None:
+                        code = len(self.block.cpu.by_code)
+                        while code in self.block.cpu.by_code:
+                                code += 1
                 self.code = code
                 self.name = name
                 self.size = size
                 self.execute = execute
-                self.block = ASM
                 self.block.cpu.by_code[code] = self
                 self.block.cpu.by_name[name] = self
 
@@ -126,28 +130,28 @@ def ASM_init(block, dummy):
                 ["/"        , asm_divide],
                 ]:
                 ASM.call('update_rule', rule)
-        def x00(cpu): cpu.stack_push(cpu.get_data_byte())
-        Instruction(0x00, "LOAD IMMEDIATE"  , 1, x00)
-        def x01(cpu): cpu.store_at(cpu.get_data_word())
-        Instruction(0x01, "STORE AT ADDRESS", 2, x01)
-        def x02(cpu): cpu.load_at(cpu.get_data_word())
-        Instruction(0x02, "LOAD AT ADDRESS" , 2, x02)
-        def x03(cpu): cpu.stack_push(cpu.stack_pop() + cpu.stack_pop())
-        Instruction(0x03, "ADDITION"        , 0, x03)
-        def x04(cpu):
+        def LOAD_IMMEDIATE(cpu): cpu.stack_push(cpu.get_data_byte())
+        Instruction("LOAD IMMEDIATE"  , 1, LOAD_IMMEDIATE)
+        def STORE_AT_ADDRESS(cpu): cpu.store_at(cpu.get_data_word())
+        Instruction("STORE AT ADDRESS", 2, STORE_AT_ADDRESS)
+        def LOAD_AT_ADDRESS(cpu): cpu.load_at(cpu.get_data_word())
+        Instruction("LOAD AT ADDRESS" , 2, LOAD_AT_ADDRESS)
+        def ADDITION(cpu): cpu.stack_push(cpu.stack_pop() + cpu.stack_pop())
+        Instruction("ADDITION"        , 0, ADDITION)
+        def SUBTRACTION(cpu):
                 a = cpu.stack_pop()
                 b = cpu.stack_pop()
                 cpu.stack_push(b - a)
-        Instruction(0x04, "SUBTRACTION"     , 0, x04)
-        def x05(cpu): cpu.stack_push(cpu.stack_pop() * cpu.stack_pop())
-        Instruction(0x05, "MULTIPLY"        , 0, x05)
-        def x06(cpu):
+        Instruction("SUBTRACTION"     , 0, SUBTRACTION)
+        def MULTIPLY(cpu): cpu.stack_push(cpu.stack_pop() * cpu.stack_pop())
+        Instruction("MULTIPLY"        , 0, MULTIPLY)
+        def DIVIDE(cpu):
                 a = cpu.stack_pop()
                 b = cpu.stack_pop()
                 cpu.stack_push(b // a)
-        Instruction(0x06, "DIVIDE"          , 0, x06)
-        def x07(cpu): cpu.stack_push(-cpu.stack_pop())
-        Instruction(0x07, "NEGATE"          , 0, x07)
+        Instruction("DIVIDE"          , 0, DIVIDE)
+        def NEGATE(cpu): cpu.stack_push(-cpu.stack_pop())
+        Instruction("NEGATE"          , 0, NEGATE)
 
 ASM.add_filter('init', ASM_init)
 

@@ -8,8 +8,7 @@
 #   JUMP >0
 
 # To let the lexer find '!='
-LEX.call('add_lexem',
-                       [100, 'negate', '[ \n\t]*[!][ \n\t]*', '#808'])
+LEX.call('add_lexem', [100, 'negate', '[ \n\t]*[!][ \n\t]*', '#808'])
 
 def le(cpu): cpu.stack_pop() <= 0 and cpu.set_PC(cpu.get_data_word())
 def lt(cpu): cpu.stack_pop() <  0 and cpu.set_PC(cpu.get_data_word())
@@ -41,25 +40,20 @@ def define_operator(operator):
             block.cpu.set_data_word(address_to_patch, block.segment_code)
         return asm_operator
 
-for code, name, operator in [[0x0A, 'le', '<='],
-                             [0x0B, 'ge', '>='],
-                             [0x0C, 'eq', '=='],
-                             [0x0D, 'ne', '!='],
-                             [0x0E, 'lt', '<' ],
-                             [0x0F, 'gt', '>' ],
-                            ]:
-        LEX.call('add_lexem',
-                               [100 - len(operator),
-                                name,
-                                r'[ \n\t]*' + operator + r'[ \n\t]*',
-                                '#808'])
+for name, operator in [['le', '<='], ['ge', '>='],
+                       ['eq', '=='], ['ne', '!='],
+                       ['lt', '<' ], ['gt', '>' ],
+                      ]:
+        LEX.call('add_lexem', [100 - len(operator),
+                               name,
+                               r'[ \n\t]*' + operator + r'[ \n\t]*',
+                               '#808'])
         YAC.call('update_rule',
             [1950, 'Binary', [['Expression'], [name], ['Expression']]])
 
-        Instruction(code, 'JUMP ' + operator + '0', 2, eval(name))
+        Instruction('JUMP ' + operator + '0', 2, eval(name))
 
-        ASM.call('update_rule',
-                               [operator, define_operator(operator)])
+        ASM.call('update_rule', [operator, define_operator(operator)])
 
 def compare_regtest(tty, dummy):
         def set_source(i, operator, j, expected):

@@ -60,9 +60,9 @@ AST.call('update_rule', ['While', ast_while])
 # Add processor 'JUMP' instruction
 ##############################################################################
 
-def x09(cpu):
+def JUMP(cpu):
         cpu.set_PC(cpu.get_data_word())
-Instruction(0x09, "JUMP", 2, x09)
+Instruction("JUMP", 2, JUMP)
 
 ##############################################################################
 # Generate assembly code

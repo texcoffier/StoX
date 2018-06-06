@@ -96,3 +96,16 @@ Calling a hook and so all the functions added:
 ```python
   XYZ.call('hook-name', data)
 ```
+
+## TODO list
+
+The next things to enhance:
+
+  * Change font size interactively.
+  * Open/close blocks.
+  * Allow options in the URL (source content, opened blocks...).
+  * Add instructions `ROTATE(nr_items, shift)`, `JUMP FCT`, `RETURN`.
+  * Add an integer to boolean function and use it for comparison operators.
+  * Add optimization: `while(a>b)` become `while>(a,b)`.
+  * Add documentation/parameters at the block bottom.
+  * Add time travel to the syntactic analyzer: it is needed for debugging.
