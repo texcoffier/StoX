@@ -72,13 +72,13 @@ def canvas_html_init(block, title):
                 tt.childNodes[0].onclick = time_travel_back
                 tt.childNodes[2].onclick = time_travel_forward
         block.element = div.childNodes[1]
-        block.element.width = (window_width - 50) / len(blocks.blocks)
+        block.element.width = (4 * window_width) / len(blocks.blocks)
         block.element.height = window_height - 100
         block.element.style.width = str(block.element.width) + 'px'
         block.element.style.height = str(block.element.height) + 'px'
         block.ctx = block.element.getContext("2d")
         div.style.overflow = 'hidden'
-        div.style.width = str(block.element.width) + 'px'
+        div.style.width = str((window_width - 50) / len(blocks.blocks)) + 'px'
         div.style.height = str(block.element.height + 100) + 'px'
 SRC.add_filter('html_init', canvas_html_init)
 

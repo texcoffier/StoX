@@ -104,7 +104,6 @@ Calling a hook and so all the functions added:
 
 The next things to enhance:
 
-  * Open/close blocks.
   * Allow options in the URL (source content, opened blocks...).
   * Add instructions `ROTATE(nr_items, shift)`, `JUMP FCT`, `RETURN`.
   * Add an integer to boolean function and use it for comparison operators.
