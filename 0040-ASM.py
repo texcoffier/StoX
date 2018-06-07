@@ -134,7 +134,7 @@ def ASM_init(block, dummy):
                 ["*"        , asm_multiply],
                 ["/"        , asm_divide],
                 ]:
-                ASM.call('update_rule', rule)
+                ASM.call('update_asm', rule)
 
         def LOAD_IMMEDIATE(cpu):
                 cpu.stack_push(cpu.get_data_byte())
@@ -171,7 +171,7 @@ def asm_generate(block, item):
 
 def ASM_update_rule(block, rule):
         block.rules[rule[0]] = rule[1]
-ASM.add_filter('update_rule', ASM_update_rule)
+ASM.add_filter('update_asm', ASM_update_rule)
 
 
 def ASM_set_time(block, t):

@@ -18,13 +18,13 @@ LEX.call('add_lexem',
 # Syntaxic analyser
 ##############################################################################
 
-YAC.call('update_rule',
+YAC.call('update_yac',
         [450,   # Before the promotion of 'Group' to 'Value'
          'Put', # Name
          ['put', 'Group'] # Lexem 'put' followed by '(expression)'
         ])
 # 'Put' is a 'Statement'
-YAC.call('update_rule', [8000, 'Statement', ['Put']])
+YAC.call('update_yac', [8000, 'Statement', ['Put']])
 
 ##############################################################################
 # Abstract syntax tree
@@ -37,7 +37,7 @@ def ast_put(block, item):
                 # The children of the AST node (only one here)
                 [ast_apply(block, item.children[1])]
                 )
-AST.call('update_rule', ['Put', ast_put])
+AST.call('update_ast', ['Put', ast_put])
 
 ##############################################################################
 # Add processor 'PUT' instruction
@@ -64,7 +64,7 @@ def asm_put(block, item):
                  [],    # Data bytes to put after instruction code
                  asm_feedback_pop # Rectangle feedback on execution
                  )
-ASM.call('update_rule',
+ASM.call('update_asm',
                         ['Put',   # AST node name
                          asm_put  # Generating function
                          ])

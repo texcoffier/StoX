@@ -35,13 +35,13 @@ LEX.call('add_lexem',
 # Syntaxic analyser
 ##############################################################################
 
-YAC.call('update_rule',
+YAC.call('update_yac',
         [450,   # Before the promotion of 'Group' to 'Value'
          'While', # Name
          ['while', 'Expression', 'open-brace', 'Statement', 'close-brace']
         ])
 # 'While' is a 'Statement'
-YAC.call('update_rule', [8000, 'Statement', ['While']])
+YAC.call('update_yac', [8000, 'Statement', ['While']])
 
 ##############################################################################
 # Abstract syntax tree
@@ -54,7 +54,7 @@ def ast_while(block, item):
                 [ast_apply(block, item.children[1]),
                  ast_apply(block, item.children[3])]
                 )
-AST.call('update_rule', ['While', ast_while])
+AST.call('update_ast', ['While', ast_while])
 
 ##############################################################################
 # Add processor 'JUMP' instruction
@@ -96,7 +96,7 @@ def asm_while(block, item):
                  )
         block.add_label(item, label_end)
         block.cpu.set_data_word(address_to_patch, block.segment_code)
-ASM.call('update_rule',
+ASM.call('update_asm',
                         ['While',   # AST node name
                          asm_while  # Generating function
                          ])

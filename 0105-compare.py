@@ -48,15 +48,15 @@ for name, operator in [['le', '<='], ['ge', '>='],
                                name,
                                r'[ \n\t]*' + operator + r'[ \n\t]*',
                                '#808'])
-        YAC.call('update_rule',
-            [1950, 'Binary', ['Expression', name, 'Expression']])
+        YAC.call('update_yac',
+                 [1950, 'Binary', ['Expression', name, 'Expression']])
 
         fct = eval(name)
         fct.stox_name = 'JUMP ' + operator + '0'
         fct.stox_size = 2 # 2 bytes of data after instruction code
         ASM.new_instruction(fct)
 
-        ASM.call('update_rule', [operator, define_operator(operator)])
+        ASM.call('update_asm', [operator, define_operator(operator)])
 
 def compare_regtest(tty, dummy):
         def set_source(i, operator, j, expected):

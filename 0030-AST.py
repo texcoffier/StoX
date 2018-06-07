@@ -26,7 +26,7 @@ def AST_init(block, dummy):
                 ['Group'      , ast_group],
                 ['Statement'  , ast_program],
                 ]:
-                AST.call('update_rule', rule)
+                AST.call('update_ast', rule)
 AST.add_filter('init', AST_init)
 
 def ast_apply(block, item):
@@ -49,7 +49,7 @@ AST.add_filter('set_time', AST_set_time)
 
 def AST_update_rule(block, rule):
         block.rules[rule[0]] = rule[1]
-AST.add_filter('update_rule', AST_update_rule)
+AST.add_filter('update_ast', AST_update_rule)
 
 def ast_value(block, item):
         if item.children[0].lex:

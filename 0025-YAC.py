@@ -38,7 +38,7 @@ def YAC_init(block, dummy):
            [8000, 'Statement'  , ['Affectation']],
            [9000, 'Statement'  , ['Statement', 'Statement']],
         ]:
-                block.call('update_rule', rule)
+                block.call('update_yac', rule)
 YAC.add_filter('init', YAC_init)
 
 class Rule:
@@ -59,7 +59,7 @@ def YAC_update_rule(block, rule):
                 block.rules.sort(lex_compare_js)
         else:
                 block.rules.sort(key=lex_compare_python)
-YAC.add_filter('update_rule', YAC_update_rule)
+YAC.add_filter('update_yac', YAC_update_rule)
 
 def rule_match(items, position, rule):
         for name in rule.lexems:
