@@ -29,7 +29,7 @@ def LEX_init(block, dummy):
                 [100, 'close'       , '[ \n\t]*[)][ \n\t]*'      , '#00F'],
                 [999, 'nothing'     , '[ \n\t]+'                 , '#000']
         ]:
-                block.call('add_lexem', lexem)
+                block.call('update_lex', lexem)
 LEX.add_filter('init', LEX_init)
 
 class Lexem:
@@ -46,7 +46,7 @@ def lex_compare_js(x, y):
 def lex_compare_python(x):
         return x.priority
 
-def LEX_add_lexem(block, lexem):
+def LEX_update_lex(block, lexem):
         l = Lexem(lexem)
         block.lexem.append(l)
         block.lexem_by_rule[l.name] = l
@@ -54,7 +54,7 @@ def LEX_add_lexem(block, lexem):
                 block.lexem.sort(lex_compare_js)
         else:
                 block.lexem.sort(key=lex_compare_python)
-LEX.add_filter('add_lexem', LEX_add_lexem)
+LEX.add_filter('update_lex', LEX_update_lex)
 
 def LEX_set_time(block, t):
         block.t = t

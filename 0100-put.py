@@ -7,7 +7,7 @@
 # Lexical analyser
 ##############################################################################
 
-LEX.call('add_lexem',
+LEX.call('update_lex',
         [90,          # Priority: must be higher than the 'word' lexem priority
          'put'                , # Name
          '[ \n\t]*put[ \n\t]*', # Regular expression to match

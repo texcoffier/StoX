@@ -12,19 +12,19 @@
 # Lexical analyser
 ##############################################################################
 
-LEX.call('add_lexem',
+LEX.call('update_lex',
         [90,      # Priority: must be higher than the 'word' lexem priority
          'while',                 # Name
          '[ \n\t]*while[ \n\t]*', # Regular expression to match
          '#480'   # Color
         ])
-LEX.call('add_lexem',
+LEX.call('update_lex',
         [100,
          'open-brace', # Name
          ' *[{] *'   , # Regular expression to match
          '#480'        # Color
         ])
-LEX.call('add_lexem',
+LEX.call('update_lex',
         [100,
          'close-brace', # Name
          ' *[}] *'    , # Regular expression to match

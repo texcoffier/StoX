@@ -8,7 +8,7 @@
 #   JUMP >0
 
 # To let the lexer find '!='
-LEX.call('add_lexem', [100, 'negate', '[ \n\t]*[!][ \n\t]*', '#808'])
+LEX.call('update_lex', [100, 'negate', '[ \n\t]*[!][ \n\t]*', '#808'])
 
 def le(cpu): cpu.stack_pop() <= 0 and cpu.set_PC(cpu.get_data_word())
 def lt(cpu): cpu.stack_pop() <  0 and cpu.set_PC(cpu.get_data_word())
@@ -44,7 +44,7 @@ for name, operator in [['le', '<='], ['ge', '>='],
                        ['eq', '=='], ['ne', '!='],
                        ['lt', '<' ], ['gt', '>' ],
                       ]:
-        LEX.call('add_lexem', [100 - len(operator),
+        LEX.call('update_lex', [100 - len(operator),
                                name,
                                r'[ \n\t]*' + operator + r'[ \n\t]*',
                                '#808'])
