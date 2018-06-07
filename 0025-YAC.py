@@ -13,30 +13,30 @@ def YAC_init(block, dummy):
         block.fontsize = 8
         block.line_spacing = 1
         for rule in [
-           [ 100, 'Variable='  , [['word'], ['affectation']]],
-           [ 200, 'Variable'   , [['word']]],
-           [ 300, 'Value'      , [['Variable']]],
-           [ 400, 'Value'      , [['number']]],
-           [ 500, 'Value'      , [['Group']]],
-           [ 600, 'Expression' , [['Value']]],
-           [ 700, 'Group'      , [['open']      , ['Expression'], ['close']]],
-           [ 800, 'Group'      , [['open']      , ['Unary']     , ['close']]],
-           [ 900, 'Binary'     , [['Expression'], ['star']      , ['Unary']]],
-           [1000, 'Binary'     , [['Expression'], ['slash']     , ['Unary']]],
-           [1100, 'Unary'      , [['plus']      , ['Expression']]],
-           [1200, 'Unary'      , [['minus']     , ['Expression']]],
-           [1300, 'Unary'      , [['Unary']     , ['star']      , ['Expression']]],
-           [1400, 'Unary'      , [['Unary']     , ['slash']     , ['Expression']]],
-           [1500, 'Unary'      , [['Unary']     , ['star']      , ['Unary']]],
-           [1600, 'Unary'      , [['Unary']     , ['slash']     , ['Unary']]],
-           [1700, 'Binary'     , [['Expression'], ['star']      , ['Expression']]],
-           [1800, 'Binary'     , [['Expression'], ['slash']     , ['Expression']]],
-           [1900, 'Binary'     , [['Expression'], ['Unary']]],
-           [2000, 'Expression' , [['Binary']]],
-           [2100, 'Value'      , [['Unary']]],
-           [2200, 'Affectation', [['Variable='] , ['Expression']]],
-           [8000, 'Statement'  , [['Affectation']]],
-           [9000, 'Statement'  , [['Statement'], ['Statement']]],
+           [ 100, 'Variable='  , ['word', 'affectation']],
+           [ 200, 'Variable'   , ['word']],
+           [ 300, 'Value'      , ['Variable']],
+           [ 400, 'Value'      , ['number']],
+           [ 500, 'Value'      , ['Group']],
+           [ 600, 'Expression' , ['Value']],
+           [ 700, 'Group'      , ['open'      , 'Expression', 'close']],
+           [ 800, 'Group'      , ['open'      , 'Unary'     , 'close']],
+           [ 900, 'Binary'     , ['Expression', 'star'      , 'Unary']],
+           [1000, 'Binary'     , ['Expression', 'slash'     , 'Unary']],
+           [1100, 'Unary'      , ['plus'      , 'Expression']],
+           [1200, 'Unary'      , ['minus'     , 'Expression']],
+           [1300, 'Unary'      , ['Unary'     , 'star'      , 'Expression']],
+           [1400, 'Unary'      , ['Unary'     , 'slash'     , 'Expression']],
+           [1500, 'Unary'      , ['Unary'     , 'star'      , 'Unary']],
+           [1600, 'Unary'      , ['Unary'     , 'slash'     , 'Unary']],
+           [1700, 'Binary'     , ['Expression', 'star'      , 'Expression']],
+           [1800, 'Binary'     , ['Expression', 'slash'     , 'Expression']],
+           [1900, 'Binary'     , ['Expression', 'Unary']],
+           [2000, 'Expression' , ['Binary']],
+           [2100, 'Value'      , ['Unary']],
+           [2200, 'Affectation', ['Variable=' , 'Expression']],
+           [8000, 'Statement'  , ['Affectation']],
+           [9000, 'Statement'  , ['Statement', 'Statement']],
         ]:
                 block.call('update_rule', rule)
 YAC.add_filter('init', YAC_init)
@@ -62,16 +62,12 @@ def YAC_update_rule(block, rule):
 YAC.add_filter('update_rule', YAC_update_rule)
 
 def rule_match(items, position, rule):
-        for name, repeat in rule.lexems:
+        for name in rule.lexems:
                 if position == len(items):
                         return False
-                if repeat == '*':
-                        while position < len(items) and name == items[position].rule:
-                                position += 1
-                else:
-                        if name != items[position].rule:
-                                return False
-                        position += 1
+                if name != items[position].rule:
+                        return False
+                position += 1
         return position
 
 def rule_apply(block, items, rule):

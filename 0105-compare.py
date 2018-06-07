@@ -49,7 +49,7 @@ for name, operator in [['le', '<='], ['ge', '>='],
                                r'[ \n\t]*' + operator + r'[ \n\t]*',
                                '#808'])
         YAC.call('update_rule',
-            [1950, 'Binary', [['Expression'], [name], ['Expression']]])
+            [1950, 'Binary', ['Expression', name, 'Expression']])
 
         fct = eval(name)
         fct.stox_name = 'JUMP ' + operator + '0'

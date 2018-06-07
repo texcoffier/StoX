@@ -21,10 +21,10 @@ LEX.call('add_lexem',
 YAC.call('update_rule',
         [450,   # Before the promotion of 'Group' to 'Value'
          'Put', # Name
-         [['put'], ['Group']] # Lexem 'put' followed by '(expression)'
+         ['put', 'Group'] # Lexem 'put' followed by '(expression)'
         ])
 # 'Put' is a 'Statement'
-YAC.call('update_rule', [8000, 'Statement', [['Put']]])
+YAC.call('update_rule', [8000, 'Statement', ['Put']])
 
 ##############################################################################
 # Abstract syntax tree
@@ -61,7 +61,7 @@ def asm_put(block, item):
                  item,  # Take color/highlightcursor from AST 'Put'
                  'PUT', # Processor instruction
                  '',    # Instruction parameter (only for user feedback)
-                 [],    # Data byte to put after instruction code
+                 [],    # Data bytes to put after instruction code
                  asm_feedback_pop # Rectangle feedback on execution
                  )
 ASM.call('update_rule',

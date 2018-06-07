@@ -38,10 +38,10 @@ LEX.call('add_lexem',
 YAC.call('update_rule',
         [450,   # Before the promotion of 'Group' to 'Value'
          'While', # Name
-         [['while'], ['Expression'], ['open-brace'],['Statement'],['close-brace']]
+         ['while', 'Expression', 'open-brace', 'Statement', 'close-brace']
         ])
 # 'While' is a 'Statement'
-YAC.call('update_rule', [8000, 'Statement', [['While']]])
+YAC.call('update_rule', [8000, 'Statement', ['While']])
 
 ##############################################################################
 # Abstract syntax tree
