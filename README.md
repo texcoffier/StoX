@@ -66,7 +66,12 @@ The following files, enhance the behavior of previous blocks:
   * `0110-while.py`: 'while(){}' statement and 'JUMP', 'JUMP IF ZERO' CPU
                    instructions.
 
-The last one to be executed is the main program: '9999-main.py'
+The following files, enhance the user interface:
+
+  * `1000-font-size.py`: change font size with `Ctrl +` and `Ctrl -`
+  * `1010-open-close.py`: interactively open and close blocks.
+
+The last one to be executed is the main program: `9999-main.py`
 
 A good starting point is `0100-put.py`, it is heavily commented.
 

@@ -13,8 +13,10 @@ def block_open_close_toggle(event):
                 div = block.element.parentNode
                 if block.is_open:
                         div.style.width = width
+                        div.className = 'opened'
                 else:
                         div.style.width = closed_size + '%'
+                        div.className = 'closed'
 
 def block_open_close(block, is_open):
         block.is_open = is_open
@@ -32,8 +34,10 @@ def open_close_style(blocks, dummy):
         style.textContent = """
         .title SPAN { color: #88F; cursor: pointer; }
         .title:hover SPAN { color: #00F; }
-        .title:hover { background: #EEF; }
-        BODY > DIV > DIV { transition: width 1s ; }
+        .title { background: #EEF; }
+        DIV.closed CANVAS { opacity: 0.3; }
+        BODY > DIV > DIV { transition: width 1s; }
+        DIV CANVAS { transition: opacity 0.3s; }
         """
         body.appendChild(style)
 blocks.add_filter('html_init', open_close_style)
