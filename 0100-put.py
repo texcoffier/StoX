@@ -53,7 +53,7 @@ ASM.new_instruction(PUT) # Add the instruction to the CPU instruction set
 # Generate assembly code
 ##############################################################################
 
-def asm_put(block, item):
+def asm_put(block, item, data):
         # The generated assembly code will let the result on the stack
         asm_generate(block, item.children[0])
         # The 'PUT' will pop the stack top.

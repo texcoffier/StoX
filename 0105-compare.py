@@ -17,27 +17,45 @@ def gt(cpu): cpu.stack_pop() >  0 and cpu.set_PC(cpu.get_data_word())
 def eq(cpu): cpu.stack_pop() == 0 and cpu.set_PC(cpu.get_data_word())
 def ne(cpu): cpu.stack_pop() != 0 and cpu.set_PC(cpu.get_data_word())
 
+reverse_operator = {'<=':  '>',  '<': '>=',
+                    '>=':  '<',  '>': '<=',
+                    '==': '!=', '!=': '==',
+                    }
+
 def define_operator(operator):
-        def asm_operator(block, item):
-            label_ok  = block.new_label('compare_ok')
-            label_end = block.new_label('compare_end')
+        def asm_operator(block, item, data):
+            # If 'data' is 'None': push 0 or 1 on the stack
+            # else it is ['jump on false', 'the jump label', []]
+            # The [] will contains all the memory addresses
+            # to patch to put the real jump address.
+            t = operator
+            if data:
+                if data[0] == 'jump on false':
+                    t = reverse_operator[t]
+                label_true = data[1]
+            else:
+                label_true = block.new_label('compare_true')
+                label_end = block.new_label('compare_end')
 
             asm_generate(block, item.children[0])
             asm_generate(block, item.children[1])
             asm_Item(block, item, 'SUBTRACTION', '', [], asm_feedback_binary)
-            asm_Item(block, item, 'JUMP ' + operator + '0', label_ok,
-                     asm_bytes(0xFFFF), asm_feedback_pop)
-            address_to_patch = block.segment_code - 2
-            asm_Item(block, item, 'LOAD_IMMEDIATE', '0', [0], asm_feedback_push)
-            asm_Item(block, item, 'JUMP', label_end, asm_bytes(0xFFFF))
+            asm_Item(block, item, 'JUMP ' + t + '0',
+                     label_true, asm_bytes(0xFFFF), asm_feedback_pop)
+            jump_bad_addr = block.segment_code - 2
 
-            block.add_label(item, label_ok)
-            block.cpu.set_data_word(address_to_patch, block.segment_code)
-            address_to_patch = block.segment_code - 2
-            asm_Item(block, item, 'LOAD_IMMEDIATE', '1', [1], asm_feedback_push)
+            if data:
+                data[2].append(jump_bad_addr)
+            else:
+                asm_Item(block, item, 'LOAD_IMMEDIATE', '0', [0], asm_feedback_push)
+                asm_Item(block, item, 'JUMP', label_end, asm_bytes(0xFFFF))
+                jump_end_addr = block.segment_code - 2
+                block.add_label(item, label_true)
+                block.cpu.set_data_word(jump_bad_addr, block.segment_code)
+                asm_Item(block, item, 'LOAD_IMMEDIATE', '1', [1], asm_feedback_push)
+                block.add_label(item, label_end)
+                block.cpu.set_data_word(jump_end_addr, block.segment_code)
 
-            block.add_label(item, label_end)
-            block.cpu.set_data_word(address_to_patch, block.segment_code)
         return asm_operator
 
 for name, operator in [['le', '<='], ['ge', '>='],

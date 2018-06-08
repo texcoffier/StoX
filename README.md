@@ -207,9 +207,10 @@ and the machine code.
 The function translating `*` `AST` node to assembly and code:
 
 ```python
-def asm_multiply(block,   # The ASM block
-             item     # An item from the AST block
-            ):
+def asm_multiply(block,  # The ASM block
+                 item,   # An item from the AST block
+                 data    # A contextual data (see 0110-while and 0105-compare)
+                ):
     # Generate the code for the left operand
     asm_generate(block, item.children[0])
 
@@ -234,7 +235,8 @@ There is the code of the instruction pushing the value of a variable on the stac
 
 ```python
 def asm_variable(block,  # The ASM block
-             item,   # An item from the AST block
+                 item,   # An item from the AST block
+                 data    # A contextual data (see 0110-while and 0105-compare)
             ):
     variable_name = item.children[0].value
     if variable_name in block.variables:
@@ -297,6 +299,5 @@ The next things to enhance:
   * Allow options in the URL (source content, opened blocks...).
   * Add instructions `ROTATE(nr_items, shift)`, `JUMP FCT`, `RETURN`.
   * Add an integer to boolean function and use it for comparison operators.
-  * Add optimization: `while(a>b)` become `while>(a,b)`.
   * Add documentation/parameters at the block bottom.
   * Add time travel to the syntactic analyzer: it is needed for debugging.

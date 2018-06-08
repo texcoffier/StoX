@@ -69,23 +69,26 @@ ASM.new_instruction(JUMP) # Add the instruction to the CPU instruction set
 # Generate assembly code
 ##############################################################################
 
-def asm_while(block, item):
+def asm_while(block, item, data):
         label_start  = block.new_label('while_start')
         label_end    = block.new_label('while_end')
 
         while_start = block.segment_code
         block.add_label(item, label_start)
         # The generate assembly will let the expression result on the stack
-        asm_generate(block, item.children[0])
-        # Stop the loop if zero
-        asm_Item(block,
+        data = ['jump on false', label_end, []]
+        asm_generate(block, item.children[0], data)
+        if len(data[2]) == 0:
+                # It is not a boolean test but a value
+                # Stop the loop if zero
+                asm_Item(block,
                  item,             # Take color/highlightcursor from AST 'While'
                  'JUMP ==0',       # Processor instruction
                  label_end,        # Instruction parameter (only for user feedback)
                  asm_bytes(0xFFFF),# Data byte to put after instruction code
                  asm_feedback_pop  # Rectangle feedback on execution
                  )
-        address_to_patch = block.segment_code - 2
+                data[1].append(block.segment_code - 2)
         # The loop code
         asm_generate(block, item.children[1])
         asm_Item(block,
@@ -95,7 +98,8 @@ def asm_while(block, item):
                  asm_bytes(while_start)
                  )
         block.add_label(item, label_end)
-        block.cpu.set_data_word(address_to_patch, block.segment_code)
+        for addr in data[2]:
+                block.cpu.set_data_word(addr, block.segment_code)
 ASM.call('update_asm',
                         ['While',   # AST node name
                          asm_while  # Generating function

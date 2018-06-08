@@ -165,9 +165,9 @@ def ASM_init(block, dummy):
 
 ASM.add_filter('init', ASM_init)
 
-def asm_generate(block, item):
+def asm_generate(block, item, data=None):
         if item.char in block.rules:
-                block.rules[item.char](block, item)
+                block.rules[item.char](block, item, data)
 
 def ASM_update_rule(block, rule):
         block.rules[rule[0]] = rule[1]
@@ -244,14 +244,14 @@ def asm_Item(block, from_item, name, value='', codes=[], feedback=None):
         for code in codes:
                 block.add_code(item.clone().set_byte(code))
 
-def asm_program(block, item):
+def asm_program(block, item, data):
         for child in item.children:
                 asm_generate(block, child)
 
 def asm_bytes(value):
         return [clamp(int(value) >> 8), clamp(int(value) & 0xFF)]
 
-def asm_affectation(block, item):
+def asm_affectation(block, item, data):
         asm_generate(block, item.children[1])
         variable_name = item.children[0].value
         addr = block.declare(item.children[0], variable_name)
@@ -261,7 +261,7 @@ def asm_affectation(block, item):
         asm_Item(block, item, 'STORE_AT_ADDRESS', variable_name,
                  asm_bytes(addr), feedback)
 
-def asm_value(block, item):
+def asm_value(block, item, data):
         value = item.children[0].value
         asm_Item(block, item.children[0], 'LOAD_IMMEDIATE', value,
                  [int(value)], asm_feedback_push)
@@ -271,7 +271,7 @@ def asm_feedback_variable(asm):
                 asm.block.cpu.memory[asm.addr].rectangle("#0F0")
         asm_feedback_push(asm)
 
-def asm_variable(block, item):
+def asm_variable(block, item, data):
         variable_name = item.children[0].value
         if variable_name in block.variables:
                 addr = block.variables[variable_name]
@@ -292,12 +292,12 @@ def asm_feedback_binary(asm):
 def asm_feedback_unary(asm):
         asm.block.cpu.memory[asm.block.cpu.SP.value-1].rectangle("#F80")
 
-def asm_addition(block, item):
+def asm_addition(block, item, data):
         asm_generate(block, item.children[0])
         asm_generate(block, item.children[1])
         asm_Item(block, item, 'ADDITION', '', [], asm_feedback_binary)
 
-def asm_subtraction(block, item):
+def asm_subtraction(block, item, data):
         if len(item.children) == 1:
                 asm_generate(block, item.children[0])
                 asm_Item(block, item, 'NEGATE', '', [], asm_feedback_unary)
@@ -306,12 +306,12 @@ def asm_subtraction(block, item):
                 asm_generate(block, item.children[1])
                 asm_Item(block, item, 'SUBTRACTION', '', [], asm_feedback_binary)
 
-def asm_multiply(block, item):
+def asm_multiply(block, item, data):
         asm_generate(block, item.children[0])
         asm_generate(block, item.children[1])
         asm_Item(block, item, 'MULTIPLY', '', [], asm_feedback_binary)
 
-def asm_divide(block, item):
+def asm_divide(block, item, data):
         asm_generate(block, item.children[0])
         asm_generate(block, item.children[1])
         asm_Item(block, item, 'DIVIDE', '', [], asm_feedback_binary)
