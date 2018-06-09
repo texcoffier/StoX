@@ -199,6 +199,10 @@ they are also defined as hooks:
     and the function to call to generate the assembly and machine code
     for the node. For example `['While', asm_while]`
 
+  * `put` is called to send a char to TTY.
+    So it is possible to add filters to recognize control sequences
+    as clear screen.
+
 ### The assembly langage
 
 The function added with `update_asm` must generate the assembly language

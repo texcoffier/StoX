@@ -74,13 +74,6 @@ ASM.call('update_asm',
 ##############################################################################
 
 def put_regtest(tty, dummy):
-        SRC.call('set', 'put(65)put(10)\nput(66)put(67)')
-        ASM.cpu.run()
-        for i, expect in enumerate(['0×0:A<A>,previous=8×2:08<put>',
-                                    '1×0: < >,previous=14×2:08<put>',
-                                    '0×1:B<B>,previous=4×3:08<put>',
-                                    '1×1:C<C>,previous=10×3:08<put>']):
-                if tty.items[i].long() != expect:
-                        print(tty.items[i].long())
-                        bug
+        TTY.check('put(65)put(10)\nput(66)put(67)',
+                  '0×0:A\n1×0: \n0×1:B\n1×1:C\n')
 TTY.add_filter('regtest', put_regtest)

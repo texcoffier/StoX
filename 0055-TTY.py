@@ -1,6 +1,24 @@
 class _TTY_(Block):
         title = "TTY"
         name = "TTY"
+        def string(self):
+                s = ''
+                for item in self.items:
+                        s += (str(int(item.x)) + '×' + str(int(item.y)) + ':'
+                              + item.char + '\n')
+                return s
+        def check(self, source, expected):
+                SRC.call('set', source)
+                ASM.cpu.run()
+                if expected != self.string():
+                        print('=== source ===')
+                        print(repr(source))
+                        print('=== computed ===')
+                        print(repr(self.string()))
+                        print('=== expected ===')
+                        print(repr(expected))
+                        ASM.dump()
+                        bug
 TTY = blocks.append(_TTY_())
 
 TTY.add_filter('dump', LEX_dump)
