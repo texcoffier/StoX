@@ -75,8 +75,7 @@ ASM.call('update_asm',
 
 def put_regtest(tty, dummy):
         SRC.call('set', 'put(65)put(10)\nput(66)put(67)')
-        for i in range(100):
-                ASM.cpu.step()
+        ASM.cpu.run()
         for i, expect in enumerate(['0×0:A<A>,previous=8×2:08<put>',
                                     '1×0: < >,previous=14×2:08<put>',
                                     '0×1:B<B>,previous=4×3:08<put>',

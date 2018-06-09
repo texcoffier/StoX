@@ -41,8 +41,7 @@ def CPU_regtest(block, dummy):
                 ['a=-128-1'     ,  127],
         ]:
                 SRC.call('set', input)
-                for i in range(100):
-                        asm.cpu.step()
+                asm.cpu.run()
                 computed = asm.cpu.memory[asm.segment_heap].value
                 if computed != output:
                         print("input:", input)

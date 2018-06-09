@@ -79,8 +79,7 @@ for name, operator in [['le', '<='], ['ge', '>='],
 def compare_regtest(tty, dummy):
         def set_source(i, operator, j, expected):
                 SRC.call('set', 'put(48 + (' + str(i) + operator + str(j) +'))')
-                for k in range(9):
-                        ASM.cpu.step()
+                ASM.cpu.run()
                 if (TTY.items[0].char != '0') != expected:
                         print('computed:', TTY.items[0].char)
                         print('expected:', expected)

@@ -91,11 +91,15 @@ class CPU_emulator:
         def step(self):
                 PC = self.PC.value
                 if PC not in self.memory:
-                        return
+                        return False
                 instruction = self.by_code[self.memory[PC].value]
                 instruction(self)
                 if self.PC.value == PC: # Not a JUMP
                         self.set_PC(PC + instruction.stox_size + 1)
+                return True
+        def run(self, max_steps=1<<30):
+                while self.step() and max_steps:
+                        max_steps -= 1
         def get_data_word(self):
                 return (self.memory[self.PC.value+1].unsigned_value * 256
                       + self.memory[self.PC.value+2].unsigned_value)
