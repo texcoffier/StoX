@@ -268,6 +268,23 @@ def asm_variable(block,  # The ASM block
                 block.items[-1].error = True
 ```
 
+#### Jump and label management
+
+The functionality is defined in `0041-ASM-context-jump.py`
+by adding filters to `ASM` `set_time`:
+  * on start, it initializes environment and add new methods to the `ASM` block.
+  * on end, it patches the object code to set the good `JUMP` addresses.
+
+The new block methods are:
+  * `new_label(base_label_name)`:
+     returns a new label name with a number is added after.
+  * `add_label(item, label_name)`:
+     add the label in the assembly block.
+  * `add_jump(item, label_name, _TST_)`:
+     add the jump instruction `JUMP _TST_0`.
+     If `_TST_` is not defined, then the jump instruction is `JUMP`.
+
+
 
 ### The processor
 

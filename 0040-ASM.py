@@ -11,19 +11,6 @@ class _ASM_(Block):
                 else:
                         self.cpu.memory[self.variables[variable]].previous_items.append(item)
                 return self.variables[variable]
-        def new_label(self, text):
-                if text not in self.labels:
-                        self.labels[text] = 0
-                label = text + '_' + str(self.labels[text])
-                self.labels[text] += 1
-                return label
-        def add_label(self, from_item, label):
-                item = from_item.clone()
-                item.char = '   ' + label + ':'
-                item.value = label
-                item.y = len(self.items)
-                item.instruction = None
-                self.append(item)
         def add_code(self, item):
                 self.cpu.memory[self.segment_code] = item
                 item.addr = self.segment_code
@@ -171,7 +158,7 @@ ASM.add_filter('init', ASM_init)
 
 def asm_generate(block, item, data=None):
         if item.char in block.rules:
-                block.rules[item.char](block, item, data)
+                return block.rules[item.char](block, item, data)
 
 def ASM_update_rule(block, rule):
         block.rules[rule[0]] = rule[1]

@@ -40,21 +40,16 @@ def define_operator(operator):
             asm_generate(block, item.children[0])
             asm_generate(block, item.children[1])
             asm_Item(block, item, 'SUBTRACTION', '', [], asm_feedback_binary)
-            asm_Item(block, item, 'JUMP ' + t + '0',
-                     label_true, asm_bytes(0xFFFF), asm_feedback_pop)
-            jump_bad_addr = block.segment_code - 2
+            block.add_jump(item, label_true, t)
 
             if data:
-                data[2].append(jump_bad_addr)
+                return True
             else:
                 asm_Item(block, item, 'LOAD_IMMEDIATE', '0', [0], asm_feedback_push)
-                asm_Item(block, item, 'JUMP', label_end, asm_bytes(0xFFFF))
-                jump_end_addr = block.segment_code - 2
+                block.add_jump(item, label_end)
                 block.add_label(item, label_true)
-                block.cpu.set_data_word(jump_bad_addr, block.segment_code)
                 asm_Item(block, item, 'LOAD_IMMEDIATE', '1', [1], asm_feedback_push)
                 block.add_label(item, label_end)
-                block.cpu.set_data_word(jump_end_addr, block.segment_code)
 
         return asm_operator
 
@@ -77,6 +72,7 @@ for name, operator in [['le', '<='], ['ge', '>='],
         ASM.call('update_asm', [operator, define_operator(operator)])
 
 def compare_regtest(tty, dummy):
+        print("Comparator regtest")
         def set_source(i, operator, j, expected):
                 if expected:
                     c = '1'

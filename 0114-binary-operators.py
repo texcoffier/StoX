@@ -34,6 +34,7 @@ ASM.call('update_asm', ["|", asm_binary_or])
 ASM.call('update_asm', ["^", asm_binary_xor])
 
 def binary_regtest(tty, dummy):
+        print("Binary regtest")
         for op1 in ['&', '|', '^']:
          for op2 in ['&', '|', '^']:
           for op3 in ['&', '|', '^']:

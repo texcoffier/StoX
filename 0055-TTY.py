@@ -18,6 +18,7 @@ class _TTY_(Block):
                         print('=== expected ===')
                         print(repr(expected))
                         ASM.dump()
+                        OBJ.dump()
                         bug
 TTY = blocks.append(_TTY_())
 
