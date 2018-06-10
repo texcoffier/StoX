@@ -127,6 +127,7 @@ Adding a hook:
 
 ```python
   XYZ.add_filter('hook-name', function_to_call)
+  XYZ.add_filter('hook-name', function_to_call, True) # Add before the others
 ```
 
 Calling a hook and so all the functions added (in the order of addition):

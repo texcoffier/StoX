@@ -134,10 +134,13 @@ class Block:
                         return self.methods[method]
                 else:
                         return []
-        def add_filter(self, method, function):
+        def add_filter(self, method, function, before=False):
                 if method not in self.methods:
                         self.methods[method] = []
-                self.methods[method].append(function)
+                if before:
+                        self.methods[method].insert(0, function)
+                else:
+                        self.methods[method].append(function)
         def call(self, method, args=None):
                 for function in self.get_filter(method):
                         function(self, args)
