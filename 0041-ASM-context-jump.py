@@ -18,9 +18,11 @@ def context_jump_add_label(from_item, label):
 def context_jump_add_jump(item, label, test=None):
         if test is None:
                 test = 'JUMP'
+                feedback = None
         else:
                 test = 'JUMP ' + test + '0'
-        asm_Item(ASM, item, test, label, asm_bytes(0xFFFF), asm_feedback_pop)
+                feedback = asm_feedback_pop
+        asm_Item(ASM, item, test, label, asm_bytes(0xFFFF), feedback)
         ASM.jump_to_patch[ASM.segment_code - 2] = label
 
 def context_jump_init(block, dummy):
