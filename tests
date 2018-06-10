@@ -1,13 +1,5 @@
 #!/bin/sh
 
-if [ ! -x RapydScript/bin/rapydscript ]
-then
-        git clone https://github.com/atsepkov/RapydScript.git
-fi
-
-RapydScript/bin/rapydscript --prettify --bare xxx.py |
-sed -e 's/x.__class__.__name__/typeof(x)/'  >xxx.js
-
 if ! python3 xxx.py >xxx-py.txt
 then
         cat xxx-py.txt
