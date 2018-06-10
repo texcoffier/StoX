@@ -23,33 +23,14 @@ reverse_operator = {'<=':  '>',  '<': '>=',
                     }
 
 def define_operator(operator):
-        def asm_operator(block, item, data):
-            # If 'data' is 'None': push 0 or 1 on the stack
-            # else it is ['jump on false', 'the jump label', []]
-            # The [] will contains all the memory addresses
-            # to patch to put the real jump address.
-            t = operator
-            if data:
-                if data[0] == 'jump on false':
-                    t = reverse_operator[t]
-                label_true = data[1]
-            else:
-                label_true = block.new_label('compare_true')
-                label_end = block.new_label('compare_end')
-
+        def asm_operator(block, item):
+            BCS.begin()
             asm_generate(block, item.children[0])
             asm_generate(block, item.children[1])
             asm_Item(block, item, 'SUBTRACTION', '', [], asm_feedback_binary)
-            block.add_jump(item, label_true, t)
-
-            if data:
-                return True
-            else:
-                asm_Item(block, item, 'LOAD_IMMEDIATE', '0', [0], asm_feedback_push)
-                block.add_jump(item, label_end)
-                block.add_label(item, label_true)
-                asm_Item(block, item, 'LOAD_IMMEDIATE', '1', [1], asm_feedback_push)
-                block.add_label(item, label_end)
+            BCS.jump_false(item, reverse_operator[operator])
+            BCS.jump_true(item)
+            BCS.end(item)
 
         return asm_operator
 

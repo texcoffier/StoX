@@ -1,12 +1,6 @@
 
 # What:           Loop
 # Syntax:         while(expression) { instructions }
-# Generated code:
-#      WHILE_START_0:
-#      expression code
-#      JUMP IF ZERO WHILE_END_0
-#      instructions
-#      JUMP WHILE_START_0
 
 ##############################################################################
 # Lexical analyser
@@ -69,21 +63,20 @@ ASM.new_instruction(JUMP) # Add the instruction to the CPU instruction set
 # Generate assembly code
 ##############################################################################
 
-def asm_while(block, item, data):
-        label_start  = block.new_label('while_start')
-        label_end    = block.new_label('while_end')
+def asm_while(block, item):
+        BCS.begin(None, None, False)
 
-        block.add_label(item, label_start)
-        # The generate assembly will let the expression result on the stack
-        data = ['jump on false', label_end]
-        if not asm_generate(block, item.children[0], data):
-                # It is not a boolean test but a value
-                # Stop the loop if zero
-                block.add_jump(item, label_end, '==')
-        # The loop code
+        label_start = ASM.new_label('while_start')
+        ASM.add_label(item, label_start)
+        asm_generate(block, item.children[0])
+        BCS.jump_false(item, '==')
+
+        BCS.add_label_true(item)
         asm_generate(block, item.children[1])
         block.add_jump(item, label_start)
-        block.add_label(item, label_end)
+
+        BCS.add_label_false(item)
+        BCS.end(item)
 ASM.call('update_asm',
                         ['While',   # AST node name
                          asm_while  # Generating function
@@ -98,7 +91,7 @@ def while_regtest(tty, dummy):
         tty.check('while(0) { put(65) }', '')
         tty.check('a=2 while(a) { put(65)  a = a - 1 }',
                   '0×0:A\n1×0:A\n')
-        tty.check('a=2 while(a != 0) { put(65)  a = a - 1 }',
-                  '0×0:A\n1×0:A\n')
+        tty.check('a=2 while(a != 0) { put(66)  a = a - 1 }',
+                  '0×0:B\n1×0:B\n')
 TTY.add_filter('regtest', while_regtest)
 

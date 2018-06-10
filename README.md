@@ -213,8 +213,7 @@ The function translating `*` `AST` node to assembly and code:
 
 ```python
 def asm_multiply(block,  # The ASM block
-                 item,   # An item from the AST block
-                 data    # A contextual data (see 0110-while and 0105-compare)
+                 item    # An item from the AST block
                 ):
     # Generate the code for the left operand
     asm_generate(block, item.children[0])
@@ -240,8 +239,7 @@ There is the code of the instruction pushing the value of a variable on the stac
 
 ```python
 def asm_variable(block,  # The ASM block
-                 item,   # An item from the AST block
-                 data    # A contextual data (see 0110-while and 0105-compare)
+                 item    # An item from the AST block
             ):
     variable_name = item.children[0].value
     if variable_name in block.variables:
@@ -284,7 +282,12 @@ The new block methods are:
      add the jump instruction `JUMP _TST_0`.
      If `_TST_` is not defined, then the jump instruction is `JUMP`.
 
+#### Boolean jump management
 
+The functionality is defined in `0101-ASM-context-boolean.py` and
+used by the creators and users of boolean values.
+
+TO BE CONTINUED
 
 ### The processor
 

@@ -15,15 +15,15 @@ ASM.new_instruction(AND)
 ASM.new_instruction(XOR)
 ASM.new_instruction(OR)
 
-def asm_binary_and(block, item, data):
+def asm_binary_and(block, item):
         asm_generate(block, item.children[0])
         asm_generate(block, item.children[1])
         asm_Item(block, item, 'AND', '', [], asm_feedback_binary)
-def asm_binary_xor(block, item, data):
+def asm_binary_xor(block, item):
         asm_generate(block, item.children[0])
         asm_generate(block, item.children[1])
         asm_Item(block, item, 'XOR', '', [], asm_feedback_binary)
-def asm_binary_or(block, item, data):
+def asm_binary_or(block, item):
         asm_generate(block, item.children[0])
         asm_generate(block, item.children[1])
         asm_Item(block, item, 'OR', '', [], asm_feedback_binary)

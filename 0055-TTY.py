@@ -9,6 +9,7 @@ class _TTY_(Block):
                 return s
         def check(self, source, expected):
                 SRC.call('set', source)
+                # print(source) ; ASM.dump()
                 ASM.cpu.run()
                 if expected != self.string():
                         print('=== source ===')
