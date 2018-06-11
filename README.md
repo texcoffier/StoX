@@ -286,10 +286,43 @@ The new block methods are:
 
 The functionality is defined in `0101-ASM-context-boolean.py` and
 used by the creators and users of boolean values.
+The boolean context manager is in a global variable named `BCS`.
 
-TO BE CONTINUED
+There are 2 cases for boolean evaluation:
+  * 0 or 1 is pushed on the stack and the execution continue.
+  * a jump to 'true' or 'false' label is done,
+    the following instruction is not executed.
+    This case happen when the caller function needs
+    a boolean result, but not 0 or 1.
 
-### The processor
+A boolean function must start by `BCS.begin()` and
+end by `BCS.end(item)`.
+If needed the later one will push 0 or 1 on the stack.
+`BCS` manages a stack of true and false labels.
+
+The result is defined by a jump: `BCS.jump_false(item)` or
+`BCS.jump_true(item)`.
+The jump may be conditional: `BCS.jump_false(item, '!=')`
+
+
+The comparison operators in `0105-compare.py` are a good starting point.
+
+In some case, the caller is not interested by the boolean result
+but only by a jump to the good place, `0110-while.py` for example.
+In this case, the places to jump are defined by
+`BCS.add_label_true(item)` and `BCS.add_label_false(item)`.
+
+If the operand returns an integer, it has not jumped to the good label.
+Then after the operand evaluation a jump must be done to the good label.
+This jump produce no assembly code if the operand is a real boolean.
+
+This is complicated in order to allow optimum evaluation of
+complex expression with mixed 'or' and 'and' operators.
+This case is defined in `0115-boolean-operators.py`
+
+
+
+## The processor
 
 It can be fully redefined, there is the description of
 the current processor:
@@ -323,6 +356,6 @@ The next things to enhance:
 
   * Allow options in the URL (source content, opened blocks...).
   * Add instructions `ROTATE(nr_items, shift)`, `JUMP FCT`, `RETURN`.
-  * Add an integer to boolean function and use it for comparison operators.
+  * Add an integer-to-boolean function and use it for comparison operators.
   * Add documentation/parameters at the block bottom.
   * Add time travel to the syntactic analyzer: it is needed for debugging.

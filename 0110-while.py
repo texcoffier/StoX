@@ -69,7 +69,7 @@ def asm_while(block, item):
         label_start = ASM.new_label('while_start')
         ASM.add_label(item, label_start)
         asm_generate(block, item.children[0])
-        BCS.jump_false(item, '==')
+        BCS.jump_false(item, '==') # Generate jump code only if it is needed
 
         BCS.add_label_true(item)
         asm_generate(block, item.children[1])
