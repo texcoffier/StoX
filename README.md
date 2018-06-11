@@ -204,6 +204,12 @@ they are also defined as hooks:
     So it is possible to add filters to recognize control sequences
     as clear screen.
 
+Some hooks where added over the basic framework:
+
+  * `remove` is called when an item is removed.
+    So to remove an item: `block.call('remove', item)`
+
+
 ### The assembly langage
 
 The function added with `update_asm` must generate the assembly language
