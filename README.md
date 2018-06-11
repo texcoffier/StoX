@@ -327,6 +327,8 @@ complex expression with mixed 'or' and 'and' operators.
 This case is defined in `0115-boolean-operators.py`
 
 
+And the removing of unecessary jumps is done by `0125-cleanup_jumps.py`.
+
 
 ## The processor
 
