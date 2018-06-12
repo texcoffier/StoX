@@ -1,8 +1,12 @@
 
-def block_open_close_toggle(event):
+def open_close_event(event):
         for block in blocks.blocks:
                 if block.name == event.target.className:
-                        block_open_close(block, 1 - block.is_open)
+                        opened(block, 1 - block.is_open)
+                        break
+
+def opened(block, state):
+        block_open_close(block, state)
         nr_open = 0
         for block in blocks.blocks:
                 if block.is_open:
@@ -25,9 +29,13 @@ def block_open_close(block, is_open):
 def open_close_behavior(block, dummy):
         block.title = block.element.parentNode.firstChild
         block.title.innerHTML = (
-        '<span onclick="block_open_close_toggle(event)" class="'
+        '<span onclick="open_close_event(event)" class="'
         + block.name + '"></span>' + block.title.innerHTML)
         block_open_close(block, 1)
+
+for block in blocks.blocks:
+        block.add_filter('html_init', open_close_behavior)
+        block.add_filter('opened', opened)
 
 def open_close_style(blocks, dummy):
         style = document.createElement("STYLE")
@@ -41,7 +49,3 @@ def open_close_style(blocks, dummy):
         """
         body.appendChild(style)
 blocks.add_filter('html_init', open_close_style)
-
-for block in blocks.blocks:
-        block.add_filter('html_init', open_close_behavior)
-
