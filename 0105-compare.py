@@ -7,9 +7,6 @@
 #   JUMP >=0
 #   JUMP >0
 
-# To let the lexer find '!='
-LEX.call('update_lex', [100, 'negate', '[ \n\t]*[!][ \n\t]*', '#808'])
-
 def le(cpu): cpu.stack_pop() <= 0 and cpu.set_PC(cpu.get_data_word())
 def lt(cpu): cpu.stack_pop() <  0 and cpu.set_PC(cpu.get_data_word())
 def ge(cpu): cpu.stack_pop() >= 0 and cpu.set_PC(cpu.get_data_word())

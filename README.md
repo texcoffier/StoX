@@ -193,6 +193,15 @@ they are also defined as hooks:
        the same name may be used more than once to make an `or`.
      * `['Expression', 'slash', 'Unary']` the list of lexem to match
 
+  * `update_ast` is called to add a rule to `AST` the data
+    parameter is a pair:
+       * The LEX rule name
+       * The function creating a node in the AST tree.
+
+  * `update_opt` is called to add a rule to `OPT` the data
+    parameter is the function optimizing the item given as parameter.
+    The optimization calls are done bottom to top.
+
   * `new_instruction` is called to add an instruction to the `CPU`
     the data parameter is the function emulating the instruction.
     The function may have attribute defined:
@@ -367,7 +376,6 @@ Useful methods of `ASM.cpu` to create new instructions are:
 
 The next things to enhance:
 
-  * Add boolean not and binary not
   * Add instructions `ROTATE(nr_items, shift)`, `JUMP FCT`, `RETURN`.
   * Add an integer-to-boolean function and use it for comparison operators.
   * Add documentation/parameters at the block bottom.
