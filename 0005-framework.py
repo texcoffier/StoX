@@ -177,11 +177,7 @@ class Block:
         def html_init  (self, args=None): self.call('html_init'  , args)
         def html_draw  (self, args=None): self.call('html_draw'  , args)
         def draw_cursor(self, args=None): self.call('draw_cursor', args)
-
-        def set_time   (self, t):
-                self.call('set_time'   , t)
-                if body and self.time_travel and self.time_travel_t:
-                        self.time_travel_t.innerHTML = t
+        def set_time   (self, t):         self.call('set_time'   , t)
         
         def append(self, item):
                 item.index = len(self.items)
@@ -203,4 +199,3 @@ class Blocks(Block):
                 return block
         def key(self, key):
                 self.call('key', key)
-

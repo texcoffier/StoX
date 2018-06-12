@@ -47,6 +47,10 @@ def SRC_set_time(block, t):
         block.next_block.set_time(0)
 SRC.add_filter('set_time', SRC_set_time)
 
+def block_set_time(block, t):
+        if body and block.time_travel and block.time_travel_t:
+                block.time_travel_t.innerHTML = t
+
 def canvas_html_init(block, title):
         div = document.createElement('DIV')
         div.innerHTML = ('<p class="title">'
@@ -80,6 +84,10 @@ def canvas_html_init(block, title):
         div.style.overflow = 'hidden'
         div.style.width = str((window_width - 50) / len(blocks.blocks)) + 'px'
         div.style.height = str(block.element.height + 100) + 'px'
+
+        for b in blocks.blocks:
+                b.add_filter('set_time', block_set_time)
+
 SRC.add_filter('html_init', canvas_html_init)
 
 def SRC_html_draw(block, dummy):
