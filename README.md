@@ -71,6 +71,10 @@ The following files, enhance the user interface:
 
   * `1000-font-size.py`: change font size with `Ctrl +` and `Ctrl -`
   * `1010-open-close.py`: interactively open and close blocks.
+     Add a hook `opened` to set the state of a block.
+  * `1020-parse-url-options.py`: the usr hash may contain call to hooks
+     or attribute to set such as
+       `#SRC·set·a=9§CPU·set_time·1§LEX·fontsize·4§AST·opened·0`
 
 The last one to be executed is the main program: `9999-main.py`
 
@@ -167,6 +171,7 @@ There is the list of used hooks in the base system:
 
   * `append` is called with the item added to the block.
 
+  * `final_init` is called just before the JavaScript event loop starts.
 
 The following hooks may have been defined as a simple method.
 But in order to let any functionality to be added to the application
@@ -362,7 +367,7 @@ Useful methods of `ASM.cpu` to create new instructions are:
 
 The next things to enhance:
 
-  * Allow options in the URL (source content, opened blocks...).
+  * Add boolean not and binary not
   * Add instructions `ROTATE(nr_items, shift)`, `JUMP FCT`, `RETURN`.
   * Add an integer-to-boolean function and use it for comparison operators.
   * Add documentation/parameters at the block bottom.
