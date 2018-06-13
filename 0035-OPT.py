@@ -2,6 +2,7 @@ class _OPT_(Block):
         title = "Code optimizer"
         name = "OPT"
         fullline_highlight = True
+        time_travel = ['F9', 'F10']
 OPT = blocks.append(_OPT_())
 
 OPT.add_filter('dump', LEX_dump)
@@ -41,15 +42,30 @@ def OPT_walk(item):
         new_item = item.clone()
         for child in item.children:
                 new_item.children.append(OPT_walk(child))
-        for rule in OPT.rules:
+        for i, rule in enumerate(OPT.rules):
+                if i >= OPT.t:
+                        break
                 new_item = rule(new_item) or new_item
         return new_item
 
 def OPT_set_time(block, t):
+        if t < 0:
+                t = len(block.rules)
         block.t = t
         block.items = []
         if len(block.previous_block.items):
                 root = OPT_walk(block.previous_block.items[0])
-                yac_walk(block, root, 0, 0, 0, False, True)
+                y = yac_walk(block, root, 0, 0, 0, False, True)
+                if t != len(block.rules):
+                        block.append(Item('Rule:', 0, y+1))
+                        block.append(Item(block.rules[t].name, 0, y+2))
         block.next_block.set_time(0)
 OPT.add_filter('set_time', OPT_set_time)
+
+OPT_key_codes = {'F9': -1, 'F10': +1}
+def OPT_key(blocks, event):
+        if event.key in OPT_key_codes:
+                OPT.set_time(min(max(0, OPT.t + OPT_key_codes[event.key]),
+                                     len(OPT.rules)))
+                stop_event(event)
+blocks.add_filter('key', OPT_key)

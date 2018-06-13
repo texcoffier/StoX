@@ -44,7 +44,7 @@ def AST_set_time(block, t):
                 block.ast = ast_apply(block, block.previous_block.items[0])
                 if len(block.ast.children): # No AST elements
                         yac_walk(block, block.ast, 0, 0, 0, False, True)
-        block.next_block.set_time(0)
+        block.next_block.set_time(-1)
 AST.add_filter('set_time', AST_set_time)
 
 def AST_update_rule(block, rule):
