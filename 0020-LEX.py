@@ -115,7 +115,7 @@ def LEX_set_time(block, t):
                         previous_items.append(item)
                         previous_possibles = possibles
                         previous_current = current
-        block.next_block.set_time(0)
+        block.next_block.set_time(-1)
 LEX.add_filter('set_time', LEX_set_time)
 
 def LEX_html_draw(block, dummy):
@@ -125,6 +125,9 @@ def LEX_html_draw(block, dummy):
                         feedback.block = block
                         for text in ['Rule:',
                                      item.rule,
+                                     '',
+                                     'Priority:',
+                                     block.lexem_by_rule[item.rule].priority,
                                      '',
                                      'Regular expression:',
                                      block.lexem_by_rule[item.rule].regexp

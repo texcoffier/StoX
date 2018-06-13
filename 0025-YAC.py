@@ -2,6 +2,7 @@ class _YAC_(Block):
         title = "Syntaxic analyser"
         name = "YAC"
         fullline_highlight = True
+        time_travel = ['F7', 'F8']
 YAC = blocks.append(_YAC_())
 
 YAC.add_filter('dump', LEX_dump)
@@ -93,7 +94,7 @@ def rule_apply(block, items, rule):
 def yac_walk(block, item, x, y, depth, bad, expand=False):
         item.x = x
         item.y = y
-        if bad:
+        if bad and block.real_t == -1:
                 item.error = True
         block.append(item)
         if not expand and len(item.children) == 1:
@@ -123,43 +124,48 @@ def yac_nice(item):
         return s + ')'
 
 def YAC_set_time(block, t):
-        block.t = t
-        items = []
-        block.path = []
-        for i in block.previous_block.items:
-                item = i.clone()
-                item.char = item.value.replace("\n", "\\n")
-                item.lex = True
-                items.append(item)
-        change = True
-        while change:
+        block.real_t = t
+        if t < 0:
+                t = -1
+        if t < block.t or t == -1:
+                block.t = 0
+                block.current_items = []
+                block.path = []
+                for i in block.previous_block.items:
+                        item = i.clone()
+                        item.char = item.value.replace("\n", "\\n")
+                        item.lex = True
+                        block.current_items.append(item)
+        rule = None
+        while block.t < t or t == -1:
                 change = False
                 for rule in block.rules:
-                        new_items = rule_apply(block, items, rule)
+                        new_items = rule_apply(block, block.current_items, rule)
                         if new_items:
-                                items = new_items
-                                block.path.append([i.rule for i in items])
+                                block.current_items = new_items
+                                block.path.append([i.rule
+                                                   for i in block.current_items])
                                 change = True
                                 break
+                if not change:
+                        break
+                block.t += 1
         block.items = []
         y = 0
         bad = False
-        for root in items:
+        for root in block.current_items:
                 y = yac_walk(block, root, 0, y, 0, bad)
                 bad = True
+        if t != -1 and rule:
+                block.append(Item("Rule:"      , 0, y+1))
+                block.append(Item(rule.name    , 4, y+2))
+                block.append(Item("Priority:"  , 0, y+4))
+                block.append(Item(rule.priority, 4, y+5))
+                block.append(Item("Lexems:"    , 0, y+7))
+                for i, lexem in enumerate(rule.lexems):
+                        block.append(Item(lexem, 4, y+8+i))
         block.next_block.set_time(0)
 YAC.add_filter('set_time', YAC_set_time)
-
-def YAC_key(blocks, event):
-        if event.key == 'F1':
-                s = ''
-                for path in YAC.path:
-                        for rule in path:
-                                s += ' ' + rule
-                        s += '\n'
-                alert(s)
-blocks.add_filter('key', YAC_key)
-
 
 def YAC_regtest(yac, dummy):
         for input, output in [
@@ -192,3 +198,9 @@ def YAC_regtest(yac, dummy):
                         bug
 YAC.add_filter('regtest', YAC_regtest)
 
+YAC_key_codes = {'F7': -1, 'F8': +1}
+def YAC_key(blocks, event):
+        if event.key in YAC_key_codes:
+                YAC.set_time(max(0, YAC.t + YAC_key_codes[event.key]))
+                stop_event(event)
+blocks.add_filter('key', YAC_key)
