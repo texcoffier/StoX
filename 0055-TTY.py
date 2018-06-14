@@ -1,6 +1,8 @@
 class _TTY_(Block):
         title = "TTY"
         name = "TTY"
+        is_running = False
+        time_travel = ['F11', 'F12']
         def string(self):
                 s = ''
                 for item in self.items:
@@ -28,11 +30,23 @@ TTY.add_filter('html_init', canvas_html_init)
 TTY.add_filter('html_draw', SRC_html_draw)
 
 def TTY_set_time(block, t):
+        if block.is_running:
+                return
+        block.is_running = True
+        if t == 0 or t < block.t:
+                block.items = []
+                block.x = 0
+                block.y = 0
+                ASM.cpu.tty = block
+        if t < block.t:
+                CPU.set_time(0)
+        while len(block.items) < t:
+                tt = CPU.t
+                CPU.set_time(CPU.t + 1)
+                if tt == CPU.t:
+                        break
         block.t = t
-        block.items = []
-        block.x = 0
-        block.y = 0
-        ASM.cpu.tty = block
+        block.is_running = False
 TTY.add_filter('set_time', TTY_set_time)
 
 def TTY_put(block, code):
@@ -50,3 +64,11 @@ def TTY_put(block, code):
         else:
                 block.x += 1
 TTY.add_filter('put', TTY_put)
+
+TTY_key_codes = {'F11': -1, 'F12': +1}
+def TTY_key(blocks, event):
+        if event.key in TTY_key_codes:
+                TTY.set_time(TTY.t + TTY_key_codes[event.key])
+                stop_event(event)
+blocks.add_filter('key', TTY_key)
+

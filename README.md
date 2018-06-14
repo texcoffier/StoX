@@ -376,7 +376,7 @@ Useful methods of `ASM.cpu` to create new instructions are:
 
 The next things to enhance:
 
+  * Mouse cursor
   * Add instructions `ROTATE(nr_items, shift)`, `JUMP FCT`, `RETURN`.
   * Add an integer-to-boolean function and use it for comparison operators.
   * Add documentation/parameters at the block bottom.
-  * Add time travel to the optimizer: it is needed for debugging.

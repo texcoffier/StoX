@@ -25,7 +25,8 @@ def CPU_set_time(block, t):
                 asm.cpu.reset()
                 block.next_block.set_time(0)
         while block.t < t:
-                asm.cpu.step()
+                if not asm.cpu.step():
+                        break
                 block.t += 1
 CPU.add_filter('set_time', CPU_set_time)
 
