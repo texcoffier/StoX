@@ -143,8 +143,8 @@ LEX.add_filter('html_draw', LEX_html_draw)
 def LEX_regtest(lex, dummy):
         SRC.call('set', 'a$7')
         for i, expected in enumerate([
-        '0×0:a → word<word>,previous=0×0:a<a>',
-        '0×1:$ is UNEXPECTED<$ is UNEXPECTED>,previous=1×0:$<$>·2×0:7<7>',
+        '0×0:a → word<word>,next=23×0:a<word>,previous=0×0:a<a>',
+        '0×1:$ is UNEXPECTED<$ is UNEXPECTED>,next=0×1:$ is UNEXPECTED<$ is UNEXPECTED>,previous=1×0:$<$>·2×0:7<7>',
         ]):
                 if lex.items[i].long() != backslash(expected):
                         print(expected)

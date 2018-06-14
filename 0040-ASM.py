@@ -98,6 +98,7 @@ class CPU_emulator:
         def stack_push(self, value):
                 self.memory[self.SP.value].set_byte(value)
                 self.memory[self.SP.value].color = "#000"
+                self.memory[self.SP.value].previous_items = [self.memory[self.PC.value]]
                 self.SP.set_word(self.SP.value + 1)
         def stack_pop(self):
                 self.SP.set_word(self.SP.value - 1)

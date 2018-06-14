@@ -24,6 +24,7 @@ class Item:
                 item.char           = self.char
                 item.rule           = self.rule
                 item.value          = self.value
+                self.next_items = [item]
                 return item
         def set_byte(self, i):
                 self.char = hex(i>>4) + hex(i)
@@ -74,6 +75,10 @@ class Item:
                 w, h = self.wh()
                 self.block.ctx.strokeStyle = color
                 self.block.ctx.strokeRect(x - 1, y - h, w, h + 2)
+        def contains(self, px, py):
+                x, y = self.xy()
+                w, h = self.wh()
+                return x < px < x + w and y - h < py < y
         def fillText(self):
                 x, y = self.xy()
                 if self.error:

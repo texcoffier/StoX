@@ -27,3 +27,34 @@ def blocks_html_draw(blocks, body):
                 block.draw_cursor()
 blocks.add_filter('html_draw', blocks_html_draw)
 
+def blocks_mousemove(blocks, event):
+        selected = None
+        for block in blocks.blocks:
+                if block.element is event.target:
+                        selected = block
+                        break
+        if selected is None:
+                return
+        x = event.x - selected.element.offsetLeft
+        y = event.y - selected.element.offsetTop
+        for item in selected.items:
+                if item.contains(x, y):
+                        blocks.call('highlight', item)
+                        break
+blocks.add_filter('mousemove', blocks_mousemove)
+
+def hightlight_recursive(blocks, item, past):
+        item.rectangle()
+        if past:
+                items = item.previous_items
+        else:
+                items = item.next_items
+        for p in items:
+                hightlight_recursive(blocks, p, past)
+
+def hightlight(blocks, item):
+        hightlight_recursive(blocks, item, True)
+        hightlight_recursive(blocks, item, False)
+
+blocks.add_filter('highlight', hightlight)
+

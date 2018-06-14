@@ -15,12 +15,15 @@ if body:
         def drawevent():
                 blocks.html_draw()
                 SRC.cursor_visible = 1 - SRC.cursor_visible
+        def mousemoveevent(event):
+                blocks.call('mousemove', event)
 
         blocks.html_init(body)
         SRC.call('set', 'a=65\nwhile(a != 70)\n {\n  put(a)\n  a = a + 1\n }')
         blocks.call('final_init')
         setInterval(drawevent, 400)
-        window.addEventListener('keydown', keyevent, False)
+        window.addEventListener('keydown'  , keyevent      , False)
+        window.addEventListener('mousemove', mousemoveevent, False)
 else:
         blocks.dump()
         
