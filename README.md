@@ -76,6 +76,17 @@ The following files, enhance the user interface:
      or attribute to set such as
        `#SRC·set·a=9§CPU·set_time·1§LEX·fontsize·4§AST·opened·0`
 
+Some files redefine the base language:
+
+  * `2000-semicolon.py`: displays a warning message if there is no ';'
+    between statements.
+
+Some files defines base functionalities, but their hook
+needs to be executed last:
+
+  * `9990-next-items.py`: computes `item.next_items` from `item.previous_items`
+    each time the hook `set_time` has been executed.
+
 The last one to be executed is the main program: `9999-main.py`
 
 A good starting point is `0100-put.py`, it is heavily commented.
@@ -197,6 +208,7 @@ they are also defined as hooks:
        after the first child.
        Clicking on the error message sent the cursor at the end
        of the previous argument.
+       See `2000-semicolon.py` for an usage example.
 
   * `update_ast` is called to add a rule to `AST` the data
     parameter is a pair:
