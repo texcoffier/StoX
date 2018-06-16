@@ -63,9 +63,14 @@ class CPU_emulator:
         def reset(self):
                 self.SP.set_word(0x8000)
                 self.set_PC(0)
+                i = 0x8000 - 1
+                while i in self.memory:
+                        self.memory[i].set_byte(0x00)
+                        i -= 1
                 i = 0x8000
                 while i in self.memory:
                         self.memory[i].color = "#DDD"
+                        self.memory[i].set_byte(0x00)
                         i += 1
 
         def set_PC(self, value):

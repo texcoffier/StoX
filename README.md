@@ -3,15 +3,15 @@
 This tool allow to edit a source code in a web page
 and see all the stages from compilation to execution:
 
-  * Source code edition
+  * Source code edition (time travel: undo/redo)
   * Lexical analysis
-  * Syntactic analysis
+  * Syntactic analysis (time travel: steps of the lexical analysis)
   * Abstract Syntax Tree
-  * Code optimization
+  * Code optimization (time travel: application of the optimization methods)
   * Assembly generation
   * Machine code generation
-  * Processor execution
-  * Screen display
+  * Processor execution (time travel: processor execution step by step)
+  * Screen display (time travel: character by character display)
 
 When moving the cursor in the source code,
 the 8 next stages are updated to highlight
@@ -22,7 +22,6 @@ stages highlight execute/read/write/modify in
 the previous stages.
 
 Try it: [StoX.html](http://perso.univ-lyon1.fr/thierry.excoffier/PARSER/StoX.html)
-
 
 ## How to use
 
@@ -72,7 +71,7 @@ The following files, enhance the user interface:
   * `1000-font-size.py`: change font size with `Ctrl +` and `Ctrl -`
   * `1010-open-close.py`: interactively open and close blocks.
      Add a hook `opened` to set the state of a block.
-  * `1020-parse-url-options.py`: the usr hash may contain call to hooks
+  * `1020-parse-url-options.py`: the URL hash may contain calls to hook
      or attribute to set such as
        `#SRC·set·a=9§CPU·set_time·1§LEX·fontsize·4§AST·opened·0`
 
@@ -393,6 +392,9 @@ Useful methods of `ASM.cpu` to create new instructions are:
 
 The next things to enhance:
 
+  * Add a 'Course and Question' block before the source editor.
+  * Add character constants as 'a' '\n'
   * Add instructions `ROTATE(nr_items, shift)`, `JUMP FCT`, `RETURN`.
   * Add an integer-to-boolean function and use it for comparison operators.
+  * Add functions to the language
   * Add documentation/parameters at the block bottom.
