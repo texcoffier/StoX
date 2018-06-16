@@ -6,7 +6,9 @@ class Item:
         error = False
         color = "#000" # The text color
         arrow_to = None
-        def __init__(self, char='', x=0, y=0, previous_items=[]):
+        def __init__(self, char='', x=0, y=0, previous_items=None):
+                if previous_items is None:
+                        previous_items = []
                 self.previous_items = previous_items
                 self.char           = char # The text displayed on screen
                 self.rule           = char # The node name (class)

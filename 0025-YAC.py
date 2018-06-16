@@ -1,7 +1,6 @@
 class _YAC_(Block):
         title = "Syntaxic analyser"
         name = "YAC"
-        fullline_highlight = True
         time_travel = ['F7', 'F8']
 YAC = blocks.append(_YAC_())
 
@@ -102,6 +101,10 @@ def rule_apply(block, items, rule):
                         for i in items[error_pos:p]:
                                 match.children.append(i)
                 match.lex = False
+                for item in match.children:
+                        if not item.error:
+                                for i in item.previous_items:
+                                        match.previous_items.append(i)
                 after.append(match)
                 position = p
                 while position < len(items):
