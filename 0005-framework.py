@@ -6,8 +6,7 @@ class Item:
         error = False
         color = "#000" # The text color
         arrow_to = None
-        def __init__(self, char='', x=0, y=0, previous_items=[], next_items=[]):
-                self.next_items     = next_items
+        def __init__(self, char='', x=0, y=0, previous_items=[]):
                 self.previous_items = previous_items
                 self.char           = char # The text displayed on screen
                 self.rule           = char # The node name (class)
@@ -15,8 +14,7 @@ class Item:
                 self.x              = x
                 self.y              = y
                 self.children       = []
-                for i in previous_items:
-                        i.next_items = [self]
+                self.next_items     = []
         def clone(self):
                 item = Item(self.value)
                 item.previous_items = [self]
@@ -24,7 +22,7 @@ class Item:
                 item.char           = self.char
                 item.rule           = self.rule
                 item.value          = self.value
-                self.next_items = [item]
+                self.next_items     = []
                 return item
         def set_byte(self, i):
                 self.char = hex(i>>4) + hex(i)
@@ -44,9 +42,6 @@ class Item:
                         + self.char + '<' + str(self.rule) + '>')
         def long(self):
                 v = self.short()
-                if len(self.next_items):
-                        v += ',next=' + join([i.short() 
-                                            for i in self.next_items])
                 if len(self.previous_items):
                         v += ',previous=' + join([i.short() 
                                                 for i in self.previous_items])

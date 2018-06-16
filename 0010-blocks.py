@@ -51,10 +51,8 @@ def hightlight_recursive(blocks, item, past):
                 items = item.next_items
         for p in items:
                 hightlight_recursive(blocks, p, past)
-
 def hightlight(blocks, item):
         hightlight_recursive(blocks, item, True)
         hightlight_recursive(blocks, item, False)
-
 blocks.add_filter('highlight', hightlight)
 

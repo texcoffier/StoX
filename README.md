@@ -110,6 +110,7 @@ The most useful attributes of an `Item` are:
   * `previous_items`: the items in the previous blocks that triggered the
                       creation of this item.
   * `next_items`: the created items in the next block.
+    The list is fully generated on `set_time` call.
   * `color`: the CSS color of the item.
   * `error`: there is an error for this item: red background.
 
