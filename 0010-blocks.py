@@ -45,6 +45,8 @@ blocks.add_filter('mousemove', blocks_mousemove)
 
 def hightlight_recursive(blocks, item, past):
         item.rectangle()
+        if item.block is SRC:
+                SRC.mousemove = item
         if past:
                 items = item.previous_items
         else:

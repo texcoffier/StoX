@@ -2,6 +2,7 @@ class _SRC_(Block):
         title = "Source code editor"
         name = "SRC"
         time_travel = ['^Z', '^Y']
+        mousemove = None
         def analyse(self, text):
                 self.items = []
                 x = y = 0
@@ -222,6 +223,17 @@ def SRC_key(blocks, event):
                 print('key=', key)
         SRC.cursor_visible = 1
 blocks.add_filter('key', SRC_key)
+
+def SRC_mousedown(block, event):
+        if SRC.mousemove is None:
+                return
+        SRC.cursor = SRC.mousemove.index + 1
+        if event.target is SRC.element:
+                return
+        while SRC.cursor > 0 and SRC.items[SRC.cursor - 1].char in [' ', '\n', '\t']:
+                SRC.cursor -= 1
+blocks.add_filter('mousedown', SRC_mousedown)
+
 
 def SRC_regtest(src, dummy):
         src.call('set', 'a\nab\na\n\na')
