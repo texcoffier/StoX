@@ -193,6 +193,10 @@ they are also defined as hooks:
      * `Binary`: the name of the rule, it will be the node name.
        the same name may be used more than once to make an `or`.
      * `['Expression', 'slash', 'Unary']` the list of lexem to match
+     * optional `[1, 'Error message']`: the error message is inserted
+       after the first child.
+       Clicking on the error message sent the cursor at the end
+       of the previous argument.
 
   * `update_ast` is called to add a rule to `AST` the data
     parameter is a pair:

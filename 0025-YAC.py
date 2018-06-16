@@ -43,10 +43,11 @@ def YAC_init(block, dummy):
 YAC.add_filter('init', YAC_init)
 
 class Rule:
-        def __init__(self, priority, name, data):
+        def __init__(self, priority, name, data, error):
                 self.priority = priority
                 self.name = name
                 self.lexems = []
+                self.error = error
                 for x in data:
                         if len(x) == 1:
                                 x = [x[0], '1']
@@ -55,7 +56,11 @@ class Rule:
                 return self.name + ':' + self.lexems
 
 def YAC_update_rule(block, rule):
-        block.rules.append(Rule(rule[0], rule[1], rule[2]))
+        if len(rule) == 3:
+                error = False
+        else:
+                error = rule[3]
+        block.rules.append(Rule(rule[0], rule[1], rule[2], error))
         if context == "JavaScript":
                 block.rules.sort(lex_compare_js)
         else:
@@ -82,7 +87,20 @@ def rule_apply(block, items, rule):
                         position += 1
                         continue
                 match = Item(rule.name)
-                match.children = items[position:p]
+                if rule.error is False:
+                        match.children = items[position:p]
+                else:
+                        error_pos = position+rule.error[0]
+                        match.children = []
+                        for i in items[position:error_pos]:
+                                match.children.append(i)
+                        error = Item(rule.error[1])
+                        error.error = True
+                        error.lex = True
+                        error.previous_items = items[error_pos-1].previous_items
+                        match.children.append(error)
+                        for i in items[error_pos:p]:
+                                match.children.append(i)
                 match.lex = False
                 after.append(match)
                 position = p
@@ -155,7 +173,7 @@ def YAC_set_time(block, t):
         bad = False
         for root in block.current_items:
                 y = yac_walk(block, root, 0, y, 0, bad)
-                bad = True
+                # bad = True
         if t != -1 and rule:
                 block.append(Item("Rule:"      , 0, y+1))
                 block.append(Item(rule.name    , 4, y+2))
