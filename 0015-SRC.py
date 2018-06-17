@@ -166,16 +166,19 @@ def SRC_regtest(src, dummy):
         src.call('set', 'a\nab\na\n\na')
         src.call('set', 'a\nab\na\n\na\n')
         src.call('set', 'a\nab\na\n\na\naa\na')
-        for t in [0, 1, 2]:
+        t0 = len(src.history)-3
+        t1 = len(src.history)-2
+        t2 = len(src.history)-1
+        for t in [t0, t1, t2]:
                 src.set_time(t)
                 char = 0
                 tests = [
                         [0,0, 2,0], [1,0, 3,0], [0,0, 5,0], [1,0, 6,0],
                         [1,0, 6,0], [2,0, 7,0], [3,0, 7,0], [5,0, 8,0]
                         ]
-                if t == 0:
+                if t == t0:
                         more = [[7,0, 8,0], [7,0, 8,1]]
-                elif t == 1:
+                elif t == t1:
                         more = [[7,0, 9,1], [7,0, 9,1], [8,0, 9,1]]
                 else:
                         more = [[7,0,10,0], [7,0,11,0], [8,0,13,0],

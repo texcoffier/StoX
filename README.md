@@ -425,7 +425,6 @@ Useful methods of `ASM.cpu` to create new instructions are:
 
 The next things to enhance:
 
-  * Add a 'Course and Question' block before the source editor.
   * Add character constants as 'a' '\n'
   * Add instructions `ROTATE(nr_items, shift)`, `JUMP FCT`, `RETURN`.
   * Add an integer-to-boolean function and use it for comparison operators.

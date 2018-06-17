@@ -14,7 +14,6 @@ if body:
                 blocks.call('mousedown', event)
 
         blocks.html_init(body)
-        blocks.call('final_init')
         setInterval(drawevent, 400)
         window.addEventListener('keydown'  , keyevent      , False)
         window.addEventListener('mousemove', mousemoveevent, False)
