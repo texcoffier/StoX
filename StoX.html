@@ -3,16 +3,36 @@
   <meta charset="utf-8">
   <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
   <style>
+        BODY {
+                margin: 0px ;
+                overflow: hidden ;
+        }
+        BODY > DIV {
+                white-space: nowrap ;
+        }
         BUTTON {
                 padding: 0px;
                 margin-left: 0.5em;
                 margin-right: 0.5em;
                 border: 1px solid #888;
                 }
-        .title {
+        .header {
+                background: linear-gradient(90deg, #F8FFF8, #DDF);
                 margin-top: 0;
                 white-space: nowrap;
+                padding: 0.5em ;
                 }
+        .buttons {
+                position: relative ;
+                height: 1.5em ;
+                 }
+        .time_travel, .time_travel BUTTON { font-size: 90% ; }
+        .time_travel {
+                position: absolute ;
+                right: 0.2em ;
+                top: 0.2em ;
+        }
+        .header:hover BUTTON { background: #FFF; }
         .footer {
                 white-space: nowrap;
                 overflow: hidden;

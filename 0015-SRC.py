@@ -54,9 +54,10 @@ def block_set_time(block, t):
 
 def canvas_html_init(block, title):
         div = document.createElement('DIV')
-        div.innerHTML = ('<p class="title">'
-                         + title
-                         + '</p>'
+        div.innerHTML = ('<div class="header">'
+                         + '<div class="buttons"></div>'
+                         + '<div class="title">' + title + '</div>'
+                         + '</div>'
                          + '<canvas></canvas>'
                          + '<div class="footer"></div>')
         div.style.display = "inline-block"
@@ -65,13 +66,16 @@ def canvas_html_init(block, title):
                 block.blocks.element.appendChild(div)
         else:
                 block.previous_block.element.parentNode.appendChild(div)
+        block.buttons = div.firstChild.firstChild
         if block.time_travel:
-                tt = div.childNodes[2]
-                tt.innerHTML = (
-                          '<button>◀ ' + block.time_travel[0] + '</button>'
+                block.buttons.innerHTML = (
+                          '<div class="time_travel">'
+                        + '<button>◀ ' + block.time_travel[0] + '</button>'
                         + '<span></span>'
                         + '<button>' + block.time_travel[1] + ' ▶</button>'
+                        + '</div>'
                         )
+                tt = block.buttons.firstChild
                 block.time_travel_t = tt.childNodes[1]
                 def time_travel_back():
                         block.set_time(block.t - 1)
@@ -87,7 +91,10 @@ def canvas_html_init(block, title):
         block.element.style.height = str(block.element.height) + 'px'
         block.ctx = block.element.getContext("2d")
         div.style.overflow = 'hidden'
-        div.style.width = str((window_width - 50) / blocks.nr_columns) + 'px'
+        if block.window_top:
+                div.style.width = str(window_width / blocks.nr_columns) + 'px'
+        else:
+                div.style.width = '100%'
 
         for b in blocks.blocks:
                 b.add_filter('set_time', block_set_time)
