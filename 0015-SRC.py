@@ -61,7 +61,10 @@ def canvas_html_init(block, title):
                          + '<div class="footer"></div>')
         div.style.display = "inline-block"
         div.style.verticalAlign = 'top'
-        block.blocks.element.appendChild(div)
+        if block.window_top:
+                block.blocks.element.appendChild(div)
+        else:
+                block.previous_block.element.parentNode.appendChild(div)
         if block.time_travel:
                 tt = div.childNodes[2]
                 tt.innerHTML = (
@@ -77,14 +80,14 @@ def canvas_html_init(block, title):
                 tt.childNodes[0].onclick = time_travel_back
                 tt.childNodes[2].onclick = time_travel_forward
         block.element = div.childNodes[1]
-        block.element.width = (4 * window_width) / len(blocks.blocks)
-        block.element.height = window_height - 100
+        block.element.width = (4 * window_width) / blocks.nr_columns
+        height = (block.height * window_height) / 100
+        block.element.height = height - 80
         block.element.style.width = str(block.element.width) + 'px'
         block.element.style.height = str(block.element.height) + 'px'
         block.ctx = block.element.getContext("2d")
         div.style.overflow = 'hidden'
-        div.style.width = str((window_width - 50) / len(blocks.blocks)) + 'px'
-        div.style.height = str(block.element.height + 100) + 'px'
+        div.style.width = str((window_width - 50) / blocks.nr_columns) + 'px'
 
         for b in blocks.blocks:
                 b.add_filter('set_time', block_set_time)

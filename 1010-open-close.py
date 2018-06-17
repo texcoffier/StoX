@@ -9,11 +9,13 @@ def opened(block, state):
         block_open_close(block, state)
         nr_open = 0
         for block in blocks.blocks:
-                if block.is_open:
+                if block.window_top and block.is_open:
                         nr_open += 1
         closed_size = 2
         width = (100 - (len(blocks.blocks)-nr_open) * closed_size) / nr_open + '%'
         for block in blocks.blocks:
+                if not block.window_top:
+                        continue
                 div = block.element.parentNode
                 if block.is_open:
                         div.style.width = width
@@ -27,6 +29,8 @@ def block_open_close(block, is_open):
         block.title.firstChild.innerHTML = is_open and "▶" or "▼"
 
 def open_close_behavior(block, dummy):
+        if not block.window_top:
+                return
         block.title = block.element.parentNode.firstChild
         block.title.innerHTML = (
         '<span onclick="open_close_event(event)" class="'

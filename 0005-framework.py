@@ -124,6 +124,8 @@ class Block:
         line_spacing   = 1.3
         time_travel    = False
         initialized    = False
+        window_top     = True
+        height         = 100 # Full window height
         fullline_highlight = False
         def __init__(self):
                 self.items          = []

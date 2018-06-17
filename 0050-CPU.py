@@ -1,6 +1,7 @@
 class _CPU_(Block):
         title = "Processor"
         name = "CPU"
+        height = 30
         time_travel = ['⇞', '⇟']
 CPU = blocks.append(_CPU_())
 

@@ -10,7 +10,10 @@ def blocks_dump(blocks, dummy_arg):
 blocks.add_filter('dump', blocks_dump)
 
 def blocks_init(blocks, dummy_arg):
+        blocks.nr_columns = 0
         for block in blocks.blocks:
+                if block.window_top:
+                        blocks.nr_columns += 1
                 block.init(dummy_arg)
 blocks.add_filter('init', blocks_init)
 
