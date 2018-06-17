@@ -31,7 +31,12 @@ JavaScript to be executed on the browser.
 Type `make` to generate `xxx.js` and run regression tests
 in Python and also with NodeJS.
 The regression tests also run in the web browser when
-loading the page `StoX.html`
+loading the page `StoX.html`.
+
+In `StoX.html` the default course text and source code is defined.
+The texts between cotes are highlighted and clickable if they
+exists in the source code.
+
 
 ## How to enhance
 
@@ -46,6 +51,7 @@ of functionality addition.
   * `0002-utilities.py`
   * `0005-framework.py`: the 'Item', 'Block' and 'Blocks' classes.
   * `0010-blocks.py`:
+  * `0014-CAQ.py`: Course And Question.
   * `0015-SRC.py`: Source editor.
   * `0020-LEX.py`: Lexical analyzer.
   * `0025-YAC.py`: Syntactic analyze.
@@ -129,7 +135,28 @@ is is good starting point to create an item in the current
 using an item from the last block.
 
 
-### Hooks
+
+### Programming by functionality (FyHooks)
+
+The goal of this method of programming is to add a functionality
+by adding an unique source code file, without modifying any other files.
+
+`StoX` uses this idea to create a fully customizable application
+without needing to patch files.
+
+The `0014-CAQ.py` block has been inserted into the application
+after the `SRC` block.
+With a classic programming method:
+  * the `SRC` block must have been modified to take into account the `CAQ` block.
+  * the `SRC` source code will be less readable.
+  * the `CAQ` block can not be removed easily.
+
+The programming by functionality is based upon hooks (as in Emacs).
+The functionalities add themselves in the hook pipe in order
+to implement their behavior.
+
+
+#### Hooks
 
 Defining the behavior:
 
@@ -138,14 +165,14 @@ Defining the behavior:
       pass
 ```
 
-Adding a hook:
+Adding a behavior to a hook:
 
 ```python
   XYZ.add_filter('hook-name', function_to_call)
   XYZ.add_filter('hook-name', function_to_call, True) # Add before the others
 ```
 
-Calling a hook and so all the functions added (in the order of addition):
+Calling a hook and so all the added functions (in the order of addition):
 
 ```python
   XYZ.call('hook-name', data)
@@ -153,7 +180,7 @@ Calling a hook and so all the functions added (in the order of addition):
 
 The hooks may be attached to `Blocks` or `Block`.
 
-### Standard hooks
+#### Standard hooks
 
 You can create or overload any hook you want.
 There is the list of used hooks in the base system:
@@ -233,6 +260,12 @@ they are also defined as hooks:
   * `put` is called to send a char to TTY.
     So it is possible to add filters to recognize control sequences
     as clear screen.
+
+  * `highlight` is called when the mouse is inside an item,
+    The parameter is the item.
+
+  * `mouvemove` is called on mouse move, the parameter is
+    the JavaScript event.
 
 Some hooks where added over the basic framework:
 

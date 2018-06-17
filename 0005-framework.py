@@ -6,6 +6,7 @@ class Item:
         error = False
         color = "#000" # The text color
         arrow_to = None
+        char_width = 0.7
         def __init__(self, char='', x=0, y=0, previous_items=None):
                 if previous_items is None:
                         previous_items = []
@@ -51,12 +52,16 @@ class Item:
         def dump(self):
                 print("\t\t{", self.long(), "}")
         def xy(self):
-                return [4 + 0.7 * self.block.fontsize * self.x,
+                return [4 + self.char_width * self.block.fontsize * self.x,
                         self.block.fontsize
                         + self.block.line_spacing * self.block.fontsize * self.y]
         def wh(self):
-                return [len(self.char) * self.block.fontsize * 0.7,
+                return [len(self.char) * self.block.fontsize * self.char_width,
                         self.block.fontsize]
+        def clipped(self):
+                x, y = self.xy()
+                w, h = self.wh()
+                return x + w > self.block.element.parentNode.offsetWidth
         def fillRect(self):
                 x, y = self.xy()
                 w, h = self.wh()
@@ -191,6 +196,7 @@ class Block:
                 return item
 
 class Blocks(Block):
+        name = "BLOCKS"
         def __init__(self):
                 self.blocks  = []
                 self.methods = {}
@@ -203,3 +209,86 @@ class Blocks(Block):
                 return block
         def key(self, key):
                 self.call('key', key)
+
+def canvas_html_init(block, title):
+        div = document.createElement('DIV')
+        div.innerHTML = ('<div class="header">'
+                         + '<div class="buttons"></div>'
+                         + '<div class="title">' + title + '</div>'
+                         + '</div>'
+                         + '<canvas></canvas>')
+        div.style.display = "inline-block"
+        div.style.verticalAlign = 'top'
+        if block.window_top:
+                block.blocks.element.appendChild(div)
+        else:
+                block.previous_block.element.parentNode.appendChild(div)
+        block.buttons = div.firstChild.firstChild
+        if block.time_travel:
+                block.buttons.innerHTML = (
+                          '<div class="time_travel">'
+                        + '<button>◀ ' + block.time_travel[0] + '</button>'
+                        + '<span></span>'
+                        + '<button>' + block.time_travel[1] + ' ▶</button>'
+                        + '</div>'
+                        )
+                tt = block.buttons.firstChild
+                block.time_travel_t = tt.childNodes[1]
+                def time_travel_back():
+                        block.set_time(block.t - 1)
+                def time_travel_forward():
+                        block.set_time(block.t + 1)
+                tt.childNodes[0].onclick = time_travel_back
+                tt.childNodes[2].onclick = time_travel_forward
+        block.element = div.childNodes[1]
+        block.element.style.display = 'block'
+        block.element.width = (4 * window_width) / blocks.nr_columns
+        height = (block.height * window_height) / 100
+        block.element.height = height - div.childNodes[0].offsetHeight
+        block.element.style.width = str(block.element.width) + 'px'
+        block.element.style.height = str(block.element.height) + 'px'
+        block.ctx = block.element.getContext("2d")
+        div.style.overflow = 'hidden'
+        if block.window_top:
+                div.style.width = str(window_width / blocks.nr_columns) + 'px'
+        else:
+                div.style.width = '100%'
+
+        for b in blocks.blocks:
+                b.add_filter('set_time', block_set_time)
+
+def SRC_html_draw(block, dummy):
+        block.ctx.fillStyle = "#FFF"
+        block.ctx.clearRect(0, 0, 10000, 10000)
+        block.ctx.font = str(block.fontsize) + "px monospace"
+
+        for item in block.items:
+                item.delta_arrow = 0
+        for item in block.items:
+                if item.arrow_to is None:
+                        continue
+                dest_item = block.items[item.arrow_to]
+                if item.arrow_to > item.index:
+                        item.delta_arrow += 1
+                        dest_item.delta_arrow -= 1
+                else:
+                        item.delta_arrow -= 1
+                        dest_item.delta_arrow += 1
+        nr_arrows = 0
+        for item in block.items:
+                if block.previous_block:
+                        item.highlight = False
+                        for i in item.previous_items:
+                                if i.highlight:
+                                        item.highlight = True
+                                        break
+                if item.highlight:
+                        item.fillRect()
+                else:
+                        item.fillText()
+                item.lines_to_children()
+                nr_arrows += item.delta_arrow
+                item.nr_arrows = nr_arrows
+                if item.arrow_to:
+                        block.ctx.strokeStyle = "#000"
+                        item.draw_arrow()

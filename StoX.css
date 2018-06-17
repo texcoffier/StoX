@@ -1,6 +1,7 @@
 BODY {
         margin: 0px ;
         overflow: hidden ;
+        font-family: sans-serif ;
         }
 BODY > DIV {
         white-space: nowrap ;
