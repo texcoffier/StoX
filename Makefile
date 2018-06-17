@@ -23,4 +23,4 @@ clean:
 	-rm xxx*
 
 install:run-tests
-	cp xxx.js StoX.html $(HOME)/public_html/PARSER
+	cp xxx.js StoX.html StoX.css $(HOME)/public_html/PARSER

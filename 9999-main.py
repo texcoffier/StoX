@@ -20,5 +20,6 @@ if body:
         window.addEventListener('mousemove', mousemoveevent, False)
         window.addEventListener('mousedown', mousedownevent, False)
 else:
+        blocks.call('regtest')
         blocks.dump()
         
