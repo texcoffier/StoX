@@ -58,8 +58,7 @@ def canvas_html_init(block, title):
                          + '<div class="buttons"></div>'
                          + '<div class="title">' + title + '</div>'
                          + '</div>'
-                         + '<canvas></canvas>'
-                         + '<div class="footer"></div>')
+                         + '<canvas></canvas>')
         div.style.display = "inline-block"
         div.style.verticalAlign = 'top'
         if block.window_top:
@@ -84,9 +83,10 @@ def canvas_html_init(block, title):
                 tt.childNodes[0].onclick = time_travel_back
                 tt.childNodes[2].onclick = time_travel_forward
         block.element = div.childNodes[1]
+        block.element.style.display = 'block'
         block.element.width = (4 * window_width) / blocks.nr_columns
         height = (block.height * window_height) / 100
-        block.element.height = height - 80
+        block.element.height = height - div.childNodes[0].offsetHeight
         block.element.style.width = str(block.element.width) + 'px'
         block.element.style.height = str(block.element.height) + 'px'
         block.ctx = block.element.getContext("2d")
