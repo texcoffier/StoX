@@ -61,3 +61,9 @@ def hightlight(blocks, item):
         hightlight_recursive(blocks, item, False)
 blocks.add_filter('highlight', hightlight)
 
+def blocks_regtest(blocks, dummy):
+        for block in blocks.blocks:
+                print('Regression tests for «', block.title, "»")
+                block.call('regtest')
+                print("OK")
+blocks.add_filter('regtest', blocks_regtest)
