@@ -188,7 +188,9 @@ class Block:
         def draw_cursor(self, args=None): self.call('draw_cursor', args)
         def set_time   (self, t):         self.call('set_time'   , t)
         
-        def append(self, item):
+        def append(self, item, dy=None):
+                if len(self.items) and dy is not None:
+                        item.y = self.items[-1].y + dy
                 item.index = len(self.items)
                 self.items.append(item)
                 item.block = self
