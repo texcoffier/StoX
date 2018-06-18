@@ -40,6 +40,8 @@ def CAQ_set(block, text):
 CAQ.add_filter('set', CAQ_set)
 
 def CAQ_update_src(src, dummy):
+        for i in CAQ.items:
+                i.next_items = []
         t = src.history[-1]
         for word in CAQ.words:
                 for i in range(len(t)):
