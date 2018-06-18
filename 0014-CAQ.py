@@ -22,12 +22,12 @@ def CAQ_set(block, text):
                 return item, x, y
         for line in text.split('\n'):
                 normal = True
-                for chunk in line.split("'"):
+                for chunk in line.split("‘"):
                         if normal:
                                 for char in chunk.split(' '):
                                         item, x, y = add(char, x, y)
                         else:
-                                item, x, y = add("'" + chunk + "'", x, y)
+                                item, x, y = add(chunk, x, y)
                                 if chunk not in block.words:
                                         block.words[chunk] = []
                                 block.words[chunk].append(item)

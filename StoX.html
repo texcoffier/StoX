@@ -11,15 +11,15 @@
   <script src="xxx.js"></script>
   <script>
           blocks.call('regtest') ;
-          CAQ.call('set',
+          CAQ.call('set', // Beware: ‘ is not '
            "This program displays letters ABCDE.\n\n"
-           + "It initializes the loop variable 'a=65' "
+           + "It initializes the loop variable ‘a='A'‘ "
            + "to the ASCII code of the letter 'A'.\n\n"
-           + "It runs the loop until 'a != 70' (the 'G' letter).\n\n"
-           + "The loop prints the variable content with 'put(a)'.\n\n"
-           + "Once printed, 'a = a + 1' set the variable to the next letter."
+           + "It runs the loop until ‘a != 'G'‘.\n\n"
+           + "The loop prints the variable content with ‘put(a)‘.\n\n"
+           + "Once printed, ‘a = a + 1‘ set the variable to the next letter."
            ) ;
-          SRC.call('set','a=65\nwhile(a != 70)\n {\n  put(a)\n  a = a + 1\n }');
+          SRC.call('set',"a='A'\nwhile(a != 'G')\n {\n  put(a)\n  a = a + 1\n }");
           blocks.call('final_init') ;
   </script>
 </html>
