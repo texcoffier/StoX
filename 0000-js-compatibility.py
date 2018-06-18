@@ -35,6 +35,8 @@ except:
         def backslash(txt):
                 return txt.replace(RegExp('\n','g'),'\\n'
                          ).replace(RegExp('\t','g'),'\\t')
+        def ord(x):
+                return x.charCodeAt(0)
         def _array_insert_(index, data):
                 this.splice(index, 0, data)
         o.defineProperty(Array.prototype, 'insert' ,

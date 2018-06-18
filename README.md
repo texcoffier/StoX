@@ -66,11 +66,19 @@ of functionality addition.
 The following files, enhance the behavior of previous blocks:
 
   * `0100-put.py`: 'put' function and CPU instruction.
+  * `0101-ASM-context-boolean.py`: add utilities to manage boolean
+     expression evaluation.
+  * `0102-not.py`: the boolean and binary `not` operator.
   * `0105-compare.py`: Add `<`, `>`, `<=`, `>=`, `==`, `!=` to the language and
                     `JUMP <0`, `JUMP >0`... to the instruction set.
                     There are no CPU instruction for `<`, `>`.
   * `0110-while.py`: 'while(){}' statement and 'JUMP', 'JUMP IF ZERO' CPU
                    instructions.
+  * `0114-binary-operators.py`: integer binary operators.
+  * `0115-boolean-operators.py`: boolean operator `OR` and `AND`.
+  * `0120-remove-item.py`: add a hook to remove an item from a block.
+  * `0125-cleanup-jumps.py`: remove jumps to the next instruction.
+  * `0130-literal-char.py`: allow literal chars such as 'a', '\n', '\t'.
 
 The following files, enhance the user interface:
 
@@ -425,7 +433,9 @@ Useful methods of `ASM.cpu` to create new instructions are:
 
 The next things to enhance:
 
-  * Add character constants as 'a' '\n'
+  * Store local changes into the URL (source content, open/close, font size...)
+  * Add functionality enabling and disabling in the browser.
+  * Add '\t' behavior into TTY
   * Add instructions `ROTATE(nr_items, shift)`, `JUMP FCT`, `RETURN`.
   * Add an integer-to-boolean function and use it for comparison operators.
   * Add functions to the language
