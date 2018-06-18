@@ -153,6 +153,8 @@ def YAC_set_time(block, t):
                 block.current_items = []
                 block.path = []
                 for i in block.previous_block.items:
+                        if not i.is_a_lexem:
+                                break
                         item = i.clone()
                         item.char = item.value.replace("\n", "\\n")
                         item.lex = True

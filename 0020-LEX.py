@@ -90,6 +90,7 @@ def LEX_set_time(block, t):
                                 lexem = previous_possibles[0]
                                 item = Item('', 0, len(block.items),
                                             previous_items)
+                                item.is_a_lexem = True
                                 item.rule  = lexem.name
                                 item.value = strip(previous_current)
                                 item.char  = (backslash(item.value)
@@ -105,10 +106,20 @@ def LEX_set_time(block, t):
                                         item = Item(current + ' is UNEXPECTED',
                                             0, len(block.items),
                                             previous_items)
+                                        item.is_a_lexem = False
                                         item.previous_items = items[i:]
                                         item.color = "#F00"
                                         item.error = True
                                         block.append(item)
+                                        item = Item('Possibles lexems:')
+                                        block.append(item, dy=2)
+                                        for p in previous_possibles:
+                                                item = Item(p.name+':'+p.regexp)
+                                                block.append(item, dy=1)
+                                        item = Item('Analyse:')
+                                        block.append(item, dy=2)
+                                        item = Item(current)
+                                        block.append(item, dy=1)
                                 break
                 else:
                         i += 1
