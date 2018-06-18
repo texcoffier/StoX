@@ -34,9 +34,7 @@ def CAQ_set(block, text):
                         normal = not normal
                 x = 0
                 y += 1
-        height = y * CAQ.line_spacing * CAQ.fontsize
-        CAQ.element.height = height
-        CAQ.element.style.height = height + "px"
+        block.set_to_minimal_height()
 CAQ.add_filter('set', CAQ_set)
 
 def CAQ_update_src(src, dummy):

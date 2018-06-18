@@ -4,7 +4,6 @@ class _TTY_(Block):
         is_running = False
         time_travel = ['F11', 'F12']
         window_top = False
-        height = 70
         def string(self):
                 s = ''
                 for item in self.items:

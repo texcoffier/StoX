@@ -176,6 +176,13 @@ class Block:
                         if self.items[-1].char == '\n':
                                 return [self.items[-1], 1]
                         return [item, after]
+        def set_to_minimal_height(self):
+                if not body:
+                        return
+                y = self.items[-1].y + 1
+                height = y * block.line_spacing * block.fontsize
+                block.element.height = height
+                block.element.style.height = height + "px"
 
         # Standard hooks
         def dump       (self, args=None): self.call('dump'       , args)

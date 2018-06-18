@@ -25,6 +25,7 @@ def CPU_set_time(block, t):
                 asm.cpu.SP.x = 3
                 asm.cpu.reset()
                 block.next_block.set_time(0)
+                block.set_to_minimal_height()
         while block.t < t:
                 if not asm.cpu.step():
                         break
