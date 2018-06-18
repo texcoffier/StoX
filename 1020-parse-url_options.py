@@ -1,11 +1,19 @@
 
-def parse_url_options():
+def get_url_options():
+        options = []
         if window.location.hash == '':
-                return
+                return options
         for item in decodeURIComponent(window.location.hash[1:]).split("§"):
                 block_name, method, value = item.split('·')
                 if value is None:
-                        print(item)
+                        options.append([item, None, None])
+                else:
+                        options.append([block_name, method, value])
+        return options
+
+def parse_url_options():
+        for block_name, method, value in get_url_options():
+                if value is None:
                         continue
                 if not isNaN(value):
                         value = int(value)
@@ -17,5 +25,4 @@ def parse_url_options():
                                 setattr(block, method, value)
                 except:
                         print(block_name, method, value)
-
 blocks.add_filter('final_init', parse_url_options)

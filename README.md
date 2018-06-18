@@ -58,6 +58,7 @@ of functionality addition.
   * `0030-AST.py`: Abstract Syntax Tree generator.
   * `0035-OPT.py`: Code Optimizer.
   * `0040-ASM.py`: Assembly generation. Contains the instruction definitions.
+  * `0041-ASM-context-jump.py`: add jump and label management methods to `ASM`.
   * `0045-OBJ.py`: The memory content (code, heap, stack).
   * `0050-CPU.py`: The CPU state.
   * `0055-TTY.py`: The screen.
@@ -433,8 +434,8 @@ Useful methods of `ASM.cpu` to create new instructions are:
 
 The next things to enhance:
 
-  * Store local changes into the URL (source content, open/close, font size...)
   * Add functionality enabling and disabling in the browser.
+  * History on CAQ block.
   * Add '\t' behavior into TTY
   * Add instructions `ROTATE(nr_items, shift)`, `JUMP FCT`, `RETURN`.
   * Add an integer-to-boolean function and use it for comparison operators.

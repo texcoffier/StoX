@@ -2,7 +2,7 @@
 def open_close_event(event):
         for block in blocks.blocks:
                 if block.open_close_button is event.target:
-                        opened(block, 1 - block.is_open)
+                        block.call('opened', 1 - block.is_open)
                         break
 
 def opened(block, state):

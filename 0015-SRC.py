@@ -40,13 +40,21 @@ def SRC_set(block, text):
         block.next_block.set_time(0)
 SRC.add_filter('set', SRC_set)
 
+def SRC_cursor(block, position):
+        if position > len(block.items):
+                position = len(block.items)
+        elif position < -1:
+                position = 0
+        block.cursor = position
+        block.cursor_visible = 1
+SRC.add_filter('cursor', SRC_cursor)
+
 def SRC_set_time(block, t):
         if t < 0 or t >= len(block.history):
                 return
         block.t = t
         block.analyse(block.history[t])
-        if block.cursor > len(block.items):
-                block.cursor = len(block.items)
+        block.call('cursor', block.cursor)
         block.next_block.set_time(0)
 SRC.add_filter('set_time', SRC_set_time)
 
@@ -93,28 +101,23 @@ def SRC_key(blocks, event):
                 elif key == 'y':
                         SRC.set_time(SRC.t + 1)
                 return
+        cursor = SRC.cursor
+        y = SRC.items[min(cursor, len(SRC.items)-1)].y
         content = SRC.history[SRC.t]
         if key == 'ArrowRight':
-                if SRC.cursor < len(content):
-                        SRC.cursor += 1
-                stop_event(event)
+                cursor += 1
         elif key == 'ArrowLeft':
-                if SRC.cursor > 0:
-                        SRC.cursor -= 1
+                cursor -= 1
         elif key == 'Home':
-                y = SRC.items[min(SRC.cursor, len(SRC.items)-1)].y
-                while SRC.cursor > 0 and SRC.items[SRC.cursor-1].y == y:
-                        SRC.cursor -= 1
-                stop_event(event)
+                while cursor > 0 and SRC.items[cursor - 1].y == y:
+                        cursor -= 1
         elif key == 'End':
-                y = SRC.items[min(SRC.cursor, len(SRC.items)-1)].y
-                while SRC.cursor < len(SRC.items)-1 and SRC.items[SRC.cursor+1].y == y:
-                        SRC.cursor += 1
-                if SRC.cursor == len(SRC.items)-1 and SRC.items[-1].char != '\n':
-                        SRC.cursor += 1
-                stop_event(event)
+                while cursor < len(SRC.items)-1 and SRC.items[cursor + 1].y == y:
+                        cursor += 1
+                if cursor == len(SRC.items)-1 and SRC.items[-1].char != '\n':
+                        cursor += 1
         elif key == 'ArrowUp' or key == 'ArrowDown':
-                if SRC.cursor == len(content):
+                if cursor == len(content):
                         if content[-1] == '\n':
                                 after = 0
                         else:
@@ -122,43 +125,43 @@ def SRC_key(blocks, event):
                         item = SRC.items[-1]
                 else:
                         after = 0
-                        item = SRC.items[SRC.cursor]
+                        item = SRC.items[cursor]
                 if key == 'ArrowUp':
                         direction = -1
                 else:
                         direction = 1
                 item, after = SRC.change_line(item, direction, after)
-                SRC.cursor = item.index + after
-                stop_event(event)
+                cursor = item.index + after
         elif key == 'Backspace':
                 if SRC.cursor != 0:
-                        new_content = content[:SRC.cursor-1] + content[SRC.cursor:]
-                        SRC.cursor -= 1
+                        new_content = content[:cursor-1] + content[cursor:]
+                        cursor -= 1
                         SRC.call('set', new_content)
         elif key == 'Delete':
                 if SRC.cursor != len(content):
-                        new_content = content[:SRC.cursor] + content[SRC.cursor+1:]
+                        new_content = content[:cursor] + content[cursor+1:]
                         SRC.call('set', new_content)
         elif len(key) == 1 or key == 'Enter':
                 if key == 'Enter':
                         key = '\n'
-                new_content = content[:SRC.cursor] + key + content[SRC.cursor:]
+                new_content = content[:cursor] + key + content[cursor:]
                 SRC.call('set', new_content)
-                SRC.cursor += 1
-                stop_event(event)
+                cursor += 1
         else:
                 print('key=', key)
-        SRC.cursor_visible = 1
+                return
+        stop_event(event)
+        SRC.call('cursor', cursor)
 blocks.add_filter('key', SRC_key)
 
 def SRC_mousedown(block, event):
         if SRC.mousemove is None:
                 return
-        SRC.cursor = SRC.mousemove.index + 1
-        if event.target is SRC.element:
-                return
-        while SRC.cursor > 0 and SRC.items[SRC.cursor - 1].char in [' ', '\n', '\t']:
-                SRC.cursor -= 1
+        cursor = SRC.mousemove.index + 1
+        if event.target is not SRC.element:
+                while cursor > 0 and SRC.items[cursor-1].char in [' ','\n','\t']:
+                        cursor -= 1
+        SRC.call('cursor', cursor)
 blocks.add_filter('mousedown', SRC_mousedown)
 
 

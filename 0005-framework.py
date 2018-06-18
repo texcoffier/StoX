@@ -198,7 +198,7 @@ class Block:
                 return item
 
 class Blocks(Block):
-        name = "BLOCKS"
+        name = "blocks"
         def __init__(self):
                 self.blocks  = []
                 self.methods = {}
@@ -218,7 +218,7 @@ def canvas_html_init(block, title):
                          + '<div class="buttons"></div>'
                          + '<div class="title">' + title + '</div>'
                          + '</div>'
-                         + '<canvas></canvas>')
+                         + '<canvas tabindex="0"></canvas>')
         div.style.display = "inline-block"
         div.style.verticalAlign = 'top'
         if block.window_top:
