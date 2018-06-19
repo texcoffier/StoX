@@ -1,3 +1,5 @@
+"""Block: the processor and its registers"""
+
 class _CPU_(Block):
         title = "Processor"
         name = "CPU"

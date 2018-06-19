@@ -1,3 +1,4 @@
+"""Core utility: label/jump assembly and code generation"""
 
 def context_jump_new_label(text):
         if text not in ASM.jump_labels_counters:

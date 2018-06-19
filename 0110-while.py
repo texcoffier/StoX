@@ -1,3 +1,4 @@
+"""Source code: the «while» statement"""
 
 # What:           Loop
 # Syntax:         while(expression) { instructions }

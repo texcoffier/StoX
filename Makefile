@@ -7,8 +7,8 @@ run-tests:xxx.js
 run:xxx.py
 	python3 xxx.py
 
-xxx.py: $(SRC) RapydScript
-	cat $(SRC) >xxx.py
+xxx.py: $(SRC) RapydScript concatenate.py
+	./concatenate.py $(SRC) >xxx.py
 
 RapydScript:
 	git clone https://github.com/atsepkov/RapydScript.git

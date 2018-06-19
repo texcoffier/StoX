@@ -1,3 +1,5 @@
+"""Block: the object code and memory"""
+
 class _OBJ_(Block):
         title = "Memory content"
         name = "OBJ"

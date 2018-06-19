@@ -1,3 +1,5 @@
+"""Block: code optimizer"""
+
 class _OPT_(Block):
         title = "Code optimizer"
         name = "OPT"

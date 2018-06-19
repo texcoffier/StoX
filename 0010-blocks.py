@@ -1,3 +1,5 @@
+"""Core: Block management"""
+
 blocks = Blocks()
 
 def blocks_dump(blocks, dummy_arg):

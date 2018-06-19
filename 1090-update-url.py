@@ -1,3 +1,5 @@
+"""GUI: update the URL to save the application state"""
+
 def put_url_options(options):
         s = ''
         for option in options:

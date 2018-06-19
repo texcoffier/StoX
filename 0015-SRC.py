@@ -1,3 +1,5 @@
+"""Block: source code editor"""
+
 class _SRC_(Block):
         title = "Source code editor"
         name = "SRC"

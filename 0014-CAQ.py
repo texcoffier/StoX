@@ -1,3 +1,5 @@
+"""Block: course and question"""
+
 class _CAQ_(Block):
         title = "Course &amp; Question"
         name = "CAQ"

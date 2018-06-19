@@ -1,6 +1,4 @@
-###############################################################################
-# Create framework
-###############################################################################
+"""Core: heart of the framework: «Item», «Block» and «Blocks»"""
 
 class Item:
         error = False
@@ -218,6 +216,8 @@ class Blocks(Block):
                 return block
         def key(self, key):
                 self.call('key', key)
+        def keyup(self, key):
+                self.call('keyup', key)
 
 def canvas_html_init(block, title):
         div = document.createElement('DIV')

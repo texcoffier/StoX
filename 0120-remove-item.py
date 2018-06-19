@@ -1,3 +1,4 @@
+"""Core addon: the hook «remove»"""
 
 def remove_item(block, item):
         for i in range(item.index, len(block.items) - 1):

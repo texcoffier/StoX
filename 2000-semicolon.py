@@ -1,3 +1,4 @@
+"""Source code: tell to put an «;» between statements"""
 
 LEX.call('update_lex',[100, 'semicolon', '[ \n\t]*[;][ \n\t]*', '#F08'])
 

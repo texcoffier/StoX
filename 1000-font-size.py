@@ -1,3 +1,5 @@
+"""GUI: the font size chooser («Ctrl +» and «Ctrl -»)"""
+
 def font_size_key(blocks, event):
         if event.ctrlKey:
                 change = 0

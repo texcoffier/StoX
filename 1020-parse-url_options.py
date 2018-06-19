@@ -1,3 +1,4 @@
+"""GUI: parse the options in the URL"""
 
 def get_url_options():
         options = []

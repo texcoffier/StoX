@@ -1,3 +1,4 @@
+"""Source code: the character literals as «a»..., «\n», «\t»"""
 
 LEX.call('update_lex',
         [90, 'literal_char', "[ \\n\\t]*'([^'\\\\]|\\\\n|\\\\t)'[ \\n\\t]*", '#880'])

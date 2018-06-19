@@ -1,4 +1,4 @@
-
+"""Source code: the operators «||» and «&amp;&amp;» as boolean «or» and «and»"""
 
 LEX.call('update_lex',
         [100,                  # Priority: must be higher than the 'word' lexem priority

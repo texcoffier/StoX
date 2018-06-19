@@ -1,3 +1,5 @@
+"""Block: assembly language"""
+
 class _ASM_(Block):
         title = "Assembly language"
         name = "ASM"

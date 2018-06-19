@@ -1,3 +1,4 @@
+"""GUI: the open/close block icon"""
 
 def open_close_event(event):
         for block in blocks.blocks:

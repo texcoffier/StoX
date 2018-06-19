@@ -1,3 +1,5 @@
+"""Block: lexical analyzer"""
+
 class _LEX_(Block):
         title = "Lexical analyser"
         name = "LEX"

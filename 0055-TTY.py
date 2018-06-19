@@ -1,3 +1,5 @@
+"""Block: the screen"""
+
 class _TTY_(Block):
         title = "TTY (screen)"
         name = "TTY"

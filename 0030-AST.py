@@ -1,3 +1,5 @@
+"""Block: Abstract Syntax Tree"""
+
 class _AST_(Block):
         title = "Abstract Syntax Tree"
         name = "AST"

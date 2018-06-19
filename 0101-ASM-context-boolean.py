@@ -1,3 +1,4 @@
+"""Core utility: boolean assembly and code generation"""
 
 class BooleanContext:
         def __init__(self, label_true=None, label_false=None,

@@ -1,3 +1,5 @@
+"""Core addon: remove jumps to the next instruction"""
+
 def cleanup_jumps(block, item):
         if item.char[-1] != ':':
                 return # Not a label

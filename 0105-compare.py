@@ -1,3 +1,4 @@
+"""Source code: the comparators «&lt;», «&gt;», «&lt;=», «&gt;=», «==» and «!=»"""
 
 # The following instructions pop the stack and JUMP if the test is fine:
 #   JUMP !=0

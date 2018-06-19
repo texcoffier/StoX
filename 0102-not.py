@@ -1,5 +1,4 @@
-
-# NOT boolean or binary
+"""Source code: the operators «!» and «~» as boolean and binary «not»"""
 
 LEX.call('update_lex', [100, 'negate', '[ \n\t]*[~!][ \n\t]*', '#808'])
 

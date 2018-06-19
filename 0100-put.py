@@ -1,3 +1,4 @@
+"""Source code: the «put» statement"""
 
 # What:           Display one char on TTY
 # Syntax:         put(ascii code)

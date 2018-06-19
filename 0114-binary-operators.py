@@ -1,3 +1,5 @@
+"""Source code: the operators «&», «|» and «^» as binary «and», «or» and «xor»"""
+
 LEX.call('update_lex', [100, 'binary_or' , '[ \n\t]*[|][ \n\t]*', '#808'])
 LEX.call('update_lex', [100, 'binary_and', '[ \n\t]*[&][ \n\t]*', '#808'])
 LEX.call('update_lex', [100, 'binary_xor', '[ \n\t]*\\^[ \n\t]*'  , '#808'])

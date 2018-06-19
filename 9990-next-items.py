@@ -1,3 +1,4 @@
+"""Core: compute «next_items»"""
 
 def compute_next_items(block, t):
         for item in block.items:

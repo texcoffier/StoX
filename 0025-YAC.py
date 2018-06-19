@@ -1,3 +1,5 @@
+"""Block: syntactic analyzer"""
+
 class _YAC_(Block):
         title = "Syntaxic analyser"
         name = "YAC"

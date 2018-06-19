@@ -1,6 +1,4 @@
-###############################################################################
-# JavaScript compatibility layer
-###############################################################################
+"""Core: JavaScript compatibility layer"""
 
 window_width = 1000
 window_height = 500
@@ -12,8 +10,8 @@ try:
                 m = re.match(pattern, text, re.MULTILINE)
                 if m:
                         return m.group(0) == text
-        def join(t):
-                return '·'.join(t)
+        def join(t, sep='·'):
+                return sep.join(t)
         def strip(t):
                 return t.strip()
         def backslash(txt):
@@ -26,8 +24,8 @@ except:
                         {'enumerable': False,'value': Array.prototype.push})
         def match(pattern, text):
                 return text.replace(RegExp(pattern), '') == ''
-        def join(t):
-                return t.join('·')
+        def join(t, sep='·'):
+                return t.join(sep)
         def strip(t):
                 return t.trim()
         def str(x):
