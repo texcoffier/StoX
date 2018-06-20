@@ -8,8 +8,10 @@ def help_keyup(blocks, dummy):
         if blocks.a_key_is_pressed is False:
                 blocks.help.style.opacity = 0.9
                 blocks.help.style.transition = "opacity 0.5s"
+                blocks.help.style.pointerEvents = 'initial'
         else:
                 blocks.help.style.opacity = 0
+                blocks.help.style.pointerEvents = 'none'
 blocks.add_filter('keyup', help_keyup)
 
 def help_html_init(blocks, dummy):
