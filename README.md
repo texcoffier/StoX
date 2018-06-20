@@ -434,7 +434,6 @@ Useful methods of `ASM.cpu` to create new instructions are:
 
 The next things to enhance:
 
-  * canvas focus on mouse move
   * mouse wheel for any history ?
   * Add functionality enabling and disabling in the browser.
   * History on CAQ block.
