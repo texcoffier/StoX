@@ -15,13 +15,16 @@ if body:
                 blocks.call('mousemove', event)
         def mousedownevent(event):
                 blocks.call('mousedown', event)
+        def mousewheelevent(event):
+                blocks.call('mousewheel', event)
 
         blocks.html_init(body)
         setInterval(drawevent, 400)
-        window.addEventListener('keydown'  , keyevent      , False)
-        window.addEventListener('keyup'    , keyup         , False)
-        window.addEventListener('mousemove', mousemoveevent, False)
-        window.addEventListener('mousedown', mousedownevent, False)
+        window.addEventListener('keydown'       , keyevent       , False)
+        window.addEventListener('keyup'         , keyup          , False)
+        window.addEventListener('mousemove'     , mousemoveevent , False)
+        window.addEventListener('mousedown'     , mousedownevent , False)
+        window.addEventListener('DOMMouseScroll', mousewheelevent, False)
 else:
         blocks.call('regtest')
         blocks.dump()

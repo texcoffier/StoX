@@ -247,6 +247,8 @@ def canvas_html_init(block, title):
                         block.set_time(block.t - 1)
                 def time_travel_forward():
                         block.set_time(block.t + 1)
+                block.time_travel_back = time_travel_back
+                block.time_travel_forward = time_travel_forward
                 tt.childNodes[0].onclick = time_travel_back
                 tt.childNodes[2].onclick = time_travel_forward
         block.element = div.childNodes[1]
