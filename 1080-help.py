@@ -55,8 +55,8 @@ def help_html_init(blocks, dummy):
         s = []
         for f in functionalities:
                 s.append('<!--' + functionalities[f] + '-->'
-                         + '<tr><td class="id">' + f
-                         + '<td>' + functionalities[f] + '</tr>')
+                         + '<tr><td class="id"><a href="' + f + '.py.html">' + f
+                         + '</a><td>' + functionalities[f] + '</tr>')
         s.sort()
         blocks.help.innerHTML = '''<h1>Hit «Control» key to see this box</h1>
         <table>''' + join(s, '') + '</table>'

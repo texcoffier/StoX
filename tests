@@ -6,9 +6,9 @@ then
         exit 1
 fi
 
-ls -ls xxx.py xxx.js
+ls -ls xxx.py StoX.js
 
-node xxx.js >xxx-js.txt
+node StoX.js >xxx-js.txt
 
 if cmp xxx-py.txt xxx-js.txt
 then

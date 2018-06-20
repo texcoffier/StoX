@@ -28,7 +28,7 @@ Try it: [StoX.html](http://perso.univ-lyon1.fr/thierry.excoffier/PARSER/StoX.htm
 The tool is coded in Python and then translated into
 JavaScript to be executed on the browser.
 
-Type `make` to generate `xxx.js` and run regression tests
+Type `make` to generate `StoX.js` and run regression tests
 in Python and also with NodeJS.
 The regression tests also run in the web browser when
 loading the page `StoX.html`.
