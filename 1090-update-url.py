@@ -27,7 +27,8 @@ def new_updater(block, method):
         block.add_filter(method, fct)
 
 def update_url_hooks():
-        for method in ['set', 'opened', 'fontsize', 'set_time', 'cursor']:
+        for method in ['set', 'opened', 'fontsize', 'set_time', 'cursor',
+                       'disabled']:
                 new_updater(blocks, method)
                 for block in blocks.blocks:
                         new_updater(block, method)

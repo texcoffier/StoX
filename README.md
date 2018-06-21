@@ -434,7 +434,6 @@ Useful methods of `ASM.cpu` to create new instructions are:
 
 The next things to enhance:
 
-  * Add functionality enabling and disabling in the browser.
   * History on CAQ block.
   * Add '\t' behavior into TTY
   * Add instructions `ROTATE(nr_items, shift)`, `JUMP FCT`, `RETURN`.
