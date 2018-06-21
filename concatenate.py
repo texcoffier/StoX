@@ -42,6 +42,9 @@ def selected(name):
             pass # nodejs
     return True
 functionalities = ''', json.dumps(functionalities), ';')
-with open('required.py', 'r') as f:
-        print(f.read())
+try:
+    with open('TMP/required.py', 'r') as f:
+            print(f.read())
+except:
+    print('required = {}')
 print(''.join(s))

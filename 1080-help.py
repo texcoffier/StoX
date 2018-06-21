@@ -58,7 +58,7 @@ def help_html_init(blocks, dummy):
                 help_window['table-content'].append([
                                 functionalities[f],
                                 f,
-                                '<a href="' + f + '.py.html">' + f + '</a>',
+                                '<a href="TMP/' + f + '.py.html">' + f + '</a>',
                                 functionalities[f]])
 
         blocks.call('update_help', help_window)

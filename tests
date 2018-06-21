@@ -1,20 +1,20 @@
 #!/bin/sh
 
-if ! python3 xxx.py >xxx-py.txt
+if ! python3 TMP/xxx.py >TMP/xxx-py.txt
 then
-        cat xxx-py.txt
+        cat TMP/xxx-py.txt
         exit 1
 fi
 
-ls -ls xxx.py StoX.js
+ls -ls TMP/xxx.py TMP/StoX.js
 
-node StoX.js >xxx-js.txt
+node TMP/StoX.js >TMP/xxx-js.txt
 
-if cmp xxx-py.txt xxx-js.txt
+if cmp TMP/xxx-py.txt TMP/xxx-js.txt
 then
         echo "JavaScript output the same thing than Python"
 else
-        diff -u xxx-py.txt xxx-js.txt
+        diff -u TMP/xxx-py.txt TMP/xxx-js.txt
 fi
 
 
