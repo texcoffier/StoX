@@ -34,9 +34,12 @@ def selected(name):
             disabled_functionalities.append(name)
             return False
     except:
-        if ('-' + name) in window.location.toString():
-            disabled_functionalities.append(name)
-            return False
+        try:
+            if ('-' + name) in window.location.toString():
+                disabled_functionalities.append(name)
+                return False
+        except:
+            pass # nodejs
     return True
 functionalities = ''', json.dumps(functionalities), ';')
 with open('required.py', 'r') as f:
