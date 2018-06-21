@@ -35,6 +35,6 @@ def help_disable(blocks, help_window):
                         v = ' checked'
                         if required[f]:
                                 v += ' disabled'
-                line[3] = ('<input type="checkbox"' + v + ' name="' + f + '">'
-                           + line[3])
+                line[3] = ('<input type="checkbox"' + v + ' name="'
+                            + f + '"><div>' + line[3] + '</div>')
 blocks.add_filter('update_help', help_disable)
