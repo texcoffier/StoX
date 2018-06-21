@@ -10,7 +10,7 @@ run:TMP/xxx.py
 TMP/xxx.py: $(SRC) RapydScript concatenate.py
 	@-[ ! -d TMP ] && ( mkdir TMP ; touch TMP/recompute_required)
 	@echo "Concatenate Python files"
-	./concatenate.py $(SRC) >$@
+	@./concatenate.py $(SRC) >$@
 	@if [ -f TMP/recompute_required ] ; then \
 	      $(MAKE) TMP/required.py ; \
 	     rm TMP/recompute_required ; \
@@ -46,4 +46,5 @@ TMP/%.py.html:%.py
 	@cd TMP ; \
 	highlight --syntax=python \
 	          <../$*.py | \
-	   sed 's/highlight\.css/..\/highlight.css/' >$*.py.html
+	   sed 's/highlight\.css/..\/highlight.css/' >xxx
+	@uconv -f utf-8 -t utf-8 --add-signature <TMP/xxx  >TMP/$*.py.html

@@ -56,10 +56,11 @@ def help_html_init(blocks, dummy):
         help_window['table-columns-class'] = ['priority', 'key', 'id', 'doc']
         for f in functionalities:
                 help_window['table-content'].append([
-                                functionalities[f],
-                                f,
-                                '<a href="TMP/' + f + '.py.html">' + f + '</a>',
-                                functionalities[f]])
+                                functionalities[f],  # Sort key
+                                f,                   # Functionality ID
+                                f,                   # First column (ID)
+                                functionalities[f]   # Second column (doc)
+                                ])
 
         blocks.call('update_help', help_window)
 
