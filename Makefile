@@ -9,6 +9,7 @@ run:xxx.py
 
 xxx.py: $(SRC) RapydScript concatenate.py $(SRC:.py=.py.html) required.py
 	./concatenate.py $(SRC) >xxx.py
+	git checkout highlight.css # broken by highlight
 
 RapydScript:
 	git clone https://github.com/atsepkov/RapydScript.git
