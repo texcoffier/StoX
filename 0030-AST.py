@@ -46,7 +46,7 @@ def AST_set_time(block, t):
                 block.ast = ast_apply(block, block.previous_block.items[0])
                 if len(block.ast.children): # No AST elements
                         yac_walk(block, block.ast, 0, 0, 0, False, True)
-        block.next_block.set_time(-1)
+        block.next_block.call('set_time', -1)
 AST.add_filter('set_time', AST_set_time)
 
 def AST_update_rule(block, rule):
@@ -143,7 +143,7 @@ def AST_regtest(ast, dummy):
                         print("input:", input)
                         print("expected:", output)
                         print("computed:", nice)
-                        YAC.dump()
+                        YAC.call('dump')
                         print(yac_nice(YAC.items[0]))
                         bug
 AST.add_filter('regtest', AST_regtest)

@@ -40,5 +40,5 @@ def OBJ_set_time(block, t):
         block.display("Code" , 0               , ASM.segment_code)
         block.display("Heap" , ASM.segment_heap, 0x8000)
         block.display("Stack", 0x8000          , ASM.segment_stack)
-        block.next_block.set_time(0)
+        block.next_block.call('set_time', 0)
 OBJ.add_filter('set_time', OBJ_set_time)

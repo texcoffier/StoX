@@ -126,7 +126,6 @@ class Block:
         fontsize       = 8
         line_spacing   = 1.3
         time_travel    = False
-        initialized    = False
         window_top     = True
         height         = 100 # Full window height
         fullline_highlight = False
@@ -182,17 +181,6 @@ class Block:
                 block.element.height = height
                 block.element.style.height = height + "px"
 
-        # Standard hooks
-        def dump       (self, args=None): self.call('dump'       , args)
-        def init       (self, args=None):
-                if not self.initialized:
-                        self.call('init'       , args)
-                        self.initialized = True
-        def html_init  (self, args=None): self.call('html_init'  , args)
-        def html_draw  (self, args=None): self.call('html_draw'  , args)
-        def draw_cursor(self, args=None): self.call('draw_cursor', args)
-        def set_time   (self, t):         self.call('set_time'   , t)
-        
         def append(self, item, dy=None):
                 if len(self.items) and dy is not None:
                         item.y = self.items[-1].y + dy
@@ -214,10 +202,6 @@ class Blocks(Block):
                         self.blocks[-2].next_block = block
                         block.previous_block = self.blocks[-2]
                 return block
-        def key(self, key):
-                self.call('key', key)
-        def keyup(self, key):
-                self.call('keyup', key)
 
 def canvas_html_init(block, title):
         div = document.createElement('DIV')
@@ -244,9 +228,9 @@ def canvas_html_init(block, title):
                 tt = block.buttons.firstChild
                 block.time_travel_t = tt.childNodes[1]
                 def time_travel_back():
-                        block.set_time(block.t - 1)
+                        block.call('set_time', block.t - 1)
                 def time_travel_forward():
-                        block.set_time(block.t + 1)
+                        block.call('set_time', block.t + 1)
                 block.time_travel_back = time_travel_back
                 block.time_travel_forward = time_travel_forward
                 tt.childNodes[0].onclick = time_travel_back

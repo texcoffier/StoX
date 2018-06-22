@@ -38,8 +38,8 @@ def SRC_set(block, text):
                 block.history = block.history[:block.t+1]
         block.history.append(text)
         block.analyse(text)
-        block.set_time(block.t + 1)
-        block.next_block.set_time(0)
+        block.call('set_time', block.t + 1)
+        block.next_block.call('set_time', 0)
 SRC.add_filter('set', SRC_set)
 
 def SRC_cursor(block, position):
@@ -57,7 +57,7 @@ def SRC_set_time(block, t):
         block.t = t
         block.analyse(block.history[t])
         block.call('cursor', block.cursor)
-        block.next_block.set_time(0)
+        block.next_block.call('set_time', 0)
 SRC.add_filter('set_time', SRC_set_time)
 
 def block_set_time(block, t):
@@ -99,9 +99,9 @@ def SRC_key(blocks, event):
         key = event.key
         if event.ctrlKey:
                 if key == 'z':
-                        SRC.set_time(SRC.t - 1)
+                        SRC.call('set_time', SRC.t - 1)
                 elif key == 'y':
-                        SRC.set_time(SRC.t + 1)
+                        SRC.call('set_time', SRC.t + 1)
                 return
         cursor = SRC.cursor
         y = SRC.items[min(cursor, len(SRC.items)-1)].y
@@ -175,7 +175,7 @@ def SRC_regtest(src, dummy):
         t1 = len(src.history)-2
         t2 = len(src.history)-1
         for t in [t0, t1, t2]:
-                src.set_time(t)
+                src.call('set_time', t)
                 char = 0
                 tests = [
                         [0,0, 2,0], [1,0, 3,0], [0,0, 5,0], [1,0, 6,0],

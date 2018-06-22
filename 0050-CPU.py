@@ -26,7 +26,7 @@ def CPU_set_time(block, t):
                 asm.cpu.SP.y = 1
                 asm.cpu.SP.x = 3
                 asm.cpu.reset()
-                block.next_block.set_time(0)
+                block.next_block.call('set_time', 0)
                 block.set_to_minimal_height()
         while block.t < t:
                 if not asm.cpu.step():
@@ -59,6 +59,6 @@ CPU.add_filter('regtest', CPU_regtest)
 CPU_key_codes = {'PageUp': -1, 'PageDown': +1}
 def CPU_key(blocks, event):
         if event.key in CPU_key_codes:
-                CPU.set_time(CPU.t + CPU_key_codes[event.key])
+                CPU.call('set_time', CPU.t + CPU_key_codes[event.key])
                 stop_event(event)
 blocks.add_filter('key', CPU_key)

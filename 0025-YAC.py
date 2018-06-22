@@ -189,7 +189,7 @@ def YAC_set_time(block, t):
                 block.append(Item("Lexems:"    , 0, y+7))
                 for i, lexem in enumerate(rule.lexems):
                         block.append(Item(lexem, 4, y+8+i))
-        block.next_block.set_time(0)
+        block.next_block.call('set_time', 0)
 YAC.add_filter('set_time', YAC_set_time)
 
 def YAC_regtest(yac, dummy):
@@ -226,6 +226,6 @@ YAC.add_filter('regtest', YAC_regtest)
 YAC_key_codes = {'F7': -1, 'F8': +1}
 def YAC_key(blocks, event):
         if event.key in YAC_key_codes:
-                YAC.set_time(max(0, YAC.t + YAC_key_codes[event.key]))
+                YAC.call('set_time', max(0, YAC.t + YAC_key_codes[event.key]))
                 stop_event(event)
 blocks.add_filter('key', YAC_key)

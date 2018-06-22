@@ -14,7 +14,7 @@ class _TTY_(Block):
                 return s
         def check(self, source, expected):
                 SRC.call('set', source)
-                # print(source) ; ASM.dump()
+                # print(source) ; ASM.call('dump')
                 ASM.cpu.run()
                 if expected != self.string():
                         print('=== source ===')
@@ -23,8 +23,8 @@ class _TTY_(Block):
                         print(repr(self.string()))
                         print('=== expected ===')
                         print(repr(expected))
-                        ASM.dump()
-                        OBJ.dump()
+                        ASM.call('dump')
+                        OBJ.call('dump')
                         bug
 TTY = blocks.append(_TTY_())
 
@@ -42,10 +42,10 @@ def TTY_set_time(block, t):
                 block.y = 0
                 ASM.cpu.tty = block
         if t < block.t:
-                CPU.set_time(0)
+                CPU.call('set_time', 0)
         while len(block.items) < t:
                 tt = CPU.t
-                CPU.set_time(CPU.t + 1)
+                CPU.call('set_time', CPU.t + 1)
                 if tt == CPU.t:
                         break
         block.t = t
@@ -71,7 +71,7 @@ TTY.add_filter('put', TTY_put)
 TTY_key_codes = {'F11': -1, 'F12': +1}
 def TTY_key(blocks, event):
         if event.key in TTY_key_codes:
-                TTY.set_time(TTY.t + TTY_key_codes[event.key])
+                TTY.call('set_time', TTY.t + TTY_key_codes[event.key])
                 stop_event(event)
 blocks.add_filter('key', TTY_key)
 

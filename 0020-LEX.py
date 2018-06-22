@@ -128,7 +128,7 @@ def LEX_set_time(block, t):
                         previous_items.append(item)
                         previous_possibles = possibles
                         previous_current = current
-        block.next_block.set_time(-1)
+        block.next_block.call('set_time', -1)
 LEX.add_filter('set_time', LEX_set_time)
 
 def LEX_html_draw(block, dummy):

@@ -61,13 +61,13 @@ def OPT_set_time(block, t):
                 if t != len(block.rules):
                         block.append(Item('Rule:', 0, y+1))
                         block.append(Item(block.rules[t].name, 0, y+2))
-        block.next_block.set_time(0)
+        block.next_block.call('set_time', 0)
 OPT.add_filter('set_time', OPT_set_time)
 
 OPT_key_codes = {'F9': -1, 'F10': +1}
 def OPT_key(blocks, event):
         if event.key in OPT_key_codes:
-                OPT.set_time(min(max(0, OPT.t + OPT_key_codes[event.key]),
+                OPT.call('set_time', min(max(0, OPT.t + OPT_key_codes[event.key]),
                                      len(OPT.rules)))
                 stop_event(event)
 blocks.add_filter('key', OPT_key)

@@ -196,7 +196,7 @@ def ASM_set_time(block, t):
                         if (item.instruction
                             and item.instruction.stox_name[:4] == 'JUMP'):
                                 item.arrow_to = labels_addr[item.more]
-        block.next_block.set_time(0)
+        block.next_block.call('set_time', 0)
 ASM.add_filter('set_time', ASM_set_time)
 
 def asm_past_feedback(item):

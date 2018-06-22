@@ -3,13 +3,13 @@
 if body:
         def keyevent(event):
                 event = event or window.event
-                blocks.key(event)
-                blocks.html_draw()
+                blocks.call('key', event)
+                blocks.call('html_draw')
         def keyup(event):
                 event = event or window.event
-                blocks.keyup(event)
+                blocks.call('keyup', event)
         def drawevent():
-                blocks.html_draw()
+                blocks.call('html_draw')
                 SRC.cursor_visible = 1 - SRC.cursor_visible
         def mousemoveevent(event):
                 blocks.call('mousemove', event)
@@ -18,7 +18,7 @@ if body:
         def mousewheelevent(event):
                 blocks.call('mousewheel', event)
 
-        blocks.html_init(body)
+        blocks.call('html_init', body)
         setInterval(drawevent, 400)
         window.addEventListener('keydown'       , keyevent       , False)
         window.addEventListener('keyup'         , keyup          , False)
@@ -27,5 +27,5 @@ if body:
         window.addEventListener('DOMMouseScroll', mousewheelevent, False)
 else:
         blocks.call('regtest')
-        blocks.dump()
+        blocks.call('dump')
         
