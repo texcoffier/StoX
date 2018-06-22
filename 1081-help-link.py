@@ -1,4 +1,4 @@
-"""GUI: add links to the functionality source file"""
+"""GUI help: add links to the functionality source file"""
 
 def help_links(blocks, help_window):
         for line in help_window['table-content']:

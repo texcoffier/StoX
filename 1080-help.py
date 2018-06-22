@@ -1,4 +1,4 @@
-"""GUI: displays the help window"""
+"""GUI help: displays the help window"""
 
 def help_key(blocks, event):
         blocks.a_key_is_pressed = event.key != 'Control'

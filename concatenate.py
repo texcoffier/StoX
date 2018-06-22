@@ -4,12 +4,17 @@ import sys
 import json
 
 functionalities = {}
+functionalities_hook_defined = {}
+functionalities_hook_used = {}
 s = []
 for filename in sys.argv[1:]:
-        s.append('if selected("{}"):\n'.format(filename[:-3]))
+        name = filename[:-3]
+        s.append('if selected("{}"):\n'.format(name))
         doc = ""
         with open(filename, 'r') as f:
                 state = 'first'
+                hook_defined = set()
+                hook_used = set()
                 for line in f:
                         if state == 'first' and line.startswith(("'''", '"""')):
                                 state = 'in'
@@ -22,7 +27,15 @@ for filename in sys.argv[1:]:
                                 continue
                         state = ''
                         s.append('    ' + line)
-                functionalities[filename[:-3]] = doc
+                        if ".add_filter('" in line:
+                            hook_defined.add(line.split(".add_filter('")[1]
+                                             .split("'")[0])
+                        if ".call('" in line:
+                            hook_used.add(line.split(".call('")[1]
+                                          .split("'")[0])
+                functionalities[name] = doc
+                functionalities_hook_defined[name] = sorted(hook_defined)
+                functionalities_hook_used[name] = sorted(hook_used)
 
 print('''
 disabled_functionalities = []
@@ -41,7 +54,11 @@ def selected(name):
         except:
             pass # nodejs
     return True
-functionalities = ''', json.dumps(functionalities), ';')
+functionalities = ''', json.dumps(functionalities))
+print('functionalities_hook_defined = ',
+      json.dumps(functionalities_hook_defined))
+print('functionalities_hook_used = ',
+      json.dumps(functionalities_hook_used))
 try:
     with open('TMP/required.py', 'r') as f:
             print(f.read())

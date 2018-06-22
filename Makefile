@@ -29,10 +29,10 @@ TMP/StoX.js:TMP/xxx.py RapydScript $(addprefix TMP/,$(SRC:.py=.py.html))
 
 TMP/required.py:
 	@echo "Compute required.py. Wait a long time..."
-	(echo "required = {" ; \
+	@(echo "required = {" ; \
 	for F in $(SRC:.py=) ; \
 	do (python3 TMP/xxx.py -$$F >/dev/null 2>&1 ; echo "'$$F':$$?,") ; \
-	done ; echo '"":0}') | sed 's/[.]py//' | tee $@
+	done ; echo '"":0}') | sed -u 's/[.]py//' | tee $@
 
 clean:
 	-rm -r TMP

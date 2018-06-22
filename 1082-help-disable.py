@@ -1,4 +1,4 @@
-"""GUI: add the disable toggle to the help window"""
+"""GUI help: add the disable toggle to the help window"""
 
 def help_change(blocks, event):
         inputs = blocks.help.getElementsByTagName('INPUT')
