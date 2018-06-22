@@ -3,6 +3,8 @@
 def help_hooks(blocks, help_window):
         help_window['table-columns-class'].append('hook_defined')
         help_window['table-columns-class'].append('hook_used')
+        help_window['table-columns-title'].append('Defined hooks')
+        help_window['table-columns-title'].append('Used hooks')
         help_window['style'] += """
         .hook_defined, .hook_used { font-size: 65%; width: 20em }
         """

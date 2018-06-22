@@ -43,7 +43,8 @@ def help_html_init(blocks, dummy):
         width: 99% ;
         margin: 1em ;
 }
-.help TABLE TD {
+.help TR:hover TD { background: #FFB; }
+.help TABLE TD, .help TABLE TH {
         border: 1px solid black;
         white-space: normal;
 }
@@ -54,6 +55,7 @@ def help_html_init(blocks, dummy):
 """
         help_window['table-content'] = []
         help_window['table-columns-class'] = ['priority', 'key', 'id', 'doc']
+        help_window['table-columns-title'] = ['', '', 'Functionality', 'Explanation']
         for f in functionalities:
                 help_window['table-content'].append([
                                 functionalities[f],  # Sort key
@@ -70,6 +72,12 @@ def help_html_init(blocks, dummy):
         blocks.help = document.createElement('DIV')
         blocks.help.className = 'help'
         lines = ['<table>']
+        s = '<tr>'
+        for i, col in enumerate(help_window['table-columns-title']):
+                if i >= 2:
+                        s += '<th>' + col
+        s += '</tr>'
+        lines.append(s)
         help_window['table-content'].sort()
         for line in help_window['table-content']:
                 s = '<tr>'
