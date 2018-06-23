@@ -59,7 +59,11 @@ class Item:
         def clipped(self):
                 x, y = self.xy()
                 w, h = self.wh()
-                return x + w > self.block.element.parentNode.offsetWidth
+                r = x + w
+                if blocks.real_width:
+                        return r > blocks.real_width
+                else:
+                        return r > self.block.element.parentNode.offsetWidth
         def fillRect(self):
                 x, y = self.xy()
                 w, h = self.wh()

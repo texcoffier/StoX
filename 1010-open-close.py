@@ -13,8 +13,10 @@ def opened(block, state):
                 if block.window_top and block.is_open:
                         nr_open += 1
         closed_size = 2
-        width = (100 - (blocks.nr_columns - nr_open) * closed_size
-                ) / nr_open + '%'
+        blocks.real_width = (100 - (blocks.nr_columns - nr_open) * closed_size
+                ) / nr_open
+        width = blocks.real_width + '%'
+        blocks.real_width *= blocks.element.offsetWidth / 100
         for block in blocks.blocks:
                 if not block.window_top:
                         continue
