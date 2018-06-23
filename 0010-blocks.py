@@ -21,6 +21,7 @@ blocks.add_filter('init', blocks_init)
 
 def blocks_html_init(blocks, body):
         blocks.element = document.createElement('DIV')
+        blocks.element.style.overflow = 'hidden'
         body.appendChild(blocks.element)
         for block in blocks.blocks:
                 block.call('html_init', block.title)
