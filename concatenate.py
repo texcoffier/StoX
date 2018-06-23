@@ -9,7 +9,7 @@ functionalities_hook_used = {}
 s = []
 for filename in sys.argv[1:]:
         name = filename[:-3]
-        s.append('if selected("{}"):\n'.format(name))
+        s.append('if "{}" not in disabled_functionalities:\n'.format(name))
         doc = ""
         with open(filename, 'r') as f:
                 state = 'first'
@@ -37,28 +37,27 @@ for filename in sys.argv[1:]:
                 functionalities_hook_defined[name] = sorted(hook_defined)
                 functionalities_hook_used[name] = sorted(hook_used)
 
-print('''
-disabled_functionalities = []
-
-def selected(name):
-    try:
-        import re
-        if ('-' + name) in re.sys.argv:
-            disabled_functionalities.append(name)
-            return False
-    except:
-        try:
-            if ('-' + name) in window.location.toString():
-                disabled_functionalities.append(name)
-                return False
-        except:
-            pass # nodejs
-    return True
-functionalities = ''', json.dumps(functionalities))
+print('functionalities = ''', json.dumps(functionalities))
 print('functionalities_hook_defined = ',
       json.dumps(functionalities_hook_defined))
 print('functionalities_hook_used = ',
       json.dumps(functionalities_hook_used))
+print('''
+disabled_functionalities = []
+
+for name in functionalities:
+    try:
+        import re
+        if ('-' + name) in re.sys.argv:
+            disabled_functionalities.append(name)
+    except:
+        try:
+            if ('-' + name) in window.location.toString():
+                # XXX .append not translated by RapyScript!
+                disabled_functionalities.push(name)
+        except:
+            pass # nodejs
+''')
 try:
     with open('TMP/required.py', 'r') as f:
             print(f.read())

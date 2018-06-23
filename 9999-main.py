@@ -25,7 +25,4 @@ if body:
         window.addEventListener('mousemove'     , mousemoveevent , False)
         window.addEventListener('mousedown'     , mousedownevent , False)
         window.addEventListener('DOMMouseScroll', mousewheelevent, False)
-else:
-        blocks.call('regtest')
-        blocks.call('dump')
-        
+
