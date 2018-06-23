@@ -94,7 +94,10 @@ def SRC_key(blocks, event):
                 return
         key = event.key
         cursor = SRC.cursor
-        y = SRC.items[min(cursor, len(SRC.items)-1)].y
+        if len(SRC.items) == 0:
+                y = 0
+        else:
+                y = SRC.items[min(cursor, len(SRC.items)-1)].y
         content = SRC.history[SRC.t]
         if key == 'ArrowRight':
                 cursor += 1
