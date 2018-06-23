@@ -55,10 +55,3 @@ def CPU_regtest(block, dummy):
                         print(asm.cpu.memory[asm.segment_heap].long())
                         bug
 CPU.add_filter('regtest', CPU_regtest)
-
-CPU_key_codes = {'PageUp': -1, 'PageDown': +1}
-def CPU_key(blocks, event):
-        if event.key in CPU_key_codes:
-                CPU.call('set_time', CPU.t + CPU_key_codes[event.key])
-                stop_event(event)
-blocks.add_filter('key', CPU_key)

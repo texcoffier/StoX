@@ -203,6 +203,12 @@ class Blocks(Block):
                         block.previous_block = self.blocks[-2]
                 return block
 
+def block_set_time(block, t):
+        if body and block.time_travel and block.time_travel_t:
+                block.time_travel_t.innerHTML = block.t
+                block.time_travel_back_element.disabled = t == 0
+                block.time_travel_forward_element.disabled = t == -1
+
 def canvas_html_init(block, title):
         div = document.createElement('DIV')
         div.innerHTML = ('<div class="header">'
@@ -228,13 +234,19 @@ def canvas_html_init(block, title):
                 tt = block.buttons.firstChild
                 block.time_travel_t = tt.childNodes[1]
                 def time_travel_back():
-                        block.call('set_time', block.t - 1)
+                        if block.t > 0:
+                                block.call('set_time', block.t - 1)
                 def time_travel_forward():
+                        t = block.t + 1
                         block.call('set_time', block.t + 1)
+                        if block.t != t:
+                                block.time_travel_forward_element.disabled = True
                 block.time_travel_back = time_travel_back
                 block.time_travel_forward = time_travel_forward
-                tt.childNodes[0].onclick = time_travel_back
-                tt.childNodes[2].onclick = time_travel_forward
+                block.time_travel_back_element = tt.childNodes[0]
+                block.time_travel_forward_element = tt.childNodes[2]
+                block.time_travel_back_element.onclick = time_travel_back
+                block.time_travel_forward_element.onclick = time_travel_forward
         block.element = div.childNodes[1]
         block.element.style.display = 'block'
         block.element.width = (4 * window_width) / blocks.nr_columns

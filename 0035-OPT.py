@@ -53,6 +53,8 @@ def OPT_walk(item):
 def OPT_set_time(block, t):
         if t < 0:
                 t = len(block.rules)
+        if t > len(block.rules):
+                t = len(block.rules)
         block.t = t
         block.items = []
         if len(block.previous_block.items):
@@ -63,11 +65,3 @@ def OPT_set_time(block, t):
                         block.append(Item(block.rules[t].name, 0, y+2))
         block.next_block.call('set_time', 0)
 OPT.add_filter('set_time', OPT_set_time)
-
-OPT_key_codes = {'F9': -1, 'F10': +1}
-def OPT_key(blocks, event):
-        if event.key in OPT_key_codes:
-                OPT.call('set_time', min(max(0, OPT.t + OPT_key_codes[event.key]),
-                                     len(OPT.rules)))
-                stop_event(event)
-blocks.add_filter('key', OPT_key)

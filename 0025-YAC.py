@@ -222,10 +222,3 @@ def YAC_regtest(yac, dummy):
                                 print(path)
                         bug
 YAC.add_filter('regtest', YAC_regtest)
-
-YAC_key_codes = {'F7': -1, 'F8': +1}
-def YAC_key(blocks, event):
-        if event.key in YAC_key_codes:
-                YAC.call('set_time', max(0, YAC.t + YAC_key_codes[event.key]))
-                stop_event(event)
-blocks.add_filter('key', YAC_key)

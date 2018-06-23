@@ -69,3 +69,26 @@ def blocks_regtest(blocks, dummy):
                 block.call('regtest')
                 print("OK")
 blocks.add_filter('regtest', blocks_regtest)
+
+translate_keys = {'PageUp': '⇞', 'PageDown': '⇟', 'y': 'Y', 'z': 'Z'}
+
+def blocks_history_key(blocks, event):
+        if event.metaKey or event.altKey:
+                return
+        key = event.key
+        if key in translate_keys:
+                key = translate_keys[key]
+        if event.ctrlKey:
+                key = '^' + key
+        for block in blocks.blocks:
+                if not block.time_travel:
+                        continue
+                if block.time_travel[0] == key:
+                        block.time_travel_back()
+                elif block.time_travel[1] == key:
+                        block.time_travel_forward()
+                else:
+                        continue
+                stop_event(event)
+                return
+blocks.add_filter('key', blocks_history_key)

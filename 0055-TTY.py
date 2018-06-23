@@ -48,7 +48,7 @@ def TTY_set_time(block, t):
                 CPU.call('set_time', CPU.t + 1)
                 if tt == CPU.t:
                         break
-        block.t = t
+        block.t = len(block.items)
         block.is_running = False
 TTY.add_filter('set_time', TTY_set_time)
 
@@ -67,11 +67,3 @@ def TTY_put(block, code):
         else:
                 block.x += 1
 TTY.add_filter('put', TTY_put)
-
-TTY_key_codes = {'F11': -1, 'F12': +1}
-def TTY_key(blocks, event):
-        if event.key in TTY_key_codes:
-                TTY.call('set_time', TTY.t + TTY_key_codes[event.key])
-                stop_event(event)
-blocks.add_filter('key', TTY_key)
-

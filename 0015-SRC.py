@@ -60,10 +60,6 @@ def SRC_set_time(block, t):
         block.next_block.call('set_time', 0)
 SRC.add_filter('set_time', SRC_set_time)
 
-def block_set_time(block, t):
-        if body and block.time_travel and block.time_travel_t:
-                block.time_travel_t.innerHTML = t
-
 def SRC_draw_cursor(block, dummy):
         for item in block.items:
                 item.highlight = item.index == block.cursor - 1
@@ -94,15 +90,9 @@ def stop_event(event):
         event.cancelBubble = True
 
 def SRC_key(blocks, event):
-        if event.metaKey or event.altKey:
+        if event.metaKey or event.altKey or event.ctrlKey:
                 return
         key = event.key
-        if event.ctrlKey:
-                if key == 'z':
-                        SRC.call('set_time', SRC.t - 1)
-                elif key == 'y':
-                        SRC.call('set_time', SRC.t + 1)
-                return
         cursor = SRC.cursor
         y = SRC.items[min(cursor, len(SRC.items)-1)].y
         content = SRC.history[SRC.t]
