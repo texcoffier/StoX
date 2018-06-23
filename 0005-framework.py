@@ -4,7 +4,6 @@ class Item:
         error = False
         color = "#000" # The text color
         arrow_to = None
-        char_width = 0.57
         def __init__(self, char='', x=0, y=0, previous_items=None):
                 if previous_items is None:
                         previous_items = []
@@ -50,11 +49,11 @@ class Item:
         def dump(self):
                 print("\t\t{", self.long(), "}")
         def xy(self):
-                return [4 + self.char_width * self.block.fontsize * self.x,
+                return [4 + self.block.char_width * self.block.fontsize * self.x,
                         self.block.fontsize
                         + self.block.line_spacing * self.block.fontsize * self.y]
         def wh(self):
-                return [len(self.char) * self.block.fontsize * self.char_width,
+                return [len(self.char) * self.block.fontsize * self.block.char_width,
                         self.block.fontsize]
         def clipped(self):
                 x, y = self.xy()
@@ -69,16 +68,16 @@ class Item:
                 w, h = self.wh()
                 self.block.ctx.fillStyle = self.color + "6"
                 if self.block.fullline_highlight:
-                        self.block.ctx.fillRect(0, y - h, w + x, h + 2)
+                        self.block.ctx.fillRect(0, y - h, w + x + 2, h + 2)
                 else:
-                        self.block.ctx.fillRect(x - 1, y - h, w, h + 2)
+                        self.block.ctx.fillRect(x - 1, y - h, w + 2, h + 2)
                 self.block.ctx.fillStyle = '#000'
                 self.block.ctx.fillText(self.char, x, y)
         def rectangle(self, color="#0008"):
                 x, y = self.xy()
                 w, h = self.wh()
                 self.block.ctx.strokeStyle = color
-                self.block.ctx.strokeRect(x - 1, y - h, w, h + 2)
+                self.block.ctx.strokeRect(x - 1, y - h, w + 2, h + 2)
         def contains(self, px, py):
                 x, y = self.xy()
                 w, h = self.wh()
@@ -272,6 +271,7 @@ def SRC_html_draw(block, dummy):
         block.ctx.fillStyle = "#FFF"
         block.ctx.clearRect(0, 0, 10000, 10000)
         block.ctx.font = str(block.fontsize) + "px monospace"
+        block.char_width = block.ctx.measureText('x').width / block.fontsize
 
         for item in block.items:
                 item.delta_arrow = 0
