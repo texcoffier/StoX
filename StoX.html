@@ -10,15 +10,106 @@
   </body>
   <script src="TMP/StoX.js"></script>
   <script>
-          CAQ.call('set', // Beware: ‘ is not '
-           "This program displays letters ABCDE.\n\n"
-           + "It initializes the loop variable ‘a='A'‘ "
-           + "to the ASCII code of the letter 'A'.\n\n"
-           + "It runs the loop until ‘a != 'G'‘.\n\n"
-           + "The loop prints the variable content with ‘put(a)‘.\n\n"
-           + "Once printed, ‘a = a + 1‘ set the variable to the next letter."
-           ) ;
-          SRC.call('set',"a='A'\nwhile(a != 'G')\n {\n  put(a)\n  a = a + 1\n }");
-          blocks.call('final_init') ;
+    function course_start()
+    {
+      CAQ.call('set',
+      'Press F6 or click on the button to see the next question.') ;
+      CAQ.call('fontsize', 14) ;
+      SRC.call('fontsize', 14) ;
+      LEX.call('opened', 0) ;
+      YAC.call('opened', 0) ;
+      AST.call('opened', 0) ;
+      OPT.call('opened', 0) ;
+      ASM.call('opened', 0) ;
+      OBJ.call('opened', 0) ;
+      CPU.call('opened', 0) ;
+      SRC.call('set', '') ;
+    }
+    function course_src()
+    {
+      CAQ.call('set',
+      'The block under this text is a text editor allowing you to'
+      + ' enter computer programs.\n\n'
+      + 'The blinking blue rectangle is the cursor.\n\n'
+      + 'The rectangle indicates what the processor is'
+      + ' currently processing.'
+      ) ;
+      SRC.call('set', "1+2") ;
+    }
+    function course_asm()
+    {
+      ASM.call('opened', 1) ;
+      ASM.call('fontsize', 14) ;
+      CAQ.call('set',
+      'The assembly block displays the human readable content'
+      + ' of the program the processor is executing.\n\n'
+      + 'When you move the cursor into the source code'
+      + ' you see the instructions the processor needs to execute'
+      + ' in order to compute the answer.\n\n'
+      + 'The processor execute the instructions in this order:\n'
+      + '‘1‘ the processor push the value 1 on the stack.\n'
+      + '‘2‘ the processor push the value 2 on the stack.\n'
+      + '‘+‘ the processor pull the 2 values from the stack'
+      + ' and push the sum on the stack.\n\n'
+      + 'Move the mouse over the texts in the blocks to see what happen.\n'
+      + 'You can click in any block to move the cursor to the right'
+      + ' place in the source code block.'
+      ) ;
+      SRC.call('set', "1+2") ;
+    }
+    function course_obj()
+    {
+      OBJ.call('opened', 1) ;
+      OBJ.call('fontsize', 14) ;
+      CAQ.call('set',
+      'The processor does not execute the assembly, but machine code.\n\n'
+      + 'This processor starts by executing the instruction'
+      + ' at the address 0000 in memory.'
+      + ' It is a LOAD IMMEDIATE.'
+      + ' Its parameter is the value ‘1‘ stored in the next byte.\n\n'
+      + 'Clicking on the 02 in memory will highlight the LOAD IMMEDIATE 2.\n\n'
+      + 'The ‘+‘ instruction has no parameter, so it is coded as a single byte.'
+      ) ;
+      SRC.call('set', "1+2") ;
+    }
+    function course_cpu()
+    {
+      CPU.call('opened', 1) ;
+      CPU.call('fontsize', 14) ;
+      CAQ.call('set',
+      'In order to run, the processor needs two registers:\n'
+      + 'PC: the address of the instruction to execute (0000).\n'
+      + 'SP: the address of the stack top (8000).\n\n'
+      + 'The red rectangle shows the memory that is going to be'
+      + ' modified by the instruction.\n\n'
+      + 'To execute the current instruction, press the key «⇟»'
+      + ' or click on the button.\n\n'
+      + 'You can now see 1 on stack top and the PC and SP values'
+      + ' have been updated.\n\n'
+      + 'The next instruction will add 2 to the stack.\n\n'
+      + 'The green rectangle indicates an used byte and the orange one'
+      + ' a byte used but also modified.\n\n'
+      + 'The last instruction will let the sum on the stack top.'
+      ) ;
+      SRC.call('set', "1+2") ;
+    }
+    function course_while()
+    {
+      CAQ.call('set',
+                "This program displays letters ABCDE.\n\n"
+              + "It initializes the loop variable ‘a='A'‘ "
+              + "to the ASCII code of the letter 'A'.\n\n"
+              + "It runs the loop until ‘a != 'G'‘.\n\n"
+              + "The loop prints the variable content with ‘put(a)‘.\n\n"
+              + "Once printed, ‘a = a + 1‘ set the variable to the next letter."
+              ) ;
+      SRC.call('set', "a='A'\nwhile(a != 'G')\n {\n  put(a)\n  a = a + 1\n }") ;
+    }
+    course_content = [
+      course_start, course_src, course_asm, course_obj, course_cpu,
+      course_while
+      ] ;
+    CAQ.call('set_time', 0) ;
+    blocks.call('final_init') ;
   </script>
 </html>

@@ -38,7 +38,7 @@ clean:
 	-rm -r TMP
 
 install:run-tests
-	cp -r --update TMP StoX.html StoX.css highlight.css \
+	cp -r --update TMP StoX.html StoX-empty.html StoX.css highlight.css \
 	               $(HOME)/public_html/PARSER
 
 TMP/%.py.html:%.py

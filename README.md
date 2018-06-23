@@ -21,7 +21,14 @@ When the processor executes an instruction, previous
 stages highlight execute/read/write/modify in
 the previous stages.
 
-Try it: [StoX.html](http://perso.univ-lyon1.fr/thierry.excoffier/PARSER/StoX.html)
+To try it, you can follow these links:
+  * [A while loop example](http://perso.univ-lyon1.fr/thierry.excoffier/PARSER/StoX.html#CAQ·set_time·99),
+    if too slow to start: [without regtest](http://perso.univ-lyon1.fr/thierry.excoffier/PARSER/StoX.html#CAQ·set_time·99§blocks·disabled·-9999-regtest)
+  * [A minimal tutorial](http://perso.univ-lyon1.fr/thierry.excoffier/PARSER/StoX.html),
+    if too slow to start: [without regtest](http://perso.univ-lyon1.fr/thierry.excoffier/PARSER/StoX.html#blocks·disabled·-9999-regtest)
+  * [Empty source](http://perso.univ-lyon1.fr/thierry.excoffier/PARSER/StoX-empty.html#blocks·disabled·-0014-CAQ),
+    if too slow to start: [without regtest](http://perso.univ-lyon1.fr/thierry.excoffier/PARSER/StoX-empty.html#blocks·disabled·-0014-CAQ,-9999-regtest)
+
 
 ## How to use
 
