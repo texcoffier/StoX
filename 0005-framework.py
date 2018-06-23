@@ -4,7 +4,7 @@ class Item:
         error = False
         color = "#000" # The text color
         arrow_to = None
-        char_width = 0.7
+        char_width = 0.57
         def __init__(self, char='', x=0, y=0, previous_items=None):
                 if previous_items is None:
                         previous_items = []

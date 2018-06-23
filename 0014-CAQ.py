@@ -9,6 +9,7 @@ CAQ = blocks.append(_CAQ_())
 CAQ.add_filter('html_init', canvas_html_init)
 
 def CAQ_set(block, text):
+        block.items = []
         block.words = {}
         x = y = 0
         start = []
@@ -20,7 +21,7 @@ def CAQ_set(block, text):
                         y += 1
                         item.x = 0
                         item.y = y
-                x += len(char) + 0.3
+                x += len(char) + 1
                 return item, x, y
         for line in text.split('\n'):
                 normal = True

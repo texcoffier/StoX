@@ -19,7 +19,7 @@ class _OBJ_(Block):
                                 self.append(Item(hex4(i), 0, n + line))
                         item = ASM.cpu.memory[i]
                         self.append(item)
-                        item.x = 4.1 + 2.1 * (i % nr)
+                        item.x = 5 + 2.5 * (i % nr)
                         item.y = n + line
 OBJ = blocks.append(_OBJ_())
 
