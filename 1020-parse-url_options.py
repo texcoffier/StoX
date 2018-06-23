@@ -16,7 +16,7 @@ def parse_url_options():
         for block_name, method, value in get_url_options():
                 if value is None:
                         continue
-                if not isNaN(value):
+                if value != '' and not isNaN(value):
                         value = int(value)
                 try:
                         block = eval(block_name)
