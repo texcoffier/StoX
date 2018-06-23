@@ -45,7 +45,7 @@ SRC.add_filter('set', SRC_set)
 def SRC_cursor(block, position):
         if position > len(block.items):
                 position = len(block.items)
-        elif position < -1:
+        elif position < 0:
                 position = 0
         block.cursor = position
         block.cursor_visible = 1
