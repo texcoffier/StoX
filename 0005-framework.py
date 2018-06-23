@@ -181,9 +181,9 @@ class Block:
                 if not body:
                         return
                 y = self.items[-1].y + 1
-                height = y * block.line_spacing * block.fontsize
-                block.element.height = height
-                block.element.style.height = height + "px"
+                height = y * self.line_spacing * self.fontsize
+                self.element.height = height
+                self.element.style.height = height + "px"
 
         def append(self, item, dy=None):
                 if len(self.items) and dy is not None:
