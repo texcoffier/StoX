@@ -46,11 +46,11 @@
       + 'When you move the cursor into the source code'
       + ' you see the instructions the processor needs to execute'
       + ' in order to compute the answer.\n\n'
-      + 'The processor execute the instructions in this order:\n'
-      + '‘1‘ the processor push the value 1 on the stack.\n'
-      + '‘2‘ the processor push the value 2 on the stack.\n'
-      + '‘+‘ the processor pull the 2 values from the stack'
-      + ' and push the sum on the stack.\n\n'
+      + 'The processor executes the instructions in this order:\n'
+      + '‘1‘ the processor pushes the value 1 on the stack.\n'
+      + '‘2‘ the processor pushes the value 2 on the stack.\n'
+      + '‘+‘ the processor pulls the 2 values from the stack'
+      + ' and pushes the sum on the stack.\n\n'
       + 'Move the mouse over the texts in the blocks to see what happen.\n'
       + 'You can click in any block to move the cursor to the right'
       + ' place in the source code block.'
@@ -95,6 +95,15 @@
     }
     function course_while()
     {
+      CAQ.call('fontsize', 8) ;
+      SRC.call('fontsize', 8) ;
+      ASM.call('fontsize', 8) ;
+      OBJ.call('fontsize', 8) ;
+      CPU.call('fontsize', 8) ;
+      LEX.call('opened', 1) ;
+      YAC.call('opened', 1) ;
+      AST.call('opened', 1) ;
+      OPT.call('opened', 1) ;
       CAQ.call('set',
                 "This program displays letters ABCDEF.\n\n"
               + "It initializes the loop variable ‘a='A'‘ "
