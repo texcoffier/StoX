@@ -60,9 +60,10 @@ class Item:
                 w, h = self.wh()
                 r = x + w
                 if blocks.real_width:
-                        return r > blocks.real_width
+                        width = blocks.real_width
                 else:
-                        return r > self.block.element.parentNode.offsetWidth
+                        width = self.block.element.parentNode.offsetWidth
+                return r > min(width, self.block.element.offsetWidth)
         def fillRect(self):
                 x, y = self.xy()
                 w, h = self.wh()
@@ -183,6 +184,7 @@ class Block:
                 height = y * self.line_spacing * self.fontsize
                 self.element.height = height
                 self.element.style.height = height + "px"
+                self.i_want_minimal_height = True
 
         def append(self, item, dy=None):
                 if len(self.items) and dy is not None:

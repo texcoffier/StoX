@@ -17,5 +17,8 @@ blocks.add_filter('key', font_size_key)
 
 def set_fontsize(block, size):
         block.fontsize = size
+        if block.i_want_minimal_height:
+                block.set_to_minimal_height()
+
 for block in blocks.blocks:
         block.add_filter('fontsize', set_fontsize)
