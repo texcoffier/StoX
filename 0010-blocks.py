@@ -11,9 +11,17 @@ def blocks_dump(blocks, dummy_arg):
         print('</dump>')
 blocks.add_filter('dump', blocks_dump)
 
+
+def set_fontsize(block, size):
+        block.fontsize = size
+        block.update_font_size()
+        if block.i_want_minimal_height:
+                block.set_to_minimal_height()
+
 def blocks_init(blocks, dummy_arg):
         blocks.nr_columns = 0
         for block in blocks.blocks:
+                block.add_filter('fontsize', set_fontsize)
                 if block.window_top:
                         blocks.nr_columns += 1
                 block.call('init', dummy_arg)
@@ -25,6 +33,7 @@ def blocks_html_init(blocks, body):
         body.appendChild(blocks.element)
         for block in blocks.blocks:
                 block.call('html_init', block.title)
+                block.call('fontsize', block.fontsize)
 blocks.add_filter('html_init', blocks_html_init)
 
 def blocks_html_draw(blocks, body):

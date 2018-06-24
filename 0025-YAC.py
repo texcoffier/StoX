@@ -12,7 +12,6 @@ YAC.add_filter('html_draw', SRC_html_draw)
 
 def YAC_init(block, dummy):
         block.rules = []
-        block.fontsize = 8
         block.line_spacing = 1
         for rule in [
            [ 100, 'Variable='  , ['word', 'affectation']],

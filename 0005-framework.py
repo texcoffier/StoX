@@ -59,11 +59,10 @@ class Item:
                 x, y = self.xy()
                 w, h = self.wh()
                 r = x + w
+                width = self.block.element.offsetWidth
                 if blocks.real_width:
-                        width = blocks.real_width
-                else:
-                        width = self.block.element.parentNode.offsetWidth
-                return r > min(width, self.block.element.offsetWidth)
+                        width = min(width, blocks.real_width)
+                return x + w > width
         def fillRect(self):
                 x, y = self.xy()
                 w, h = self.wh()
@@ -195,6 +194,10 @@ class Block:
                 self.call('append', item)
                 return item
 
+        def update_font_size(self):
+                self.ctx.font = str(self.fontsize) + "px monospace"
+                self.char_width = self.ctx.measureText('x').width / self.fontsize
+
 class Blocks(Block):
         name = "blocks"
         def __init__(self):
@@ -270,8 +273,7 @@ def canvas_html_init(block, title):
 def SRC_html_draw(block, dummy):
         block.ctx.fillStyle = "#FFF"
         block.ctx.clearRect(0, 0, 10000, 10000)
-        block.ctx.font = str(block.fontsize) + "px monospace"
-        block.char_width = block.ctx.measureText('x').width / block.fontsize
+        block.update_font_size()
 
         for item in block.items:
                 item.delta_arrow = 0
