@@ -8,7 +8,7 @@ def put_url_options(options):
                 else:
                         v = option[0] + '·' + option[1] + '·' + option[2]
                 s += '§' + v
-        window.location.hash = s[1:]
+        window.history.replaceState('', '', '#' + s[1:])
 
 def update_url(block, data, method):
         options = get_url_options()
