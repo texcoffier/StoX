@@ -8,7 +8,7 @@ run:TMP/xxx.py
 	python3 TMP/xxx.py
 
 TMP/xxx.py: $(SRC) RapydScript concatenate.py
-	@-[ ! -d TMP ] && ( mkdir TMP ; touch TMP/recompute_required)
+	@-[ ! -d TMP ] && ( mkdir TMP ; touch TMP/recompute_required) || true
 	@echo "Concatenate Python files"
 	@./concatenate.py $(SRC) >$@
 	@if [ -f TMP/recompute_required ] ; then \
