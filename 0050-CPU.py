@@ -5,6 +5,7 @@ class _CPU_(Block):
         name = "CPU"
         height = 30
         time_travel = ['⇞', '⇟']
+        cpu_initialized = False
 CPU = blocks.append(_CPU_())
 
 CPU.add_filter('dump', LEX_dump)
@@ -27,7 +28,9 @@ def CPU_set_time(block, t):
                 asm.cpu.SP.x = 3
                 asm.cpu.reset()
                 block.next_block.call('set_time', 0)
-                block.set_to_minimal_height()
+                if not block.cpu_initialized:
+                        block.cpu_initialized = True
+                        block.set_to_minimal_height()
         while block.t < t:
                 if not asm.cpu.step():
                         break
