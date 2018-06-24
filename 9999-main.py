@@ -14,6 +14,8 @@ if body:
         def mousemoveevent(event):
                 blocks.call('mousemove', event)
         def mousedownevent(event):
+                if event.target.tagName != 'CANVAS':
+                        return
                 blocks.call('mousedown', event)
         def mousewheelevent(event):
                 blocks.call('mousewheel', event)
