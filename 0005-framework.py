@@ -265,9 +265,7 @@ def canvas_html_init(block, title):
                 div.style.width = str(window_width / blocks.nr_columns) + 'px'
         else:
                 div.style.width = '100%'
-
-        for b in blocks.blocks:
-                b.add_filter('set_time', block_set_time)
+        block.add_filter('set_time', block_set_time)
 
 def SRC_html_draw(block, dummy):
         block.ctx.fillStyle = "#FFF"
