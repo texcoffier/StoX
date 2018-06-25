@@ -214,6 +214,8 @@ There is the list of used hooks in the base system:
 
   * `set_time` is called to travel in the time
      (the data parameter must be an integer)
+      * for `course` functionality, it implements the course navigation
+        in the `CAQ` block.
       * for `SRC` block it is used to implement undo/redo.
       * for `CPU` block it is used to see the CPU state at one point in time.
       * it will also allow in the future to see the different stages of YAC

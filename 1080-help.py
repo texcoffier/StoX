@@ -17,6 +17,10 @@ def help_keyup(blocks, event):
                 blocks.call('help_change', event)
 blocks.add_filter('keyup', help_keyup)
 
+def disable_display_help(blocks, event):
+        blocks.a_key_is_pressed = True
+blocks.add_filter('mousewheel', disable_display_help)
+
 def help_html_init(blocks, dummy):
         if not body:
                 return

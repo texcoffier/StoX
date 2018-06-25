@@ -1,6 +1,8 @@
 """GUI: navigate in the history with the mouse wheel"""
 
 def blocks_mouse_wheel(blocks, event):
+        if event.metaKey or event.altKey or event.ctrlKey:
+                return
         for block in blocks.blocks:
                 if block.element is event.target:
                         if block.time_travel:
