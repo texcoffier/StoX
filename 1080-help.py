@@ -60,6 +60,7 @@ def help_html_init(blocks, dummy):
         help_window['table-content'] = []
         help_window['table-columns-class'] = ['priority', 'key', 'id', 'doc']
         help_window['table-columns-title'] = ['', '', 'Functionality', 'Explanation']
+        help_window['top'] = '<p>Use «Escape» to close the window or «Enter» to validate changes'
         for f in functionalities:
                 help_window['table-content'].append([
                                 functionalities[f],  # Sort key
@@ -75,7 +76,7 @@ def help_html_init(blocks, dummy):
         body.appendChild(style)
         blocks.help = document.createElement('DIV')
         blocks.help.className = 'help'
-        lines = ['<table>']
+        lines = [help_window['top'], '<table>']
         s = '<tr>'
         for i, col in enumerate(help_window['table-columns-title']):
                 if i >= 2:

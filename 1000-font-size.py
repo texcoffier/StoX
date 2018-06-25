@@ -27,3 +27,7 @@ def font_size_mouse_wheel(blocks, event):
                 update_font_size(event.target, '+')
         stop_event(event)
 blocks.add_filter('mousewheel', font_size_mouse_wheel)
+
+def help_zoom(block, help_window):
+        help_window['top'] += '<p>Use «Control mouse wheel»  or «Control +» or «Control -» to zoom.'
+blocks.add_filter('update_help', help_zoom)
