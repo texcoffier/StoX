@@ -81,5 +81,5 @@ def boolean_regtest(tty, dummy):
         tty.check('put(48 + ((1==2||2==2)&&(3==2||5==5)))', '0×0:1\n')
         tty.check('put(48 + ((1==2||2==3)&&(3==2||5==5)))', '0×0:0\n')
         tty.check('put(48 + ((1==2||2==2)&&(3==2||5==6)))', '0×0:0\n')
-#TTY.add_filter('regtest', boolean_regtest)
+TTY.add_filter('regtest', boolean_regtest)
 

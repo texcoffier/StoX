@@ -1,4 +1,4 @@
-"""Core addon: remove jumps to the next instruction"""
+"""Optimize: remove jumps to the next instruction"""
 
 def cleanup_jumps(block, item):
         if item.char[-1] != ':':
